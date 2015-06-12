@@ -94,9 +94,10 @@ namespace HtmlKit {
 
 	public sealed class HtmlTagToken : HtmlToken
 	{
-		public HtmlTagToken (string name) : base (HtmlTokenKind.Tag)
+		public HtmlTagToken (string name, bool isEndTag) : base (HtmlTokenKind.Tag)
 		{
 			Attributes = new HtmlAttributeCollection ();
+			IsEndTag = isEndTag;
 			Name = name;
 		}
 
@@ -109,7 +110,7 @@ namespace HtmlKit {
 		}
 
 		public bool IsEndTag {
-			get; internal set;
+			get; private set;
 		}
 
 		public string Name {
@@ -143,6 +144,14 @@ namespace HtmlKit {
 		}
 
 		public string Name {
+			get; set;
+		}
+
+		public string PublicIdentifier {
+			get; set;
+		}
+
+		public string SystemIdentifier {
 			get; set;
 		}
 	}

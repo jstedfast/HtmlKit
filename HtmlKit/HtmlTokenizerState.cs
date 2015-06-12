@@ -34,29 +34,69 @@ namespace HtmlKit {
 	public enum HtmlTokenizerState {
 		Data,
 		CharacterReferenceInData,
+		RcData, // todo
+		CharacterReferenceInRcData, // todo
+		RawText, // todo
+		ScriptData, // todo
+		PlainText, // todo
 		TagOpen,
-		MarkupDeclarationOpen,
 		EndTagOpen,
-		BogusComment,
 		TagName,
+		RcDataLessThan, // todo
+		RcDataEndTagOpen, // todo
+		RcDataEndTagName, // todo
+		RawTextLessThan, // todo
+		RawTextEndTagOpen, // todo
+		RawTextEndTagName, // todo
+		ScriptDataLessThan, // todo
+		ScriptDataEndTagOpen, // todo
+		ScriptDataEndTagName, // todo
+		ScriptDataEscapeStart, // todo
+		ScriptDataEscapeStartDash, // todo
+		ScriptDataEscaped, // todo
+		ScriptDataEscapedDash, // todo
+		ScriptDataEscapedDashDash, // todo
+		ScriptDataEscapedLessThan, // todo
+		ScriptDataEscapedEndTagOpen, // todo
+		ScriptDataEscapedEndTagName, // todo
+		ScriptDataDoubleEscapeStart, // todo
+		ScriptDataDoubleEscaped, // todo
+		ScriptDataDoubleEscapedDash, // todo
+		ScriptDataDoubleEscapedDashDash, // todo
+		ScriptDataDoubleEscapedLessThan, // todo
+		ScriptDataDoubleEscapeEnd, // todo
 		BeforeAttributeName,
-		SelfClosingStartTag,
 		AttributeName,
 		AfterAttributeName,
 		BeforeAttributeValue,
 		AttributeValueQuoted,
-		AfterAttributeValueQuoted,
 		AttributeValueUnquoted,
 		CharacterReferenceInAttributeValue,
-		CommentStart,
+		AfterAttributeValueQuoted,
+		SelfClosingStartTag,
+		BogusComment, // todo
+		MarkupDeclarationOpen,
+		CommentStart, // todo
+		CommentStartDash, // todo
+		Comment, // todo
+		CommentEndDash, // todo
+		CommentEnd, // todo
+		CommentEndBang, // todo
 		DocType,
 		BeforeDocTypeName,
 		DocTypeName,
 		AfterDocTypeName,
-		AfterDocTypePublic,
-		AfterDocTypeSystem,
+		AfterDocTypePublicKeyword,
+		BeforeDocTypePublicIdentifier,
+		DocTypePublicIdentifierQuoted,
+		AfterDocTypePublicIdentifier,
+		BetweenDocTypePublicAndSystemIdentifiers,
+		AfterDocTypeSystemKeyword,
+		BeforeDocTypeSystemIdentifier,
+		DocTypeSystemIdentifierQuoted,
+		AfterDocTypeSystemIdentifier,
 		BogusDocType,
-		CDataSection,
+		CDataSection, // todo
 		EndOfFile
 	}
 }
