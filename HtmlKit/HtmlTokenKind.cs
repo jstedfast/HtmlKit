@@ -32,10 +32,14 @@ namespace HtmlKit {
 	/// The kinds of tokens that the <see cref="HtmlTokenizer"/> can emit.
 	/// </remarks>
 	public enum HtmlTokenKind {
+		Comment,
+
 		/// <summary>
 		/// A token consisting of character data.
 		/// </summary>
 		Data,
+
+		DocType,
 
 		Tag,
 

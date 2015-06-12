@@ -48,6 +48,15 @@ namespace HtmlKit {
 		AfterAttributeValueQuoted,
 		AttributeValueUnquoted,
 		CharacterReferenceInAttributeValue,
+		CommentStart,
+		DocType,
+		BeforeDocTypeName,
+		DocTypeName,
+		AfterDocTypeName,
+		AfterDocTypePublic,
+		AfterDocTypeSystem,
+		BogusDocType,
+		CDataSection,
 		EndOfFile
 	}
 }

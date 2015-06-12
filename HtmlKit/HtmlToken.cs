@@ -116,4 +116,34 @@ namespace HtmlKit {
 			get; private set;
 		}
 	}
+
+	public sealed class HtmlCommentToken : HtmlToken
+	{
+		public HtmlCommentToken (string comment) : base (HtmlTokenKind.Comment)
+		{
+			if (comment == null)
+				throw new ArgumentNullException ("comment");
+
+			Comment = comment;
+		}
+
+		public string Comment {
+			get; set;
+		}
+	}
+
+	public sealed class HtmlDocTypeToken : HtmlToken
+	{
+		public HtmlDocTypeToken () : base (HtmlTokenKind.DocType)
+		{
+		}
+
+		public bool ForceQuirks {
+			get; set;
+		}
+
+		public string Name {
+			get; set;
+		}
+	}
 }
