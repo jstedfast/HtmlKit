@@ -37,6 +37,8 @@ namespace HtmlKit {
 		/// </summary>
 		Data,
 
+		Tag,
+
 		/// <summary>
 		/// A token signifying the end of the file has been reached.
 		/// </summary>

@@ -24,6 +24,7 @@
 // THE SOFTWARE.
 //
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -58,7 +59,7 @@ namespace HtmlKit {
 			attributes = new List<HtmlAttribute> (collection);
 		}
 
-		HtmlAttributeCollection ()
+		internal HtmlAttributeCollection ()
 		{
 			attributes = new List<HtmlAttribute> ();
 		}
@@ -72,6 +73,14 @@ namespace HtmlKit {
 		/// <value>The number of attributes in the collection.</value>
 		public int Count {
 			get { return attributes.Count; }
+		}
+
+		internal void Add (HtmlAttribute attribute)
+		{
+			if (attribute == null)
+				throw new ArgumentNullException ("attribute");
+
+			attributes.Add (attribute);
 		}
 
 		/// <summary>

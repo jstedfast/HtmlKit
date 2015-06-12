@@ -91,4 +91,29 @@ namespace HtmlKit {
 			get; private set;
 		}
 	}
+
+	public sealed class HtmlTagToken : HtmlToken
+	{
+		public HtmlTagToken (string name) : base (HtmlTokenKind.Tag)
+		{
+			Attributes = new HtmlAttributeCollection ();
+			Name = name;
+		}
+
+		public HtmlAttributeCollection Attributes {
+			get; private set;
+		}
+
+		public bool IsEmptyElement {
+			get; internal set;
+		}
+
+		public bool IsEndTag {
+			get; internal set;
+		}
+
+		public string Name {
+			get; private set;
+		}
+	}
 }

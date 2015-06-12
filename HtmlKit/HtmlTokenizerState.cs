@@ -33,11 +33,21 @@ namespace HtmlKit {
 	/// </remarks>
 	public enum HtmlTokenizerState {
 		Data,
-
-		EndOfFile,
-
 		CharacterReferenceInData,
-
 		TagOpen,
+		MarkupDeclarationOpen,
+		EndTagOpen,
+		BogusComment,
+		TagName,
+		BeforeAttributeName,
+		SelfClosingStartTag,
+		AttributeName,
+		AfterAttributeName,
+		BeforeAttributeValue,
+		AttributeValueQuoted,
+		AfterAttributeValueQuoted,
+		AttributeValueUnquoted,
+		CharacterReferenceInAttributeValue,
+		EndOfFile
 	}
 }

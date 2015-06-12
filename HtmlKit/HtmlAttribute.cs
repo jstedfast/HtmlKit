@@ -83,6 +83,18 @@ namespace HtmlKit {
 			Name = name;
 		}
 
+		internal HtmlAttribute (string name)
+		{
+			if (name == null)
+				throw new ArgumentNullException ("name");
+
+			if (name.Length == 0)
+				throw new ArgumentException ("The attribute name cannot be empty.", "name");
+
+			Id = name.ToHtmlAttributeId ();
+			Name = name;
+		}
+
 		/// <summary>
 		/// Get the HTML attribute identifier.
 		/// </summary>
@@ -113,7 +125,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <value>The value of the attribute.</value>
 		public string Value {
-			get; private set;
+			get; internal set;
 		}
 	}
 }
