@@ -3,20 +3,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{065C4D91-32E7-442D-8884-CEA2BC3DF4E9}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>HtmlKit</RootNamespace>
-    <AssemblyName>HtmlKit</AssemblyName>
+    <ProjectGuid>{593E3C88-A6C3-4D26-81F8-5EAAEA23F10A}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>CodeGenerator</RootNamespace>
+    <AssemblyName>CodeGenerator</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;PORTABLE</DefineConstants>
+    <DefineConstants>DEBUG;COMPACT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -27,20 +25,29 @@
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HtmlAttribute.cs" />
-    <Compile Include="HtmlAttributeCollection.cs" />
-    <Compile Include="HtmlAttributeId.cs" />
-    <Compile Include="HtmlTagId.cs" />
-    <Compile Include="HtmlToken.cs" />
-    <Compile Include="HtmlTokenKind.cs" />
-    <Compile Include="HtmlTokenizer.cs" />
-    <Compile Include="HtmlTokenizerState.cs" />
-    <Compile Include="HtmlUtils.cs" />
-    <Compile Include="HtmlEntityDecoder.cs" />
+    <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="HtmlEntities.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HtmlKit\HtmlKit.csproj">
+      <Project>{065C4D91-32E7-442D-8884-CEA2BC3DF4E9}</Project>
+      <Name>HtmlKit</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
