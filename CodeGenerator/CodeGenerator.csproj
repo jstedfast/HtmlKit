@@ -44,10 +44,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HtmlKit\HtmlKit.csproj">
-      <Project>{065C4D91-32E7-442D-8884-CEA2BC3DF4E9}</Project>
-      <Name>HtmlKit</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

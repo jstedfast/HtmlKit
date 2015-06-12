@@ -26,21 +26,58 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
 namespace CodeGenerator {
+	class GraphNode
+	{
+		public readonly List<GraphNode> Children = new List<GraphNode> ();
+		public readonly string Name;
+		public readonly int State;
+		public readonly char Char;
+		public string Value;
+
+		public GraphNode (GraphNode parent, int state, char c)
+		{
+			State = state;
+			Char = c;
+
+			if (parent != null) {
+				parent.Children.Add (this);
+				Name = parent.Name + c;
+			} else {
+				Name = "&";
+			}
+		}
+	}
+
+	class InnerSwitchLabel
+	{
+		public readonly int CurrentState;
+		public readonly int NextState;
+		public readonly string Comment;
+
+		public InnerSwitchLabel (int current, int next, string comment)
+		{
+			CurrentState = current;
+			NextState = next;
+			Comment = comment;
+		}
+	}
+
 	class Program
 	{
-		static readonly Dictionary<string, int> StateNameToInt32 = new Dictionary<string, int> ();
-		static readonly Dictionary<int, string> Int32ToValue = new Dictionary<int, string> ();
-		static readonly List<string> StateNames = new List<string> ();
+		static readonly SortedDictionary<char, SortedDictionary<int, InnerSwitchLabel>> OuterSwitchLabels = new SortedDictionary<char, SortedDictionary<int, InnerSwitchLabel>> ();
+		static readonly SortedDictionary<int, GraphNode> FinalStates = new SortedDictionary<int, GraphNode> ();
+		static readonly GraphNode Root = new GraphNode (null, 0, '\0');
 
 		public static void Main (string[] args)
 		{
+			int maxEntityLength = 0;
+			int state = 0;
+
 			using (var json = new JsonTextReader (new StreamReader ("HtmlEntities.json"))) {
 				while (json.Read ()) {
 					string name, value;
@@ -54,7 +91,7 @@ namespace CodeGenerator {
 					name = (string) json.Value;
 
 					// trim leading '&' and trailing ';'
-					name = name.Substring (1, name.Length - 2);
+					name = name.TrimStart ('&').TrimEnd (';');
 
 					if (!json.Read () || json.TokenType != JsonToken.StartObject)
 						break;
@@ -78,105 +115,109 @@ namespace CodeGenerator {
 
 					value = json.ReadAsString ();
 
-					var state = new char[name.Length];
+					var node = Root;
+
 					for (int i = 0; i < name.Length; i++) {
-						state[i] = name[i];
+						bool found = false;
 
-						var key = new string (state, 0, i + 1);
+						for (int j = 0; j < node.Children.Count; j++) {
+							if (node.Children[j].Char == name[i]) {
+								node = node.Children[j];
+								found = true;
+								break;
+							}
+						}
 
-						if (!StateNameToInt32.ContainsKey (key)) {
-							StateNameToInt32.Add (key, StateNameToInt32.Count);
-							StateNames.Add (key);
+						if (!found) {
+							node = new GraphNode (node, ++state, name[i]);
+							continue;
 						}
 					}
 
-					Int32ToValue[StateNameToInt32[name]] = value;
+					if (node.Value == null) {
+						FinalStates.Add (node.State, node);
+						node.Value = value;
+					}
+
+					maxEntityLength = Math.Max (maxEntityLength, name.Length);
 
 					if (!json.Read () || json.TokenType != JsonToken.EndObject)
 						break;
 				}
 			}
 
-			GeneratePushNamedEntityMethod ();
-			GenerateGetNamedEntityValueMethod ();
+			using (var output = new StreamWriter ("HtmlEntityDecoder.g.cs")) {
+				output.WriteLine ("// WARNING: This file is auto-generated. DO NOT EDIT!");
+				output.WriteLine ();
+				output.WriteLine ("namespace HtmlKit {");
+				output.WriteLine ("\tpublic partial class HtmlEntityDecoder {");
+				output.WriteLine ("\t\tconst int MaxEntityLength = {0};", maxEntityLength);
+				output.WriteLine ();
+				GeneratePushNamedEntityMethod (output);
+				output.WriteLine ();
+				GenerateGetNamedEntityValueMethod (output);
+				output.WriteLine ("\t}");
+				output.WriteLine ("}");
+			}
 		}
 
-		static string GetNextChars (string prefix)
+		static void GenerateSwitchLabels (GraphNode node)
 		{
-			var next = new StringBuilder ();
+			foreach (var child in node.Children) {
+				SortedDictionary<int, InnerSwitchLabel> states;
+				InnerSwitchLabel inner;
 
-			foreach (var state in StateNames) {
-				if (state.Length != prefix.Length + 1)
-					continue;
+				if (!OuterSwitchLabels.TryGetValue (child.Char, out states))
+					OuterSwitchLabels[child.Char] = states = new SortedDictionary<int, InnerSwitchLabel> ();
 
-				if (!state.StartsWith (prefix, StringComparison.Ordinal))
-					continue;
+				if (!states.TryGetValue (node.State, out inner))
+					states[node.State] = new InnerSwitchLabel (node.State, child.State, string.Format ("{0} -> {1}", node.Name, child.Name));
 
-				next.Append (state[state.Length - 1]);
+				GenerateSwitchLabels (child);
 			}
-
-			return next.ToString ();
 		}
 
-		static void GeneratePushNamedEntityMethod ()
+		static void GeneratePushNamedEntityMethod (TextWriter output)
 		{
-			Console.WriteLine ("bool PushNamedEntity (char c)");
-			Console.WriteLine ('{');
-			Console.WriteLine ("\tswitch (state) {");
-			foreach (var state in StateNames) {
-				var next = GetNextChars (state);
+			GenerateSwitchLabels (Root);
 
-				if (next.Length == 0)
-					continue;
-
-				if (next.Length == 1) {
-					#if COMPACT
-					Console.WriteLine ("\tcase {0}: if (c != '{1}') return false; state = {2}; break;", StateNameToInt32[state], next[0], StateNameToInt32[state + next[0]]);
-					#else
-					Console.WriteLine ("\tcase {0}:", StateNameToInt32[state]);
-					Console.WriteLine ("\t\tif (c != '{0}') return false;", next[0]);
-					Console.WriteLine ("\t\tstate = {0};", StateNameToInt32[state + next[0]]);
-					Console.WriteLine ("\t\tbreak;");
-					#endif
-				} else {
-					Console.WriteLine ("\tcase {0}:", StateNameToInt32[state]);
-					Console.WriteLine ("\t\tswitch (c) {");
-					foreach (var c in next)
-						Console.WriteLine ("\t\tcase '{0}': state = {1}; break;", c, StateNameToInt32[state + c]);
-					Console.WriteLine ("\t\tdefault: return false;");
-					Console.WriteLine ("\t\t}"); // end switch (c)
-					Console.WriteLine ("\t\tbreak;");
-				}
+			output.WriteLine ("\t\tbool PushNamedEntity (char c)");
+			output.WriteLine ("\t\t{");
+			output.WriteLine ("\t\t\tswitch (c) {");
+			foreach (var outer in OuterSwitchLabels) {
+				output.WriteLine ("\t\t\tcase '{0}':", outer.Key);
+				output.WriteLine ("\t\t\t\tswitch (state) {");
+				foreach (var state in outer.Value)
+					output.WriteLine ("\t\t\t\tcase {0}: state = {1}; break; // {2}", state.Value.CurrentState, state.Value.NextState, state.Value.Comment);
+				output.WriteLine ("\t\t\t\tdefault: return false;");
+				output.WriteLine ("\t\t\t\t}");
+				output.WriteLine ("\t\t\t\tbreak;");
 			}
-			Console.WriteLine ("\tdefault: return false;");
-			Console.WriteLine ("\t}"); // end switch (state)
-			Console.WriteLine ();
-			Console.WriteLine ("\tpushed[index++] = c;");
-			Console.WriteLine ();
-			Console.WriteLine ("\treturn true;");
-			Console.WriteLine ('}');
+			output.WriteLine ("\t\t\tdefault: return false;");
+			output.WriteLine ("\t\t\t}"); // end switch (state)
+			output.WriteLine ();
+			output.WriteLine ("\t\t\tpushed[index++] = c;");
+			output.WriteLine ();
+			output.WriteLine ("\t\t\treturn true;");
+			output.WriteLine ("\t\t}");
 		}
 
-		static void GenerateGetNamedEntityValueMethod ()
+		static void GenerateGetNamedEntityValueMethod (TextWriter output)
 		{
-			Console.WriteLine ("string GetNamedEntityValue ()");
-			Console.WriteLine ('{');
-			Console.WriteLine ("\tswitch (state) {");
-			foreach (var state in StateNames) {
-				int index = StateNameToInt32[state];
-				string value;
+			output.WriteLine ("\t\tstring GetNamedEntityValue ()");
+			output.WriteLine ("\t\t{");
+			output.WriteLine ("\t\t\tswitch (state) {");
+			foreach (var kvp in FinalStates) {
+				var state = kvp.Value;
 
-				if (!Int32ToValue.TryGetValue (index, out value))
-					continue;
-
-				Console.Write ("\tcase {0}: return \"", index);
-				for (int i = 0; i < value.Length; i++)
-					Console.Write ("\\u{0:X4}", (int) value[i]);
-				Console.WriteLine ("\"; // {0}", state);
+				output.Write ("\t\t\tcase {0}: return \"", state.State);
+				for (int i = 0; i < state.Value.Length; i++)
+					output.Write ("\\u{0:X4}", (int) state.Value[i]);
+				output.WriteLine ("\"; // {0}", state.Name);
 			}
-			Console.WriteLine ("\tdefault: return new string (pushed, 0, index);");
-			Console.WriteLine ("\t}");
-			Console.WriteLine ('}');
+			output.WriteLine ("\t\t\tdefault: return new string (pushed, 0, index);");
+			output.WriteLine ("\t\t\t}");
+			output.WriteLine ("\t\t}");
 		}
 	}
 }

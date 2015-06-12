@@ -34,13 +34,16 @@
     <Compile Include="HtmlAttribute.cs" />
     <Compile Include="HtmlAttributeCollection.cs" />
     <Compile Include="HtmlAttributeId.cs" />
+    <Compile Include="HtmlEntityDecoder.cs" />
+    <Compile Include="HtmlEntityDecoder.g.cs">
+      <DependentUpon>HtmlEntityDecoder.cs</DependentUpon>
+    </Compile>
     <Compile Include="HtmlTagId.cs" />
     <Compile Include="HtmlToken.cs" />
     <Compile Include="HtmlTokenKind.cs" />
     <Compile Include="HtmlTokenizer.cs" />
     <Compile Include="HtmlTokenizerState.cs" />
     <Compile Include="HtmlUtils.cs" />
-    <Compile Include="HtmlEntityDecoder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

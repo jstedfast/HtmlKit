@@ -688,7 +688,7 @@ namespace HtmlKit {
 		bool ReadMarkupDeclarationOpen (out HtmlToken token)
 		{
 			int count = 0, nc;
-			char c;
+			char c = '\0';
 
 			while (count < 2) {
 				if ((nc = text.Peek ()) == -1) {
@@ -794,8 +794,8 @@ namespace HtmlKit {
 			}
 
 			TokenizerState = HtmlTokenizerState.BeforeDocTypeName;
-
 			c = (char) nc;
+			token = null;
 
 			switch (c) {
 			case '\t': case '\n': case '\f': case ' ':
