@@ -36,18 +36,18 @@ namespace HtmlKit {
 		CharacterReferenceInData,
 		RcData, // todo
 		CharacterReferenceInRcData, // todo
-		RawText, // todo
+		RawText,
 		ScriptData,
-		PlainText, // todo
+		PlainText,
 		TagOpen,
 		EndTagOpen,
 		TagName,
 		RcDataLessThan, // todo
 		RcDataEndTagOpen, // todo
 		RcDataEndTagName, // todo
-		RawTextLessThan, // todo
-		RawTextEndTagOpen, // todo
-		RawTextEndTagName, // todo
+		RawTextLessThan,
+		RawTextEndTagOpen,
+		RawTextEndTagName,
 		ScriptDataLessThan,
 		ScriptDataEndTagOpen,
 		ScriptDataEndTagName,

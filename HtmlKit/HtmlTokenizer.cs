@@ -174,13 +174,6 @@ namespace HtmlKit {
 				TokenizerState = HtmlTokenizerState.Data;
 				data.Append ('&');
 				return false;
-			default:
-//				if (nc == additionalAllowedCharacter) {
-//					TokenizerState = HtmlTokenizerState.Data;
-//					data.Append ('&');
-//					return false;
-//				}
-				break;
 			}
 
 			entity.Push ('&');
@@ -212,6 +205,44 @@ namespace HtmlKit {
 			return false;
 		}
 
+		bool ReadRawText (out HtmlToken token)
+		{
+			do {
+				int nc = text.Read ();
+				char c;
+
+				if (nc == -1) {
+					TokenizerState = HtmlTokenizerState.EndOfFile;
+					break;
+				}
+
+				c = (char) nc;
+
+				switch (c) {
+				case '<':
+					TokenizerState = HtmlTokenizerState.RawTextLessThan;
+					return EmitDataToken (out token);
+				default:
+					data.Append (c == '\0' ? '\uFFFD' : c);
+
+					// Note: we emit at the end of every line and/or at 1024
+					// characters (whichever comes first) simply to avoid
+					// consuming too much memory.
+					if (c == '\n' || data.Length >= 1024)
+						return EmitDataToken (out token);
+
+					break;
+				}
+			} while (TokenizerState == HtmlTokenizerState.RawText);
+
+			if (data.Length > 0)
+				return EmitDataToken (out token);
+
+			token = null;
+
+			return false;
+		}
+
 		bool ReadScriptData (out HtmlToken token)
 		{
 			do {
@@ -231,6 +262,13 @@ namespace HtmlKit {
 					return EmitDataToken (out token);
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
+
+					// Note: we emit at the end of every line and/or at 1024
+					// characters (whichever comes first) simply to avoid
+					// consuming too much memory.
+					if (c == '\n' || data.Length >= 1024)
+						return EmitDataToken (out token);
+
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptData);
@@ -241,6 +279,29 @@ namespace HtmlKit {
 			token = null;
 
 			return false;
+		}
+
+		bool ReadPlainText (out HtmlToken token)
+		{
+			int nc = text.Read ();
+
+			while (nc != -1) {
+				char c = (char) nc;
+
+				data.Append (c == '\0' ? '\uFFFD' : c);
+
+				// Note: we emit at the end of every line and/or at 1024
+				// characters (whichever comes first) simply to avoid
+				// consuming too much memory.
+				if (c == '\n' || data.Length >= 1024)
+					return EmitDataToken (out token);
+
+				nc = text.Read ();
+			}
+
+			TokenizerState = HtmlTokenizerState.EndOfFile;
+
+			return EmitDataToken (out token);
 		}
 
 		bool ReadTagOpen (out HtmlToken token)
@@ -365,6 +426,115 @@ namespace HtmlKit {
 			return false;
 		}
 
+		bool ReadRawTextLessThan (out HtmlToken token)
+		{
+			int nc = text.Peek ();
+
+			data.Append ('<');
+
+			switch ((char) nc) {
+			case '/':
+				TokenizerState = HtmlTokenizerState.RawTextEndTagOpen;
+				data.Append ('/');
+				name.Clear ();
+				text.Read ();
+				break;
+			default:
+				TokenizerState = HtmlTokenizerState.RawText;
+				break;
+			}
+
+			token = null;
+
+			return false;
+		}
+
+		bool ReadRawTextEndTagOpen (out HtmlToken token)
+		{
+			int nc = text.Peek ();
+			char c;
+
+			if (nc == -1) {
+				TokenizerState = HtmlTokenizerState.EndOfFile;
+				return EmitDataToken (out token);
+			}
+
+			c = (char) nc;
+
+			if (c == 'R' || c == 'r') {
+				TokenizerState = HtmlTokenizerState.RawTextEndTagName;
+				name.Append ('r');
+				data.Append (c);
+				text.Read ();
+			} else {
+				TokenizerState = HtmlTokenizerState.RawText;
+			}
+
+			token = null;
+
+			return false;
+		}
+
+		bool ReadRawTextEndTagName (out HtmlToken token)
+		{
+			do {
+				int nc = text.Read ();
+				char c;
+
+				if (nc == -1) {
+					TokenizerState = HtmlTokenizerState.EndOfFile;
+					name.Clear ();
+
+					return EmitDataToken (out token);
+				}
+
+				c = (char) nc;
+
+				// Note: we save the data in case we hit a parse error and have to emit a data token
+				data.Append (c);
+
+				switch (c) {
+				case '\t': case '\n': case '\f': case ' ':
+					if (name.ToString () == "rawtext") {
+						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
+						break;
+					}
+
+					goto default;
+				case '/':
+					if (name.ToString () == "rawtext") {
+						TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
+						break;
+					}
+					goto default;
+				case '>':
+					if (name.ToString () == "rawtext") {
+						token = new HtmlTagToken (name.ToString (), true);
+						TokenizerState = HtmlTokenizerState.Data;
+						data.Clear ();
+						name.Clear ();
+						return true;
+					}
+					goto default;
+				default:
+					if (!IsAsciiLetter (c)) {
+						TokenizerState = HtmlTokenizerState.RawText;
+						token = null;
+						return false;
+					}
+
+					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
+					break;
+				}
+			} while (TokenizerState == HtmlTokenizerState.ScriptDataEndTagName);
+
+			tag = new HtmlTagToken (name.ToString (), true);
+			name.Clear ();
+			token = null;
+
+			return false;
+		}
+
 		bool ReadScriptDataLessThan (out HtmlToken token)
 		{
 			int nc = text.Peek ();
@@ -405,9 +575,9 @@ namespace HtmlKit {
 
 			c = (char) nc;
 
-			if (IsAsciiLetter (c)) {
+			if (c == 'S' || c == 's') {
 				TokenizerState = HtmlTokenizerState.ScriptDataEndTagName;
-				name.Append (ToLower (c));
+				name.Append ('s');
 				data.Append (c);
 				text.Read ();
 			} else {
@@ -439,7 +609,6 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '\t': case '\n': case '\f': case ' ':
-					// FIXME: compare to the active tag name
 					if (name.ToString () == "script") {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
@@ -447,14 +616,12 @@ namespace HtmlKit {
 
 					goto default;
 				case '/':
-					// FIXME: compare to the active tag name
 					if (name.ToString () == "script") {
 						TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 						break;
 					}
 					goto default;
 				case '>':
-					// FIXME: compare to the active tag name
 					if (name.ToString () == "script") {
 						token = new HtmlTagToken (name.ToString (), true);
 						TokenizerState = HtmlTokenizerState.Data;
@@ -464,6 +631,12 @@ namespace HtmlKit {
 					}
 					goto default;
 				default:
+					if (!IsAsciiLetter (c)) {
+						TokenizerState = HtmlTokenizerState.ScriptData;
+						token = null;
+						return false;
+					}
+
 					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
 					break;
 				}
@@ -678,7 +851,6 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '\t': case '\n': case '\f': case ' ':
-					// FIXME: compare to the active tag name
 					if (name.ToString () == "script") {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
@@ -686,14 +858,12 @@ namespace HtmlKit {
 
 					goto default;
 				case '/':
-					// FIXME: compare to the active tag name
 					if (name.ToString () == "script") {
 						TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 						break;
 					}
 					goto default;
 				case '>':
-					// FIXME: compare to the active tag name
 					if (name.ToString () == "script") {
 						token = new HtmlTagToken (name.ToString (), true);
 						TokenizerState = HtmlTokenizerState.Data;
@@ -2285,12 +2455,16 @@ namespace HtmlKit {
 				case HtmlTokenizerState.CharacterReferenceInRcData:
 					break;
 				case HtmlTokenizerState.RawText:
+					if (ReadRawText (out token))
+						return true;
 					break;
 				case HtmlTokenizerState.ScriptData:
 					if (ReadScriptData (out token))
 						return true;
 					break;
 				case HtmlTokenizerState.PlainText:
+					if (ReadPlainText (out token))
+						return true;
 					break;
 				case HtmlTokenizerState.TagOpen:
 					if (ReadTagOpen (out token))
@@ -2311,10 +2485,16 @@ namespace HtmlKit {
 				case HtmlTokenizerState.RcDataEndTagName:
 					break;
 				case HtmlTokenizerState.RawTextLessThan:
+					if (ReadRawTextLessThan (out token))
+						return true;
 					break;
 				case HtmlTokenizerState.RawTextEndTagOpen:
+					if (ReadRawTextEndTagOpen (out token))
+						return true;
 					break;
 				case HtmlTokenizerState.RawTextEndTagName:
+					if (ReadRawTextEndTagName (out token))
+						return true;
 					break;
 				case HtmlTokenizerState.ScriptDataLessThan:
 					if (ReadScriptDataLessThan (out token))
