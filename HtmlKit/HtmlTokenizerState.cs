@@ -74,14 +74,14 @@ namespace HtmlKit {
 		CharacterReferenceInAttributeValue,
 		AfterAttributeValueQuoted,
 		SelfClosingStartTag,
-		BogusComment, // todo
+		BogusComment,
 		MarkupDeclarationOpen,
-		CommentStart, // todo
-		CommentStartDash, // todo
-		Comment, // todo
-		CommentEndDash, // todo
-		CommentEnd, // todo
-		CommentEndBang, // todo
+		CommentStart,
+		CommentStartDash,
+		Comment,
+		CommentEndDash,
+		CommentEnd,
+		CommentEndBang,
 		DocType,
 		BeforeDocTypeName,
 		DocTypeName,

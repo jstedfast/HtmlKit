@@ -34,11 +34,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
+    <Compile Include="HtmlTokenizerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="test.html" />
+    <None Include="TestData\html\blocked.html" />
+    <None Include="TestData\html\test.html" />
+    <None Include="TestData\html\xamarin3.html" />
+    <None Include="TestData\html\xamarin3.xhtml" />
+    <None Include="TestData\html\blocked.tokens" />
+    <None Include="TestData\html\xamarin3.tokens" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HtmlKit\HtmlKit.csproj">
+      <Project>{065C4D91-32E7-442D-8884-CEA2BC3DF4E9}</Project>
+      <Name>HtmlKit</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestData\" />
+    <Folder Include="TestData\html\" />
   </ItemGroup>
 </Project>

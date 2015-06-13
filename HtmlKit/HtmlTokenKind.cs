@@ -32,6 +32,9 @@ namespace HtmlKit {
 	/// The kinds of tokens that the <see cref="HtmlTokenizer"/> can emit.
 	/// </remarks>
 	public enum HtmlTokenKind {
+		/// <summary>
+		/// An HTML comment token.
+		/// </summary>
 		Comment,
 
 		/// <summary>
@@ -39,13 +42,14 @@ namespace HtmlKit {
 		/// </summary>
 		Data,
 
+		/// <summary>
+		/// An HTML DOCTYPE token.
+		/// </summary>
 		DocType,
 
-		Tag,
-
 		/// <summary>
-		/// A token signifying the end of the file has been reached.
+		/// An HTML tag token.
 		/// </summary>
-		EndOfFile,
+		Tag,
 	}
 }
