@@ -97,13 +97,24 @@ namespace HtmlKit {
 
 		bool EmitDataToken (out HtmlToken token)
 		{
-			token = new HtmlDataToken (data.ToString ());
-			data.Clear ();
-			return true;
+			if (data.Length > 0) {
+				token = new HtmlDataToken (data.ToString ());
+				data.Clear ();
+				return true;
+			}
+
+			token = null;
+
+			return false;
 		}
 
 		bool EmitTagToken (out HtmlToken token)
 		{
+			if (!tag.IsEndTag && !tag.IsEmptyElement && tag.Name == "script")
+				TokenizerState = HtmlTokenizerState.ScriptData;
+			else
+				TokenizerState = HtmlTokenizerState.Data;
+
 			data.Clear ();
 			token = tag;
 			tag = null;
@@ -139,12 +150,7 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.Data);
 
-			if (data.Length > 0)
-				return EmitDataToken (out token);
-
-			token = null;
-
-			return false;
+			return EmitDataToken (out token);
 		}
 
 		bool ReadCharacterReferenceInData (out HtmlToken token)
@@ -222,7 +228,7 @@ namespace HtmlKit {
 				switch (c) {
 				case '<':
 					TokenizerState = HtmlTokenizerState.ScriptDataLessThan;
-					break;
+					return EmitDataToken (out token);
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
 					break;
@@ -363,20 +369,22 @@ namespace HtmlKit {
 		{
 			int nc = text.Peek ();
 
+			data.Append ('<');
+
 			switch ((char) nc) {
 			case '/':
 				TokenizerState = HtmlTokenizerState.ScriptDataEndTagOpen;
+				data.Append ('/');
 				name.Clear ();
 				text.Read ();
 				break;
 			case '!':
 				TokenizerState = HtmlTokenizerState.ScriptDataEscapeStart;
-				data.Append ("<!");
+				data.Append ('!');
 				text.Read ();
 				break;
 			default:
 				TokenizerState = HtmlTokenizerState.ScriptData;
-				data.Append ('<');
 				break;
 			}
 
@@ -392,9 +400,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				token = new HtmlDataToken ("</");
-				data.Clear ();
-				return true;
+				return EmitDataToken (out token);
 			}
 
 			c = (char) nc;
@@ -402,10 +408,10 @@ namespace HtmlKit {
 			if (IsAsciiLetter (c)) {
 				TokenizerState = HtmlTokenizerState.ScriptDataEndTagName;
 				name.Append (ToLower (c));
+				data.Append (c);
 				text.Read ();
 			} else {
 				TokenizerState = HtmlTokenizerState.ScriptData;
-				data.Append ("</");
 			}
 
 			token = null;
@@ -450,7 +456,7 @@ namespace HtmlKit {
 				case '>':
 					// FIXME: compare to the active tag name
 					if (name.ToString () == "script") {
-						token = new HtmlTagToken (name.ToString (), isEndTag);
+						token = new HtmlTagToken (name.ToString (), true);
 						TokenizerState = HtmlTokenizerState.Data;
 						data.Clear ();
 						name.Clear ();
@@ -463,7 +469,7 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEndTagName);
 
-			tag = new HtmlTagToken (name.ToString (), isEndTag);
+			tag = new HtmlTagToken (name.ToString (), true);
 			name.Clear ();
 			token = null;
 
@@ -689,7 +695,7 @@ namespace HtmlKit {
 				case '>':
 					// FIXME: compare to the active tag name
 					if (name.ToString () == "script") {
-						token = new HtmlTagToken (name.ToString (), isEndTag);
+						token = new HtmlTagToken (name.ToString (), true);
 						TokenizerState = HtmlTokenizerState.Data;
 						data.Clear ();
 						name.Clear ();
@@ -709,7 +715,7 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscapedEndTagName);
 
-			tag = new HtmlTagToken (name.ToString (), isEndTag);
+			tag = new HtmlTagToken (name.ToString (), true);
 			name.Clear ();
 			token = null;
 
@@ -929,7 +935,6 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 					return false;
 				case '>':
-					TokenizerState = HtmlTokenizerState.Data;
 					return EmitTagToken (out token);
 				case '"': case '\'': case '<': case '=':
 					// parse error
@@ -974,7 +979,6 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.BeforeAttributeValue;
 					break;
 				case '>':
-					TokenizerState = HtmlTokenizerState.Data;
 					EmitTagAttribute ();
 
 					return EmitTagToken (out token);
@@ -1019,7 +1023,6 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.BeforeAttributeValue;
 					return false;
 				case '>':
-					TokenizerState = HtmlTokenizerState.Data;
 					return EmitTagToken (out token);
 				case '"': case '\'': case '<':
 					// parse error
@@ -1061,7 +1064,6 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 					return false;
 				case '>':
-					TokenizerState = HtmlTokenizerState.Data;
 					return EmitTagToken (out token);
 				case '<': case '=': case '`':
 					// parse error
@@ -1142,7 +1144,6 @@ namespace HtmlKit {
 					token = null;
 					return false;
 				case '>':
-					TokenizerState = HtmlTokenizerState.Data;
 					return EmitTagToken (out token);
 				case '\'': case '<': case '=': case '`':
 					// parse error
@@ -1263,7 +1264,6 @@ namespace HtmlKit {
 				consume = true;
 				break;
 			case '>':
-				TokenizerState = HtmlTokenizerState.Data;
 				EmitTagToken (out token);
 				consume = true;
 				break;
@@ -1292,7 +1292,6 @@ namespace HtmlKit {
 			c = (char) nc;
 
 			if (c == '>') {
-				TokenizerState = HtmlTokenizerState.Data;
 				tag.IsEmptyElement = true;
 
 				return EmitTagToken (out token);
