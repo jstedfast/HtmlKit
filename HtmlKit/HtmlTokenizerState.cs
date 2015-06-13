@@ -37,7 +37,7 @@ namespace HtmlKit {
 		RcData, // todo
 		CharacterReferenceInRcData, // todo
 		RawText, // todo
-		ScriptData, // todo
+		ScriptData,
 		PlainText, // todo
 		TagOpen,
 		EndTagOpen,
@@ -48,23 +48,23 @@ namespace HtmlKit {
 		RawTextLessThan, // todo
 		RawTextEndTagOpen, // todo
 		RawTextEndTagName, // todo
-		ScriptDataLessThan, // todo
-		ScriptDataEndTagOpen, // todo
-		ScriptDataEndTagName, // todo
-		ScriptDataEscapeStart, // todo
-		ScriptDataEscapeStartDash, // todo
-		ScriptDataEscaped, // todo
-		ScriptDataEscapedDash, // todo
-		ScriptDataEscapedDashDash, // todo
-		ScriptDataEscapedLessThan, // todo
-		ScriptDataEscapedEndTagOpen, // todo
-		ScriptDataEscapedEndTagName, // todo
-		ScriptDataDoubleEscapeStart, // todo
-		ScriptDataDoubleEscaped, // todo
-		ScriptDataDoubleEscapedDash, // todo
-		ScriptDataDoubleEscapedDashDash, // todo
-		ScriptDataDoubleEscapedLessThan, // todo
-		ScriptDataDoubleEscapeEnd, // todo
+		ScriptDataLessThan,
+		ScriptDataEndTagOpen,
+		ScriptDataEndTagName,
+		ScriptDataEscapeStart,
+		ScriptDataEscapeStartDash,
+		ScriptDataEscaped,
+		ScriptDataEscapedDash,
+		ScriptDataEscapedDashDash,
+		ScriptDataEscapedLessThan,
+		ScriptDataEscapedEndTagOpen,
+		ScriptDataEscapedEndTagName,
+		ScriptDataDoubleEscapeStart,
+		ScriptDataDoubleEscaped,
+		ScriptDataDoubleEscapedDash,
+		ScriptDataDoubleEscapedDashDash,
+		ScriptDataDoubleEscapedLessThan,
+		ScriptDataDoubleEscapeEnd,
 		BeforeAttributeName,
 		AttributeName,
 		AfterAttributeName,

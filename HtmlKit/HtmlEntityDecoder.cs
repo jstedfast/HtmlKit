@@ -207,6 +207,11 @@ namespace HtmlKit {
 			return numeric ? GetNumericEntityValue () : GetNamedEntityValue ();
 		}
 
+		internal string GetPushedInput ()
+		{
+			return new string (pushed, 0, index);
+		}
+
 		/// <summary>
 		/// Reset the entity decoder.
 		/// </summary>
