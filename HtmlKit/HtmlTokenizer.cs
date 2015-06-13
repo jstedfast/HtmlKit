@@ -115,7 +115,7 @@ namespace HtmlKit {
 				case "plaintext": TokenizerState = HtmlTokenizerState.PlainText; break;
 				case "rawtext": TokenizerState = HtmlTokenizerState.RawText; break;
 				case "script": TokenizerState = HtmlTokenizerState.ScriptData; break;
-				default: TokenizerState = HtmlTokenizerState.Data;
+				default: TokenizerState = HtmlTokenizerState.Data; break;
 				}
 			} else {
 				TokenizerState = HtmlTokenizerState.Data;
