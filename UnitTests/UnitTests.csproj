@@ -40,11 +40,12 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="TestData\html\blocked.html" />
-    <None Include="TestData\html\test.html" />
-    <None Include="TestData\html\xamarin3.html" />
-    <None Include="TestData\html\xamarin3.xhtml" />
     <None Include="TestData\html\blocked.tokens" />
+    <None Include="TestData\html\test.html" />
+    <None Include="TestData\html\test.tokens" />
+    <None Include="TestData\html\xamarin3.html" />
     <None Include="TestData\html\xamarin3.tokens" />
+    <None Include="TestData\html\xamarin3.xhtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HtmlKit\HtmlKit.csproj">

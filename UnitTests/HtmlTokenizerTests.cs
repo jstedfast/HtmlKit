@@ -152,5 +152,11 @@ namespace UnitTests {
 		{
 			VerifyHtmlTokenizerOutput (Path.Combine ("..", "..", "TestData", "html", "xamarin3.html"));
 		}
+
+		[Test]
+		public void TestTokenizer ()
+		{
+			VerifyHtmlTokenizerOutput (Path.Combine ("..", "..", "TestData", "html", "test.html"));
+		}
 	}
 }
