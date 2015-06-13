@@ -24,6 +24,8 @@
 // THE SOFTWARE.
 //
 
+using System;
+
 namespace HtmlKit {
 	/// <summary>
 	/// An HTML entity decoder.
@@ -33,14 +35,21 @@ namespace HtmlKit {
 	/// </remarks>
 	public partial class HtmlEntityDecoder
 	{
-		readonly char[] pushed = new char[MaxEntityLength + 1];
+		readonly char[] pushed;
 		int index, state;
 		bool numeric;
 		byte digits;
 		byte xbase;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="HtmlKit.HtmlEntityDecoder"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="HtmlEntityDecoder"/>.
+		/// </remarks>
 		public HtmlEntityDecoder ()
 		{
+			pushed = new char[MaxEntityLength + 1];
 		}
 
 		bool PushNumericEntity (char c)
@@ -95,20 +104,32 @@ namespace HtmlKit {
 		/// Push the specified character into the HTML entity decoder.
 		/// </summary>
 		/// <remarks>
-		/// Pushes the specified character into the HTML entity decoder.
+		/// <para>Pushes the specified character into the HTML entity decoder.</para>
+		/// <para>The first character pushed MUST be the '&amp;' character.</para>
 		/// </remarks>
 		/// <returns><c>true</c> if the character was accepted; otherwise, <c>false</c>.</returns>
 		/// <param name="c">The character.</param>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <paramref name="c"/> is the first character being pushed and was not the '&amp;' character.
+		/// </exception>
 		public bool Push (char c)
 		{
+			if (index == 0) {
+				if (c != '&')
+					throw new ArgumentOutOfRangeException ("c", "The first character that is pushed MUST be the '&' character.");
+
+				pushed[index++] = '&';
+				return true;
+			}
+
 			if (index + 1 >= MaxEntityLength)
 				return false;
 
 			if (c == ';')
 				return false;
 
-			if (index == 0 && c == '#') {
-				pushed[index++] = c;
+			if (index == 1 && c == '#') {
+				pushed[index++] = '#';
 				numeric = true;
 				return true;
 			}

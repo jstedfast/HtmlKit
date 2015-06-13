@@ -148,12 +148,14 @@ namespace HtmlKit {
 				break;
 			}
 
+			entity.Push ('&');
+
 			while (entity.Push (c)) {
 				text.Read ();
 
 				if ((nc = text.Peek ()) == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					token = new HtmlDataToken (data + "&" + entity.GetValue ());
+					token = new HtmlDataToken (data + entity.GetValue ());
 					entity.Reset ();
 					data.Clear ();
 					return true;
@@ -609,6 +611,8 @@ namespace HtmlKit {
 				//	consume = false;
 				//	break;
 				//}
+
+				entity.Push ('&');
 
 				while (entity.Push (c)) {
 					text.Read ();
