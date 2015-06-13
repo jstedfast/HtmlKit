@@ -110,10 +110,16 @@ namespace HtmlKit {
 
 		bool EmitTagToken (out HtmlToken token)
 		{
-			if (!tag.IsEndTag && !tag.IsEmptyElement && tag.Name == "script")
-				TokenizerState = HtmlTokenizerState.ScriptData;
-			else
+			if (!tag.IsEndTag && !tag.IsEmptyElement) {
+				switch (tag.Name) {
+				case "plaintext": TokenizerState = HtmlTokenizerState.PlainText; break;
+				case "rawtext": TokenizerState = HtmlTokenizerState.RawText; break;
+				case "script": TokenizerState = HtmlTokenizerState.ScriptData; break;
+				default: TokenizerState = HtmlTokenizerState.Data;
+				}
+			} else {
 				TokenizerState = HtmlTokenizerState.Data;
+			}
 
 			data.Clear ();
 			token = tag;
