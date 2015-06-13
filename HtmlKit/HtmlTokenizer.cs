@@ -88,6 +88,13 @@ namespace HtmlKit {
 			return (c >= 'A' && c <= 'Z') ? (char) (c + 0x20) : c;
 		}
 
+		void EmitTagAttribute ()
+		{
+			attribute = new HtmlAttribute (name.ToString ());
+			tag.Attributes.Add (attribute);
+			name.Clear ();
+		}
+
 		bool EmitDataToken (out HtmlToken token)
 		{
 			token = new HtmlDataToken (data.ToString ());
@@ -95,10 +102,13 @@ namespace HtmlKit {
 			return true;
 		}
 
-		void ClearBuffers ()
+		bool EmitTagToken (out HtmlToken token)
 		{
 			data.Clear ();
-			name.Clear ();
+			token = tag;
+			tag = null;
+
+			return true;
 		}
 
 		bool ReadDataToken (out HtmlToken token)
@@ -920,10 +930,7 @@ namespace HtmlKit {
 					return false;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;
-					data.Clear ();
-					token = tag;
-					tag = null;
-					return true;
+					return EmitTagToken (out token);
 				case '"': case '\'': case '<': case '=':
 					// parse error
 					goto default;
@@ -968,20 +975,18 @@ namespace HtmlKit {
 					break;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;
-					data.Clear ();
-					token = tag;
-					break;
+					EmitTagAttribute ();
+
+					return EmitTagToken (out token);
 				default:
 					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.AttributeName);
 
-			attribute = new HtmlAttribute (name.ToString ());
-			tag.Attributes.Add (attribute);
-			name.Clear ();
+			EmitTagAttribute ();
 
-			return token != null;
+			return false;
 		}
 
 		bool ReadAfterAttributeName (out HtmlToken token)
@@ -1015,10 +1020,7 @@ namespace HtmlKit {
 					return false;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;
-					data.Clear ();
-					token = tag;
-					tag = null;
-					return true;
+					return EmitTagToken (out token);
 				case '"': case '\'': case '<':
 					// parse error
 					goto default;
@@ -1060,10 +1062,7 @@ namespace HtmlKit {
 					return false;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;
-					data.Clear ();
-					token = tag;
-					tag = null;
-					return true;
+					return EmitTagToken (out token);
 				case '<': case '=': case '`':
 					// parse error
 					goto default;
@@ -1144,10 +1143,7 @@ namespace HtmlKit {
 					return false;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;
-					data.Clear ();
-					token = tag;
-					tag = null;
-					return true;
+					return EmitTagToken (out token);
 				case '\'': case '<': case '=': case '`':
 					// parse error
 					goto default;
@@ -1268,10 +1264,8 @@ namespace HtmlKit {
 				break;
 			case '>':
 				TokenizerState = HtmlTokenizerState.Data;
+				EmitTagToken (out token);
 				consume = true;
-				data.Clear ();
-				token = tag;
-				tag = null;
 				break;
 			default:
 				TokenizerState = HtmlTokenizerState.BeforeAttributeName;
@@ -1300,9 +1294,8 @@ namespace HtmlKit {
 			if (c == '>') {
 				TokenizerState = HtmlTokenizerState.Data;
 				tag.IsEmptyElement = true;
-				data.Clear ();
-				token = tag;
-				return true;
+
+				return EmitTagToken (out token);
 			}
 
 			// parse error
@@ -1519,7 +1512,8 @@ namespace HtmlKit {
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					token = new HtmlCommentToken (name.ToString ());
-					ClearBuffers ();
+					data.Clear ();
+					name.Clear ();
 					return true;
 				}
 
@@ -1589,7 +1583,8 @@ namespace HtmlKit {
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					token = new HtmlCommentToken (name.ToString ());
-					ClearBuffers ();
+					data.Clear ();
+					name.Clear ();
 					return true;
 				}
 
