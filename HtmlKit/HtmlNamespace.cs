@@ -94,7 +94,7 @@ namespace HtmlKit {
 		{
 			int index = (int) value;
 
-			if (value < 0 || value >= NamespaceValues.Length)
+			if (value < 0 || (int)value >= NamespaceValues.Length)
 				throw new ArgumentOutOfRangeException ("value");
 
 			return NamespaceValues[index];
@@ -110,7 +110,7 @@ namespace HtmlKit {
 		/// <param name="ns">The namespace.</param>
 		public static HtmlNamespace ToHtmlNamespace (this string ns)
 		{
-			const int n = "http://www.w3.org/".Length;
+			int n = "http://www.w3.org/".Length;
 
 			if (ns == null)
 				throw new ArgumentNullException ("ns");
