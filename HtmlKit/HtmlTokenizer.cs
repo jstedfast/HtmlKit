@@ -80,6 +80,17 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
+		/// Get the current HTML namespace detected by the tokenizer.
+		/// </summary>
+		/// <remarks>
+		/// Gets the current HTML namespace detected by the tokenizer.
+		/// </remarks>
+		/// <value>The html namespace.</value>
+		public HtmlNamespace HtmlNamespace {
+			get; private set;
+		}
+
+		/// <summary>
 		/// Get the current state of the tokenizer.
 		/// </summary>
 		/// <remarks>
@@ -142,25 +153,37 @@ namespace HtmlKit {
 		bool EmitTagToken (out HtmlToken token)
 		{
 			if (!tag.IsEndTag && !tag.IsEmptyElement) {
-				switch (tag.Name) {
-				case "style": case "xmp": case "iframe": case "noembed": case "noframes":
+				switch (tag.Id) {
+				case HtmlTagId.Style: case HtmlTagId.Xmp: case HtmlTagId.IFrame: case HtmlTagId.NoEmbed: case HtmlTagId.NoFrames:
 					TokenizerState = HtmlTokenizerState.RawText;
 					activeTagName = tag.Name;
 					break;
-				case "title": case "textarea":
+				case HtmlTagId.Title: case HtmlTagId.TextArea:
 					TokenizerState = HtmlTokenizerState.RcData;
 					activeTagName = tag.Name;
 					break;
-				case "plaintext":
+				case HtmlTagId.PlainText:
 					TokenizerState = HtmlTokenizerState.PlainText;
 					break;
-				case "script":
+				case HtmlTagId.Script:
 					TokenizerState = HtmlTokenizerState.ScriptData;
 					break;
-				case "noscript":
+				case HtmlTagId.NoScript:
 					// TODO: only switch into the RawText state if scripting is enabled
 					TokenizerState = HtmlTokenizerState.RawText;
 					activeTagName = tag.Name;
+					break;
+				case HtmlTagId.Html:
+					TokenizerState = HtmlTokenizerState.Data;
+
+					for (int i = tag.Attributes.Count; i > 0; i--) {
+						var attr = tag.Attributes[i - 1];
+
+						if (attr.Id == HtmlAttributeId.XmlNS && attr.Value != null) {
+							HtmlNamespace = tag.Attributes[i].Value.ToHtmlNamespace ();
+							break;
+						}
+					}
 					break;
 				default:
 					TokenizerState = HtmlTokenizerState.Data;
