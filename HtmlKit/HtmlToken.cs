@@ -68,7 +68,7 @@ namespace HtmlKit {
 	/// <remarks>
 	/// An HTML comment token.
 	/// </remarks>
-	public sealed class HtmlCommentToken : HtmlToken
+	public class HtmlCommentToken : HtmlToken
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HtmlKit.HtmlCommentToken"/> class.
@@ -118,7 +118,7 @@ namespace HtmlKit {
 	/// <remarks>
 	/// An HTML token consisting of character data.
 	/// </remarks>
-	public sealed class HtmlDataToken : HtmlToken
+	public class HtmlDataToken : HtmlToken
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HtmlKit.HtmlDataToken"/> class.
@@ -168,7 +168,7 @@ namespace HtmlKit {
 	/// <remarks>
 	/// An HTML tag token.
 	/// </remarks>
-	public sealed class HtmlTagToken : HtmlToken
+	public class HtmlTagToken : HtmlToken
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HtmlKit.HtmlTagToken"/> class.
@@ -314,7 +314,7 @@ namespace HtmlKit {
 	/// <remarks>
 	/// An HTML DOCTYPE token.
 	/// </remarks>
-	public sealed class HtmlDocTypeToken : HtmlToken
+	public class HtmlDocTypeToken : HtmlToken
 	{
 		string publicIdentifier;
 		string systemIdentifier;
