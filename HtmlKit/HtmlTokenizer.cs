@@ -28,6 +28,12 @@ using System.IO;
 using System.Text;
 
 namespace HtmlKit {
+	/// <summary>
+	/// An HTML tokenizer.
+	/// </summary>
+	/// <remarks>
+	/// Tokenizes HTML text, emitting an <see cref="HtmlToken"/> for each token it encounters.
+	/// </remarks>
 	public class HtmlTokenizer
 	{
 		const string DocType = "doctype";
@@ -47,9 +53,30 @@ namespace HtmlKit {
 
 		TextReader text;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="HtmlKit.HtmlTokenizer"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="HtmlTokenizer"/>.
+		/// </remarks>
+		/// <param name="reader">The <see cref="TextReader"/>.</param>
 		public HtmlTokenizer (TextReader reader)
 		{
+			DecodeCharacterReferences = true;
 			text = reader;
+		}
+
+		/// <summary>
+		/// Get or set whether or not the tokenizer should decode character references.
+		/// </summary>
+		/// <remarks>
+		/// <para>Gets or sets whether or not the tokenizer should decode character references.</para>
+		/// <para>Note: Character references in attribute values will still be decoded even if this
+		/// value is set to <c>false</c>.</para>
+		/// </remarks>
+		/// <value><c>true</c> if character references should be decoded; otherwise, <c>false</c>.</value>
+		public bool DecodeCharacterReferences {
+			get; set;
 		}
 
 		/// <summary>
@@ -324,9 +351,13 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '&':
-					TokenizerState = HtmlTokenizerState.CharacterReferenceInData;
-					token = null;
-					return false;
+					if (DecodeCharacterReferences) {
+						TokenizerState = HtmlTokenizerState.CharacterReferenceInData;
+						token = null;
+						return false;
+					}
+
+					goto default;
 				case '<':
 					TokenizerState = HtmlTokenizerState.TagOpen;
 					break;
@@ -366,9 +397,13 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '&':
-					TokenizerState = HtmlTokenizerState.CharacterReferenceInRcData;
-					token = null;
-					return false;
+					if (DecodeCharacterReferences) {
+						TokenizerState = HtmlTokenizerState.CharacterReferenceInRcData;
+						token = null;
+						return false;
+					}
+
+					goto default;
 				case '<':
 					TokenizerState = HtmlTokenizerState.RcDataLessThan;
 					return EmitDataToken (out token);
