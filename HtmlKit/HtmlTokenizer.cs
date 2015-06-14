@@ -39,9 +39,11 @@ namespace HtmlKit {
 		readonly HtmlEntityDecoder entity = new HtmlEntityDecoder ();
 		readonly StringBuilder data = new StringBuilder ();
 		readonly StringBuilder name = new StringBuilder ();
+		readonly char[] cdata = new char[3];
 		HtmlDocTypeToken doctype;
 		HtmlAttribute attribute;
 		HtmlTagToken tag;
+		int cdataIndex;
 		bool isEndTag;
 		char quote;
 
@@ -2444,6 +2446,45 @@ namespace HtmlKit {
 			} while (true);
 		}
 
+		bool ReadCDataSection (out HtmlToken token)
+		{
+			int nc = text.Read ();
+
+			while (nc != -1) {
+				char c = (char) nc;
+
+				if (cdataIndex >= 3) {
+					data.Append (cdata[0]);
+					cdata[0] = cdata[1];
+					cdata[1] = cdata[2];
+					cdata[2] = c;
+
+					if (cdata[0] == ']' && cdata[1] == ']' && cdata[2] == '>') {
+						TokenizerState = HtmlTokenizerState.Data;
+						cdataIndex = 0;
+
+						return EmitDataToken (out token);
+					}
+
+					if (data.Length > 1024)
+						return EmitDataToken (out token);
+				} else {
+					cdata[cdataIndex++] = c;
+				}
+
+				nc = text.Read ();
+			}
+
+			TokenizerState = HtmlTokenizerState.EndOfFile;
+
+			for (int i = 0; i < cdataIndex; i++)
+				data.Append (cdata[i]);
+
+			cdataIndex = 0;
+
+			return EmitDataToken (out token);
+		}
+
 		public bool ReadNextToken (out HtmlToken token)
 		{
 			do {
@@ -2695,7 +2736,8 @@ namespace HtmlKit {
 						return true;
 					break;
 				case HtmlTokenizerState.CDataSection:
-					// TODO
+					if (ReadCDataSection (out token))
+						return true;
 					break;
 				case HtmlTokenizerState.EndOfFile:
 					token = null;
