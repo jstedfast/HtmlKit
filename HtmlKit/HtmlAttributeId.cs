@@ -593,7 +593,7 @@ namespace HtmlKit {
 	/// <remarks>
 	/// <see cref="HtmlAttributeId"/> extension methods.
 	/// </remarks>
-	static class HtmlAttributeIdExtensions
+	public static class HtmlAttributeIdExtensions
 	{
 		static readonly Dictionary<string, HtmlAttributeId> AttributeNameToId;
 
@@ -641,7 +641,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <returns>The attribute id.</returns>
 		/// <param name="name">The attribute name.</param>
-		public static HtmlAttributeId ToHtmlAttributeId (this string name)
+		internal static HtmlAttributeId ToHtmlAttributeId (this string name)
 		{
 			HtmlAttributeId value;
 

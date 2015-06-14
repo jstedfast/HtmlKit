@@ -183,6 +183,11 @@ namespace HtmlKit {
 		ColGroup,
 
 		/// <summary>
+		/// The HTML &lt;command&gt; tag.
+		/// </summary>
+		Command,
+
+		/// <summary>
 		/// The HTML comment tag.
 		/// </summary>
 		Comment,
@@ -372,6 +377,11 @@ namespace HtmlKit {
 		/// The HTML &lt;kbd&gt; tag.
 		/// </summary>
 		Kbd,
+
+		/// <summary>
+		/// The HTML &lt;keygen&gt; tag.
+		/// </summary>
+		Keygen,
 
 		/// <summary>
 		/// The HTML &lt;label&gt; tag.
@@ -722,7 +732,7 @@ namespace HtmlKit {
 	/// <remarks>
 	/// <see cref="HtmlTagId"/> extension methods.
 	/// </remarks>
-	static class HtmlTagIdExtensions
+	public static class HtmlTagIdExtensions
 	{
 		static readonly Dictionary<string, HtmlTagId> TagNameToId;
 
@@ -773,7 +783,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <returns>The tag id.</returns>
 		/// <param name="name">The tag name.</param>
-		public static HtmlTagId ToHtmlTagId (this string name)
+		internal static HtmlTagId ToHtmlTagId (this string name)
 		{
 			HtmlTagId value;
 
@@ -787,6 +797,39 @@ namespace HtmlKit {
 				return HtmlTagId.Unknown;
 
 			return value;
+		}
+
+		/// <summary>
+		/// Determines whether or not the HTML tag is an empty element.
+		/// </summary>
+		/// <remarks>
+		/// Determines whether or not the HTML tag is an empty element.
+		/// </remarks>
+		/// <returns><c>true</c> if the tag is an empty element; otherwise, <c>false</c>.</returns>
+		/// <param name="id">Identifier.</param>
+		public static bool IsEmptyElement (this HtmlTagId id)
+		{
+			switch (id) {
+			case HtmlTagId.Area:
+			case HtmlTagId.Base:
+			case HtmlTagId.Br:
+			case HtmlTagId.Col:
+			case HtmlTagId.Command:
+			case HtmlTagId.Embed:
+			case HtmlTagId.HR:
+			case HtmlTagId.Image:
+			case HtmlTagId.Input:
+			case HtmlTagId.Keygen:
+			case HtmlTagId.Link:
+			case HtmlTagId.Meta:
+			case HtmlTagId.Param:
+			case HtmlTagId.Source:
+			case HtmlTagId.Track:
+			case HtmlTagId.Wbr:
+				return true;
+			default:
+				return false;
+			}
 		}
 
 		/// <summary>
