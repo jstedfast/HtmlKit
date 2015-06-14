@@ -38,14 +38,14 @@ namespace HtmlKit {
 	/// </remarks>
 	public static class HtmlUtils
 	{
-		internal static bool IsValidAttributeName (string name)
+		internal static bool IsValidTokenName (string name)
 		{
 			if (string.IsNullOrEmpty (name))
 				return false;
 
 			for (int i = 0; i < name.Length; i++) {
 				switch (name[i]) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 				case '<': case '>': case '\'': case '"':
 				case '/': case '=':
 					return false;
@@ -53,51 +53,6 @@ namespace HtmlKit {
 			}
 
 			return true;
-		}
-
-		interface ICharArray
-		{
-			char this[int index] { get; }
-
-			void Write (TextWriter output, int startIndex, int count);
-		}
-
-		class CharArray : ICharArray
-		{
-			readonly char[] array;
-
-			public CharArray (char[] value)
-			{
-				array = value;
-			}
-
-			public char this[int index] {
-				get { return array[index]; }
-			}
-
-			public void Write (TextWriter output, int startIndex, int count)
-			{
-				output.Write (array, startIndex, count);
-			}
-		}
-
-		class CharString : ICharArray
-		{
-			readonly string array;
-
-			public CharString (string value)
-			{
-				array = value;
-			}
-
-			public char this[int index] {
-				get { return array[index]; }
-			}
-
-			public void Write (TextWriter output, int startIndex, int count)
-			{
-				output.Write (array, startIndex, count);
-			}
 		}
 
 		static int IndexOfHtmlEncodeAttributeChar (ICharArray value, int startIndex, int endIndex, char quote)

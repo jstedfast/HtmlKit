@@ -75,7 +75,7 @@ namespace HtmlKit {
 			if (name.Length == 0)
 				throw new ArgumentException ("The attribute name cannot be empty.", "name");
 
-			if (!HtmlUtils.IsValidAttributeName (name))
+			if (!HtmlUtils.IsValidTokenName (name))
 				throw new ArgumentException ("Invalid attribute name.", "name");
 
 			Id = name.ToHtmlAttributeId ();

@@ -140,7 +140,7 @@ namespace HtmlKit {
 		bool EmitDataToken (out HtmlToken token)
 		{
 			if (data.Length > 0) {
-				token = new HtmlDataToken (data.ToString ());
+				token = new HtmlDataToken (data.ToString (), !DecodeCharacterReferences);
 				data.Clear ();
 				return true;
 			}
