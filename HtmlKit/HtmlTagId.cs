@@ -345,7 +345,7 @@ namespace HtmlKit {
 		/// <summary>
 		/// The HTML &lt;iframe&gt; tag.
 		/// </summary>
-		Iframe,
+		IFrame,
 
 		/// <summary>
 		/// The HTML &lt;image&gt; tag.

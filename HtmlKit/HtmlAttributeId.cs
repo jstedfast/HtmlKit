@@ -568,6 +568,11 @@ namespace HtmlKit {
 		/// The "width" attribute.
 		/// </summary>
 		Width,
+
+		/// <summary>
+		/// The "xmlns" attribute.
+		/// </summary>
+		XmlNS
 	}
 
 	[AttributeUsage (AttributeTargets.Field)]
