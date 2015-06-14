@@ -95,16 +95,6 @@ namespace HtmlKit {
 			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
 		}
 
-		static bool IsAsciiUpperLetter (char c)
-		{
-			return c >= 'A' && c <= 'Z';
-		}
-
-		static bool IsAsciiLowerLetter (char c)
-		{
-			return c >= 'a' && c <= 'z';
-		}
-
 		static bool IsAsciiLetter (char c)
 		{
 			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
@@ -113,6 +103,20 @@ namespace HtmlKit {
 		static char ToLower (char c)
 		{
 			return (c >= 'A' && c <= 'Z') ? (char) (c + 0x20) : c;
+		}
+
+		// Note: value must be lowercase
+		bool NameIs (string value)
+		{
+			if (name.Length != value.Length)
+				return false;
+
+			for (int i = 0; i < name.Length; i++) {
+				if (ToLower (name[i]) != value[i])
+					return false;
+			}
+
+			return true;
 		}
 
 		void EmitTagAttribute ()
@@ -262,7 +266,7 @@ namespace HtmlKit {
 
 			if (IsAsciiLetter (c)) {
 				TokenizerState = rawTextEndTagName;
-				name.Append (ToLower (c));
+				name.Append (c);
 				data.Append (c);
 				text.Read ();
 			} else {
@@ -296,20 +300,20 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '\t': case '\n': case '\f': case ' ':
-					if (name.ToString () == activeTagName) {
+					if (NameIs (activeTagName)) {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
 					}
 
 					goto default;
 				case '/':
-					if (name.ToString () == activeTagName) {
+					if (NameIs (activeTagName)) {
 						TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 						break;
 					}
 					goto default;
 				case '>':
-					if (name.ToString () == activeTagName) {
+					if (NameIs (activeTagName)) {
 						token = new HtmlTagToken (name.ToString (), true);
 						TokenizerState = HtmlTokenizerState.Data;
 						data.Clear ();
@@ -324,7 +328,7 @@ namespace HtmlKit {
 						return false;
 					}
 
-					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
+					name.Append (c == '\0' ? '\uFFFD' : c);
 					break;
 				}
 			} while (TokenizerState == current);
@@ -552,9 +556,7 @@ namespace HtmlKit {
 			case '?': TokenizerState = HtmlTokenizerState.BogusComment; break;
 			case '/': TokenizerState = HtmlTokenizerState.EndTagOpen; break;
 			default:
-				c = ToLower (c);
-
-				if (c >= 'a' && c <= 'z') {
+				if (IsAsciiLetter (c)) {
 					TokenizerState = HtmlTokenizerState.TagName;
 					isEndTag = false;
 					name.Append (c);
@@ -590,9 +592,7 @@ namespace HtmlKit {
 				data.Clear ();
 				break;
 			default:
-				c = ToLower (c);
-
-				if (c >= 'a' && c <= 'z') {
+				if (IsAsciiLetter (c)) {
 					TokenizerState = HtmlTokenizerState.TagName;
 					isEndTag = true;
 					name.Append (c);
@@ -638,7 +638,7 @@ namespace HtmlKit {
 					name.Clear ();
 					return true;
 				default:
-					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
+					name.Append (c == '\0' ? '\uFFFD' : c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.TagName);
@@ -754,20 +754,20 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '\t': case '\n': case '\f': case ' ':
-					if (name.ToString () == "script") {
+					if (NameIs ("script")) {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
 					}
 
 					goto default;
 				case '/':
-					if (name.ToString () == "script") {
+					if (NameIs ("script")) {
 						TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 						break;
 					}
 					goto default;
 				case '>':
-					if (name.ToString () == "script") {
+					if (NameIs ("script")) {
 						token = new HtmlTagToken (name.ToString (), true);
 						TokenizerState = HtmlTokenizerState.Data;
 						data.Clear ();
@@ -782,7 +782,7 @@ namespace HtmlKit {
 						return false;
 					}
 
-					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
+					name.Append (c == '\0' ? '\uFFFD' : c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEndTagName);
@@ -935,9 +935,9 @@ namespace HtmlKit {
 				text.Read ();
 			} else if (IsAsciiLetter (c)) {
 				TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
-				name.Append (ToLower (c));
 				data.Append ('<');
 				data.Append (c);
+				name.Append (c);
 				text.Read ();
 			} else {
 				TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
@@ -965,7 +965,7 @@ namespace HtmlKit {
 
 			if (IsAsciiLetter (c)) {
 				TokenizerState = HtmlTokenizerState.ScriptDataEscapedEndTagName;
-				name.Append (ToLower (c));
+				name.Append (c);
 				text.Read ();
 			} else {
 				TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
@@ -996,20 +996,20 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '\t': case '\n': case '\f': case ' ':
-					if (name.ToString () == "script") {
+					if (NameIs ("script")) {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
 					}
 
 					goto default;
 				case '/':
-					if (name.ToString () == "script") {
+					if (NameIs ("script")) {
 						TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 						break;
 					}
 					goto default;
 				case '>':
-					if (name.ToString () == "script") {
+					if (NameIs ("script")) {
 						token = new HtmlTagToken (name.ToString (), true);
 						TokenizerState = HtmlTokenizerState.Data;
 						data.Clear ();
@@ -1025,7 +1025,7 @@ namespace HtmlKit {
 						return false;
 					}
 
-					name.Append (ToLower (c));
+					name.Append (c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscapedEndTagName);
@@ -1056,7 +1056,7 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '\t': case '\n': case '\f': case ' ': case '/': case '>':
-					if (name.ToString () == "script")
+					if (NameIs ("script"))
 						TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
 					else
 						TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
@@ -1066,7 +1066,7 @@ namespace HtmlKit {
 					if (!IsAsciiLetter (c))
 						TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
 					else
-						name.Append (ToLower (c));
+						name.Append (c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataDoubleEscapeStart);
@@ -1199,7 +1199,7 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '\t': case '\n': case '\f': case ' ': case '/': case '>':
-					if (name.ToString () == "script")
+					if (NameIs ("script"))
 						TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
 					else
 						TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
@@ -1210,7 +1210,7 @@ namespace HtmlKit {
 					if (!IsAsciiLetter (c)) {
 						TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
 					} else {
-						name.Append (ToLower (c));
+						name.Append (c);
 						data.Append (c);
 						text.Read ();
 					}
@@ -1256,7 +1256,7 @@ namespace HtmlKit {
 					goto default;
 				default:
 					TokenizerState = HtmlTokenizerState.AttributeName;
-					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
+					name.Append (c == '\0' ? '\uFFFD' : c);
 					return false;
 				}
 			} while (true);
@@ -1298,7 +1298,7 @@ namespace HtmlKit {
 
 					return EmitTagToken (out token);
 				default:
-					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
+					name.Append (c == '\0' ? '\uFFFD' : c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.AttributeName);
@@ -1344,7 +1344,7 @@ namespace HtmlKit {
 					goto default;
 				default:
 					TokenizerState = HtmlTokenizerState.AttributeName;
-					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
+					name.Append (c == '\0' ? '\uFFFD' : c);
 					return false;
 				}
 			} while (true);
@@ -1385,7 +1385,7 @@ namespace HtmlKit {
 					goto default;
 				default:
 					TokenizerState = HtmlTokenizerState.AttributeName;
-					name.Append (c == '\0' ? '\uFFFD' : ToLower (c));
+					name.Append (c == '\0' ? '\uFFFD' : c);
 					return false;
 				}
 			} while (true);
@@ -1689,6 +1689,7 @@ namespace HtmlKit {
 			if (c == 'D' || c == 'd') {
 				// Note: we save the data in case we hit a parse error and have to emit a data token
 				data.Append (c);
+				name.Append (c);
 				text.Read ();
 				count = 1;
 
@@ -1703,13 +1704,18 @@ namespace HtmlKit {
 
 					// Note: we save the data in case we hit a parse error and have to emit a data token
 					data.Append (c);
+					name.Append (c);
 					count++;
 				}
 
 				if (count == 7) {
+					doctype = new HtmlDocTypeToken (name.ToString ());
 					TokenizerState = HtmlTokenizerState.DocType;
+					name.Clear ();
 					return false;
 				}
+
+				name.Clear ();
 			} else if (c == '[') {
 				// Note: we save the data in case we hit a parse error and have to emit a data token
 				data.Append (c);
@@ -1974,9 +1980,12 @@ namespace HtmlKit {
 			char c;
 
 			if (nc == -1) {
-				token = new HtmlDocTypeToken { ForceQuirksMode = true };
 				TokenizerState = HtmlTokenizerState.EndOfFile;
+				doctype.ForceQuirksMode = true;
+				token = doctype;
+				doctype = null;
 				data.Clear ();
+				name.Clear ();
 				return true;
 			}
 
@@ -2003,8 +2012,10 @@ namespace HtmlKit {
 				char c;
 
 				if (nc == -1) {
-					token = new HtmlDocTypeToken { ForceQuirksMode = true };
 					TokenizerState = HtmlTokenizerState.EndOfFile;
+					doctype.ForceQuirksMode = true;
+					token = doctype;
+					doctype = null;
 					data.Clear ();
 					return true;
 				}
@@ -2018,19 +2029,19 @@ namespace HtmlKit {
 				case '\t': case '\n': case '\f': case ' ':
 					break;
 				case '>':
-					token = new HtmlDocTypeToken { ForceQuirksMode = true };
 					TokenizerState = HtmlTokenizerState.Data;
+					doctype.ForceQuirksMode = true;
+					token = doctype;
+					doctype = null;
 					data.Clear ();
 					return true;
 				case '\0':
 					TokenizerState = HtmlTokenizerState.DocTypeName;
-					doctype = new HtmlDocTypeToken ();
 					name.Append ('\uFFFD');
 					return false;
 				default:
 					TokenizerState = HtmlTokenizerState.DocTypeName;
-					doctype = new HtmlDocTypeToken ();
-					name.Append (ToLower (c));
+					name.Append (c);
 					return false;
 				}
 			} while (true);
@@ -2075,7 +2086,7 @@ namespace HtmlKit {
 					name.Append ('\uFFFD');
 					break;
 				default:
-					name.Append (ToLower (c));
+					name.Append (c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.DocTypeName);
@@ -2118,14 +2129,18 @@ namespace HtmlKit {
 					data.Clear ();
 					return true;
 				default:
-					name.Append (ToLower (c));
+					name.Append (c);
 					if (name.Length < 6)
 						break;
 
-					switch (name.ToString ()) {
-					case "public": TokenizerState = HtmlTokenizerState.AfterDocTypePublicKeyword; break;
-					case "system": TokenizerState = HtmlTokenizerState.AfterDocTypeSystemKeyword; break;
-					default: TokenizerState = HtmlTokenizerState.BogusDocType; break;
+					if (NameIs ("public")) {
+						TokenizerState = HtmlTokenizerState.AfterDocTypePublicKeyword;
+						doctype.PublicKeyword = name.ToString ();
+					} else if (NameIs ("system")) {
+						TokenizerState = HtmlTokenizerState.AfterDocTypeSystemKeyword;
+						doctype.SystemKeyword = name.ToString ();
+					} else {
+						TokenizerState = HtmlTokenizerState.BogusDocType;
 					}
 
 					name.Clear ();

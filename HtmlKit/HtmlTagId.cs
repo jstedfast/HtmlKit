@@ -724,16 +724,16 @@ namespace HtmlKit {
 	/// </remarks>
 	static class HtmlTagIdExtensions
 	{
-		static readonly Dictionary<string, HtmlTagId> dict;
+		static readonly Dictionary<string, HtmlTagId> TagNameToId;
 
 		static HtmlTagIdExtensions ()
 		{
 			var values = (HtmlTagId[]) Enum.GetValues (typeof (HtmlTagId));
 
-			dict = new Dictionary<string, HtmlTagId> (values.Length - 1, StringComparer.OrdinalIgnoreCase);
+			TagNameToId = new Dictionary<string, HtmlTagId> (values.Length - 1, StringComparer.OrdinalIgnoreCase);
 
 			for (int i = 0; i < values.Length - 1; i++)
-				dict.Add (values[i].ToHtmlTagName (), values[i]);
+				TagNameToId.Add (values[i].ToHtmlTagName (), values[i]);
 		}
 
 		/// <summary>
@@ -783,7 +783,7 @@ namespace HtmlKit {
 			if (name[0] == '!')
 				return HtmlTagId.Comment;
 
-			if (!dict.TryGetValue (name, out value))
+			if (!TagNameToId.TryGetValue (name, out value))
 				return HtmlTagId.Unknown;
 
 			return value;

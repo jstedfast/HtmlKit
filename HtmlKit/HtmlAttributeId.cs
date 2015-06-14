@@ -590,16 +590,16 @@ namespace HtmlKit {
 	/// </remarks>
 	static class HtmlAttributeIdExtensions
 	{
-		static readonly Dictionary<string, HtmlAttributeId> dict;
+		static readonly Dictionary<string, HtmlAttributeId> AttributeNameToId;
 
 		static HtmlAttributeIdExtensions ()
 		{
 			var values = (HtmlAttributeId[]) Enum.GetValues (typeof (HtmlAttributeId));
 
-			dict = new Dictionary<string, HtmlAttributeId> (values.Length - 1, StringComparer.OrdinalIgnoreCase);
+			AttributeNameToId = new Dictionary<string, HtmlAttributeId> (values.Length - 1, StringComparer.OrdinalIgnoreCase);
 
 			for (int i = 0; i < values.Length - 1; i++)
-				dict.Add (values[i].ToAttributeName (), values[i]);
+				AttributeNameToId.Add (values[i].ToAttributeName (), values[i]);
 		}
 
 		/// <summary>
@@ -640,7 +640,7 @@ namespace HtmlKit {
 		{
 			HtmlAttributeId value;
 
-			if (!dict.TryGetValue (name, out value))
+			if (!AttributeNameToId.TryGetValue (name, out value))
 				return HtmlAttributeId.Unknown;
 
 			return value;
