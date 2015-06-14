@@ -216,7 +216,7 @@ namespace HtmlKit {
 			token = null;
 
 			switch (c) {
-			case '\t': case '\n': case '\f': case ' ': case '<': case '&':
+			case '\t': case '\r': case '\n': case '\f': case ' ': case '<': case '&':
 				// no character is consumed, emit '&'
 				TokenizerState = next;
 				data.Append ('&');
@@ -322,7 +322,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					if (NameIs (activeTagName)) {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
@@ -648,7 +648,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 					break;
 				case '/':
@@ -776,7 +776,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					if (NameIs ("script")) {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
@@ -1018,7 +1018,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					if (NameIs ("script")) {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
@@ -1078,7 +1078,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ': case '/': case '>':
+				case '\t': case '\r': case '\n': case '\f': case ' ': case '/': case '>':
 					if (NameIs ("script"))
 						TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
 					else
@@ -1221,7 +1221,7 @@ namespace HtmlKit {
 				char c = (char) nc;
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ': case '/': case '>':
+				case '\t': case '\r': case '\n': case '\f': case ' ': case '/': case '>':
 					if (NameIs ("script"))
 						TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
 					else
@@ -1267,7 +1267,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
 				case '/':
 					TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
@@ -1307,7 +1307,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					TokenizerState = HtmlTokenizerState.AfterAttributeName;
 					break;
 				case '/':
@@ -1352,7 +1352,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
 				case '/':
 					TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
@@ -1394,7 +1394,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
 				case '"': case '\'': TokenizerState = HtmlTokenizerState.AttributeValueQuoted; quote = c; return false;
 				case '&': TokenizerState = HtmlTokenizerState.AttributeValueUnquoted; return false;
@@ -1474,7 +1474,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 					break;
 				case '&':
@@ -1523,7 +1523,7 @@ namespace HtmlKit {
 			token = null;
 
 			switch (c) {
-			case '\t': case '\n': case '\f': case ' ': case '<': case '&':
+			case '\t': case '\r': case '\n': case '\f': case ' ': case '<': case '&':
 				// no character is consumed, emit '&'
 				data.Append ('&');
 				name.Append ('&');
@@ -1593,7 +1593,7 @@ namespace HtmlKit {
 			token = null;
 
 			switch (c) {
-			case '\t': case '\n': case '\f': case ' ':
+			case '\t': case '\r': case '\n': case '\f': case ' ':
 				TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 				consume = true;
 				break;
@@ -2017,7 +2017,7 @@ namespace HtmlKit {
 			token = null;
 
 			switch (c) {
-			case '\t': case '\n': case '\f': case ' ':
+			case '\t': case '\r': case '\n': case '\f': case ' ':
 				data.Append (c);
 				text.Read ();
 				break;
@@ -2049,7 +2049,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;
@@ -2094,7 +2094,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					TokenizerState = HtmlTokenizerState.AfterDocTypeName;
 					break;
 				case '>':
@@ -2143,7 +2143,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;
@@ -2192,7 +2192,7 @@ namespace HtmlKit {
 			data.Append (c);
 
 			switch (c) {
-			case '\t': case '\n': case '\f': case ' ':
+			case '\t': case '\r': case '\n': case '\f': case ' ':
 				TokenizerState = HtmlTokenizerState.BeforeDocTypePublicIdentifier;
 				break;
 			case '"': case '\'': // parse error
@@ -2241,7 +2241,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
 				case '"': case '\'':
 					TokenizerState = HtmlTokenizerState.DocTypePublicIdentifierQuoted;
@@ -2337,7 +2337,7 @@ namespace HtmlKit {
 			data.Append (c);
 
 			switch (c) {
-			case '\t': case '\n': case '\f': case ' ':
+			case '\t': case '\r': case '\n': case '\f': case ' ':
 				TokenizerState = HtmlTokenizerState.BetweenDocTypePublicAndSystemIdentifiers;
 				break;
 			case '>':
@@ -2385,7 +2385,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;
@@ -2426,7 +2426,7 @@ namespace HtmlKit {
 			data.Append (c);
 
 			switch (c) {
-			case '\t': case '\n': case '\f': case ' ':
+			case '\t': case '\r': case '\n': case '\f': case ' ':
 				TokenizerState = HtmlTokenizerState.BeforeDocTypeSystemIdentifier;
 				break;
 			case '"': case '\'': // parse error
@@ -2475,7 +2475,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
 				case '"': case '\'':
 					TokenizerState = HtmlTokenizerState.DocTypeSystemIdentifierQuoted;
@@ -2574,7 +2574,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\n': case '\f': case ' ':
+				case '\t': case'\r': case '\n': case '\f': case ' ':
 					break;
 				case '>':
 					TokenizerState = HtmlTokenizerState.Data;

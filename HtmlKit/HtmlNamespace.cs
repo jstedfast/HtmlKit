@@ -73,6 +73,8 @@ namespace HtmlKit {
 	/// </remarks>
 	static class HtmlNamespaceExtensions
 	{
+		static readonly int NamespacePrefixLength = "http://www.w3.org/".Length;
+
 		static readonly string[] NamespaceValues = {
 			"http://www.w3.org/1999/xhtml",
 			"http://www.w3.org/1998/Math/MathML",
@@ -94,7 +96,7 @@ namespace HtmlKit {
 		{
 			int index = (int) value;
 
-			if (value < 0 || value >= NamespaceValues.Length)
+			if (index < 0 || index >= NamespaceValues.Length)
 				throw new ArgumentOutOfRangeException ("value");
 
 			return NamespaceValues[index];
@@ -110,8 +112,6 @@ namespace HtmlKit {
 		/// <param name="ns">The namespace.</param>
 		public static HtmlNamespace ToHtmlNamespace (this string ns)
 		{
-			const int n = "http://www.w3.org/".Length;
-
 			if (ns == null)
 				throw new ArgumentNullException ("ns");
 
@@ -122,7 +122,8 @@ namespace HtmlKit {
 				if (ns.Length != NamespaceValues[i].Length)
 					continue;
 
-				if (string.Compare (ns, n, NamespaceValues[i], n, ns.Length - n, StringComparison.OrdinalIgnoreCase) == 0)
+				if (string.Compare (ns, NamespacePrefixLength, NamespaceValues[i], NamespacePrefixLength,
+					ns.Length - NamespacePrefixLength, StringComparison.OrdinalIgnoreCase) == 0)
 					return (HtmlNamespace) i;
 			}
 
