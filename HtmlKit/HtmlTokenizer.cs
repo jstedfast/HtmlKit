@@ -35,7 +35,7 @@ namespace HtmlKit
     /// <remarks>
     /// Tokenizes HTML text, emitting an <see cref="HtmlToken"/> for each token it encounters.
     /// </remarks>
-    public class HtmlTokenizer
+    public partial class HtmlTokenizer
     {
         const string DocType = "doctype";
         const string CData = "[CDATA[";
@@ -53,7 +53,7 @@ namespace HtmlKit
         char quote;
 
         TextReader text;
-
+        HtmlTokenFactory tokenFactory;
         /// <summary>
         /// Initializes a new instance of the <see cref="HtmlKit.HtmlTokenizer"/> class.
         /// </summary>
@@ -61,10 +61,11 @@ namespace HtmlKit
         /// Creates a new <see cref="HtmlTokenizer"/>.
         /// </remarks>
         /// <param name="reader">The <see cref="TextReader"/>.</param>
-        public HtmlTokenizer(TextReader reader)
+        public HtmlTokenizer(TextReader reader, HtmlTokenFactory tokenFactory)
         {
             DecodeCharacterReferences = true;
             text = reader;
+            this.tokenFactory = tokenFactory;
         }
 
         /// <summary>
