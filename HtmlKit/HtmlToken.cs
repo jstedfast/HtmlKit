@@ -162,31 +162,19 @@ namespace HtmlKit {
 		/// Creates a new <see cref="HtmlDataToken"/>.
 		/// </remarks>
 		/// <param name="data">The character data.</param>
-		/// <param name="isEncoded"><c>true</c> if the data is still encoded; otherwise, <c>false</c>.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="data"/> is <c>null</c>.
 		/// </exception>
-		public HtmlDataToken (string data, bool isEncoded) : base (HtmlTokenKind.Data)
+		public HtmlDataToken (string data) : base (HtmlTokenKind.Data)
 		{
 			if (data == null)
 				throw new ArgumentNullException ("data");
 
-			IsEncoded = isEncoded;
 			Data = data;
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlKit.HtmlDataToken"/> class.
-		/// </summary>
-		/// <remarks>
-		/// Creates a new <see cref="HtmlDataToken"/>.
-		/// </remarks>
-		/// <param name="data">The character data.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="data"/> is <c>null</c>.
-		/// </exception>
-		public HtmlDataToken (string data) : this (data, false)
-		{
+		internal bool EncodeEntities {
+			get; set;
 		}
 
 		/// <summary>
@@ -197,17 +185,6 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <value>The character data.</value>
 		public string Data {
-			get; private set;
-		}
-
-		/// <summary>
-		/// Get whether or not the data is still encoded.
-		/// </summary>
-		/// <remarks>
-		/// Gets whether or not the data is still encoded.
-		/// </remarks>
-		/// <value><c>true</c> if the data is encoded; otherwise, <c>false</c>.</value>
-		public bool IsEncoded {
 			get; private set;
 		}
 
@@ -227,7 +204,7 @@ namespace HtmlKit {
 			if (output == null)
 				throw new ArgumentNullException ("output");
 
-			if (IsEncoded) {
+			if (!EncodeEntities) {
 				output.Write (Data);
 				return;
 			}
@@ -392,18 +369,6 @@ namespace HtmlKit {
 	{
 		string publicIdentifier;
 		string systemIdentifier;
-		string tagName;
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlKit.HtmlDocTypeToken"/> class.
-		/// </summary>
-		/// <remarks>
-		/// Creates a new <see cref="HtmlDocTypeToken"/>.
-		/// </remarks>
-		internal HtmlDocTypeToken (string doctype) : base (HtmlTokenKind.DocType)
-		{
-			tagName = doctype;
-		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HtmlKit.HtmlDocTypeToken"/> class.
@@ -413,7 +378,11 @@ namespace HtmlKit {
 		/// </remarks>
 		public HtmlDocTypeToken () : base (HtmlTokenKind.DocType)
 		{
-			tagName = "DOCTYPE";
+			RawTagName = "DOCTYPE";
+		}
+
+		internal string RawTagName {
+			get; set;
 		}
 
 		/// <summary>
@@ -517,7 +486,7 @@ namespace HtmlKit {
 				throw new ArgumentNullException ("output");
 
 			output.Write ("<!");
-			output.Write (tagName);
+			output.Write (RawTagName);
 			if (Name != null) {
 				output.Write (' ');
 				output.Write (Name);
