@@ -30,9 +30,6 @@ using System.Text;
 namespace HtmlKit {
 	public class HtmlTokenizer
 	{
-		const string AlphaChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-		const string HexAlphabet = "0123456789ABCDEF";
-		const string Numeric = "0123456789";
 		const string DocType = "doctype";
 		const string CData = "[CDATA[";
 
