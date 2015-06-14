@@ -38,6 +38,7 @@
     <Compile Include="HtmlEntityDecoder.g.cs">
       <DependentUpon>HtmlEntityDecoder.cs</DependentUpon>
     </Compile>
+    <Compile Include="HtmlNamespace.cs" />
     <Compile Include="HtmlTagId.cs" />
     <Compile Include="HtmlToken.cs" />
     <Compile Include="HtmlTokenKind.cs" />
