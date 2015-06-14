@@ -34,17 +34,17 @@ namespace HtmlKit {
 	public enum HtmlTokenizerState {
 		Data,
 		CharacterReferenceInData,
-		RcData, // todo
-		CharacterReferenceInRcData, // todo
+		RcData,
+		CharacterReferenceInRcData,
 		RawText,
 		ScriptData,
 		PlainText,
 		TagOpen,
 		EndTagOpen,
 		TagName,
-		RcDataLessThan, // todo
-		RcDataEndTagOpen, // todo
-		RcDataEndTagName, // todo
+		RcDataLessThan,
+		RcDataEndTagOpen,
+		RcDataEndTagName,
 		RawTextLessThan,
 		RawTextEndTagOpen,
 		RawTextEndTagName,
@@ -96,7 +96,7 @@ namespace HtmlKit {
 		DocTypeSystemIdentifierQuoted,
 		AfterDocTypeSystemIdentifier,
 		BogusDocType,
-		CDataSection, // todo
+		CDataSection,
 		EndOfFile
 	}
 }
