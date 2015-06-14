@@ -304,7 +304,7 @@ namespace HtmlKit {
 
 				if ((nc = text.Peek ()) == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					data.Append (entity.GetValue ());
+					data.Append (entity.GetPushedInput ());
 					entity.Reset ();
 
 					return EmitDataToken (out token, true);
