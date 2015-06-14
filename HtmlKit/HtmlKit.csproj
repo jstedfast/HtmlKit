@@ -45,6 +45,9 @@
     <Compile Include="HtmlTokenizer.cs" />
     <Compile Include="HtmlTokenizerState.cs" />
     <Compile Include="HtmlUtils.cs" />
+    <Compile Include="HtmlWriter.cs" />
+    <Compile Include="HtmlWriterState.cs" />
+    <Compile Include="ICharArray.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>
