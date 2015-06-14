@@ -151,6 +151,12 @@ namespace HtmlKit {
 				//case 0: // parse error, but emit it anyway
 				default:
 					data.Append (c);
+
+					// Note: we emit at 1024 characters simply to avoid
+					// consuming too much memory.
+					if (data.Length >= 1024)
+						return EmitDataToken (out token);
+
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.Data);
@@ -230,10 +236,9 @@ namespace HtmlKit {
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
 
-					// Note: we emit at the end of every line and/or at 1024
-					// characters (whichever comes first) simply to avoid
+					// Note: we emit at 1024 characters simply to avoid
 					// consuming too much memory.
-					if (c == '\n' || data.Length >= 1024)
+					if (data.Length >= 1024)
 						return EmitDataToken (out token);
 
 					break;
@@ -268,10 +273,9 @@ namespace HtmlKit {
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
 
-					// Note: we emit at the end of every line and/or at 1024
-					// characters (whichever comes first) simply to avoid
+					// Note: we emit at 1024 characters simply to avoid
 					// consuming too much memory.
-					if (c == '\n' || data.Length >= 1024)
+					if (data.Length >= 1024)
 						return EmitDataToken (out token);
 
 					break;
@@ -295,10 +299,9 @@ namespace HtmlKit {
 
 				data.Append (c == '\0' ? '\uFFFD' : c);
 
-				// Note: we emit at the end of every line and/or at 1024
-				// characters (whichever comes first) simply to avoid
+				// Note: we emit at 1024 characters simply to avoid
 				// consuming too much memory.
-				if (c == '\n' || data.Length >= 1024)
+				if (data.Length >= 1024)
 					return EmitDataToken (out token);
 
 				nc = text.Read ();
