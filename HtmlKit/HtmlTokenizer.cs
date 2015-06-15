@@ -1652,7 +1652,7 @@ namespace HtmlKit {
 			
 		}
 
-		void ReadCharacterReferenceInAttributeValue (out HtmlToken token)
+		void ReadCharacterReferenceInAttributeValue ()
 		{
 			char additionalAllowedCharacter = quote == '\0' ? '>' : quote;
 			int nc = Peek ();
@@ -1664,7 +1664,7 @@ namespace HtmlKit {
 				data.Append ('&');
 				name.Length = 0;
 
-				EmitDataToken (out token, false);
+				EmitDataToken (false);
                 return;
 			}
 
@@ -1697,7 +1697,7 @@ namespace HtmlKit {
 						data.Append (entity.GetPushedInput ());
 						entity.Reset ();
 
-						EmitDataToken (out token, false);
+						EmitDataToken ( false);
                         return;
 					}
 
@@ -1730,7 +1730,7 @@ namespace HtmlKit {
 			
 		}
 
-		void ReadAfterAttributeValueQuoted (out HtmlToken token)
+		void ReadAfterAttributeValueQuoted ()
 		{
 			int nc = Peek ();
 			bool consume;
@@ -2351,7 +2351,7 @@ namespace HtmlKit {
 			return false;
 		}
 
-		public bool ReadBeforeDocTypePublicIdentifier (out HtmlToken token)
+		public bool ReadBeforeDocTypePublicIdentifier ()
 		{
 			token = null;
 
@@ -2396,7 +2396,7 @@ namespace HtmlKit {
 			} while (true);
 		}
 
-		bool ReadDocTypePublicIdentifierQuoted ()
+		void ReadDocTypePublicIdentifierQuoted ()
 		{
 			token = null;
 
@@ -2412,7 +2412,7 @@ namespace HtmlKit {
 					doctype = null;
 					data.Length = 0;
 					name.Length = 0;
-					return true;
+                    return;
 				}
 
 				c = (char) nc;
@@ -2432,7 +2432,7 @@ namespace HtmlKit {
 					doctype = null;
 					data.Length = 0;
 					name.Length = 0;
-					return true;
+                    return;
 				default:
 					if (c == quote) {
 						TokenizerState = HtmlTokenizerState.AfterDocTypePublicIdentifier;
@@ -2447,10 +2447,10 @@ namespace HtmlKit {
 			doctype.PublicIdentifier = name.ToString ();
 			name.Length = 0;
 
-			return false;
+			
 		}
 
-		public bool ReadAfterDocTypePublicIdentifier (out HtmlToken token)
+		public void ReadAfterDocTypePublicIdentifier ()
 		{
 			int nc = Read ();
 			char c;
@@ -2461,7 +2461,7 @@ namespace HtmlKit {
 				token = doctype;
 				doctype = null;
 				data.Length = 0;
-				return true;
+                return;
 			}
 
 			c = (char) nc;
@@ -2478,7 +2478,7 @@ namespace HtmlKit {
 				token = doctype;
 				doctype = null;
 				data.Length = 0;
-				return true;
+                return;
 			case '"': case '\'': // parse error
 				TokenizerState = HtmlTokenizerState.DocTypeSystemIdentifierQuoted;
 				doctype.SystemIdentifier = string.Empty;
@@ -2492,10 +2492,10 @@ namespace HtmlKit {
 
 			token = null;
 
-			return false;
+			 
 		}
 
-		bool ReadBetweenDocTypePublicAndSystemIdentifiers (out HtmlToken token)
+		void ReadBetweenDocTypePublicAndSystemIdentifiers ()
 		{
 			token = null;
 
@@ -2509,7 +2509,7 @@ namespace HtmlKit {
 					token = doctype;
 					doctype = null;
 					data.Length = 0;
-					return true;
+                    return;
 				}
 
 				c = (char) nc;
@@ -2525,21 +2525,21 @@ namespace HtmlKit {
 					token = doctype;
 					doctype = null;
 					data.Length = 0;
-					return true;
+                    return;
 				case '"': case '\'':
 					TokenizerState = HtmlTokenizerState.DocTypeSystemIdentifierQuoted;
 					doctype.SystemIdentifier = string.Empty;
 					quote = c;
-					return false;
+                    return;
 				default: // parse error
 					TokenizerState = HtmlTokenizerState.BogusDocType;
 					doctype.ForceQuirksMode = true;
-					return false;
+                    return;
 				}
 			} while (true);
 		}
 
-		bool ReadAfterDocTypeSystemKeyword (out HtmlToken token)
+		void ReadAfterDocTypeSystemKeyword ()
 		{
 			int nc = Read ();
 			char c;
@@ -2550,7 +2550,7 @@ namespace HtmlKit {
 				token = doctype;
 				doctype = null;
 				data.Length = 0;
-				return true;
+                return;
 			}
 
 			c = (char) nc;
@@ -2573,19 +2573,17 @@ namespace HtmlKit {
 				token = doctype;
 				doctype = null;
 				data.Length = 0;
-				return true;
+                return;
 			default: // parse error
 				TokenizerState = HtmlTokenizerState.BogusDocType;
 				doctype.ForceQuirksMode = true;
 				break;
 			}
 
-			token = null;
-
-			return false;
+			token = null;			
 		}
 
-		bool ReadBeforeDocTypeSystemIdentifier (out HtmlToken token)
+		void ReadBeforeDocTypeSystemIdentifier ()
 		{
 			token = null;
 
@@ -2599,7 +2597,7 @@ namespace HtmlKit {
 					token = doctype;
 					doctype = null;
 					data.Length = 0;
-					return true;
+                    return;
 				}
 
 				c = (char) nc;
@@ -2614,23 +2612,23 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.DocTypeSystemIdentifierQuoted;
 					doctype.SystemIdentifier = string.Empty;
 					quote = c;
-					return false;
+                    return;
 				case '>': // parse error
 					TokenizerState = HtmlTokenizerState.Data;
 					doctype.ForceQuirksMode = true;
 					token = doctype;
 					doctype = null;
 					data.Length = 0;
-					return true;
+					return;
 				default: // parse error
 					TokenizerState = HtmlTokenizerState.BogusDocType;
 					doctype.ForceQuirksMode = true;
-					return false;
-				}
+                    return;
+                }
 			} while (true);
 		}
 
-		bool ReadDocTypeSystemIdentifierQuoted ()
+		void ReadDocTypeSystemIdentifierQuoted ()
 		{
 			token = null;
 
@@ -2646,7 +2644,7 @@ namespace HtmlKit {
 					doctype = null;
 					data.Length = 0;
 					name.Length = 0;
-					return true;
+                    return;
 				}
 
 				c = (char) nc;
@@ -2666,7 +2664,7 @@ namespace HtmlKit {
 					doctype = null;
 					data.Length = 0;
 					name.Length = 0;
-					return true;
+					return;
 				default:
 					if (c == quote) {
 						TokenizerState = HtmlTokenizerState.AfterDocTypeSystemIdentifier;
@@ -2681,10 +2679,10 @@ namespace HtmlKit {
 			doctype.SystemIdentifier = name.ToString ();
 			name.Length = 0;
 
-			return false;
+            
 		}
 
-		public bool ReadAfterDocTypeSystemIdentifier (out HtmlToken token)
+		public void ReadAfterDocTypeSystemIdentifier ()
 		{
 			token = null;
 
@@ -2698,7 +2696,7 @@ namespace HtmlKit {
 					token = doctype;
 					doctype = null;
 					data.Length = 0;
-					return true;
+                    return;
 				}
 
 				c = (char) nc;
@@ -2714,10 +2712,10 @@ namespace HtmlKit {
 					token = doctype;
 					doctype = null;
 					data.Length = 0;
-					return true;
+					return;
 				default: // parse error
 					TokenizerState = HtmlTokenizerState.BogusDocType;
-					return false;
+					return;
 				}
 			} while (true);
 		}
