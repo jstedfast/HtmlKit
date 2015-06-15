@@ -646,44 +646,24 @@ namespace HtmlKit {
 			if (count < 0 || count > (data.Length - startIndex))
 				throw new ArgumentOutOfRangeException ("count");
 
-			int index = data.IndexOf ('&', startIndex, count);
-			int endIndex = startIndex + count;
-			int start = startIndex;
-
-			if (index == -1 || index >= endIndex) {
-				output.Write (data);
-				return;
-			}
-
 			var entity = new HtmlEntityDecoder ();
+			int endIndex = startIndex + count;
+			int index = startIndex;
 
 			while (index < endIndex) {
-				if (index > start)
-					output.Write (data, startIndex, index - start);
+				if (data[index] == '&') {
+					while (index < endIndex && entity.Push (data[index]))
+						index++;
 
-				// at this point, text[index] is an '&' character
-				while (index < endIndex && entity.Push (data[index]))
-					index++;
+					output.Write (entity.GetValue ());
+					entity.Reset ();
 
-				output.Write (entity.GetValue ());
-
-				if (index >= endIndex) {
-					start = index;
-					break;
+					if (index < endIndex && data[index] == ';')
+						index++;
+				} else {
+					output.Write (data[index++]);
 				}
-
-				if (data[index] == ';')
-					index++;
-
-				if ((start = index) >= endIndex)
-					break;
-
-				if ((index = data.IndexOf ('&', start, endIndex - start)) == -1)
-					index = endIndex;
 			}
-
-			if (endIndex > start)
-				output.Write (data, startIndex, endIndex - start);
 		}
 
 		/// <summary>
