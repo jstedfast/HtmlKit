@@ -159,8 +159,16 @@ namespace HtmlKit {
 		{
 			return new HtmlTagToken (name, isEndTag);
 		}
+        /// <summary>
+        /// Create an HTML attribute token
+        /// </summary>
+        /// <returns>HtmlAttribute</returns>
+        protected virtual HtmlAttribute CreateAttributeToken(string name)
+        {
+            return new HtmlAttribute(name);
+        }
 
-		static bool IsAlphaNumeric (char c)
+        static bool IsAlphaNumeric (char c)
 		{
 			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
 		}
@@ -191,7 +199,7 @@ namespace HtmlKit {
 
 		void EmitTagAttribute ()
 		{
-			attribute = new HtmlAttribute (name.ToString ());
+            attribute = CreateAttributeToken (name.ToString ()); 
 			tag.Attributes.Add (attribute);
 			name.Clear ();
 		}
