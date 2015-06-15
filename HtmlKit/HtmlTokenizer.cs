@@ -229,15 +229,20 @@ namespace HtmlKit {
 
 			if ((c = text.Read ()) == -1)
 				return -1;
-
-			if (c == '\n') {
-				LinePosition = 1;
-				LineNumber++;
-			} else {
-				LinePosition++;
-			}
-
-			return c;
+            switch(c)
+            {
+                case '\0':
+                    //ensure '\0' char replacement 
+                    LinePosition++; 
+                    return '\uFFFD';
+                case '\n':
+                    LinePosition = 1;
+                    LineNumber++;
+                    return '\n';
+                default:
+                    LinePosition++;
+                    return c;
+            }			 
 		}
 
 		// Note: value must be lowercase
