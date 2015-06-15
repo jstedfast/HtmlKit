@@ -54,7 +54,7 @@ namespace HtmlKit {
 		TextReader text;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlKit.HtmlTokenizer"/> class.
+		/// Initializes a new instance of the <see cref="HtmlTokenizer"/> class.
 		/// </summary>
 		/// <remarks>
 		/// Creates a new <see cref="HtmlTokenizer"/>.
@@ -160,6 +160,19 @@ namespace HtmlKit {
 			return new HtmlTagToken (name, isEndTag);
 		}
 
+		/// <summary>
+		/// Create an attribute.
+		/// </summary>
+		/// <remarks>
+		/// Creates an attribute.
+		/// </remarks>
+		/// <returns>The attribute.</returns>
+		/// <param name="name">THe attribute name.</param>
+		protected virtual HtmlAttribute CreateAttribute (string name)
+		{
+			return new HtmlAttribute (name);
+		}
+
 		static bool IsAlphaNumeric (char c)
 		{
 			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
@@ -191,7 +204,7 @@ namespace HtmlKit {
 
 		void EmitTagAttribute ()
 		{
-			attribute = new HtmlAttribute (name.ToString ());
+			attribute = CreateAttribute (name.ToString ());
 			tag.Attributes.Add (attribute);
 			name.Length = 0;
 		}
