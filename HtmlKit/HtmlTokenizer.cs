@@ -382,8 +382,8 @@ namespace HtmlKit {
 			do {
 				int nc = text.Read ();
 				char c;
-
-				if (nc == -1) {
+                
+                if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Clear ();
 
