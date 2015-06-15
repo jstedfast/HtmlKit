@@ -37,277 +37,227 @@ namespace HtmlKit
     /// </remarks>
     partial class HtmlTokenizer
     {
+        HtmlToken _nextEmitToken;
         public bool ReadNextToken(out HtmlToken token)
         {
-            do
+            token = null;
+            //1. init
+            _nextEmitToken = null;
+            //2. 
+            while (TokenizerState != HtmlTokenizerState.EndOfFile)
             {
+
                 switch (TokenizerState)
                 {
                     case HtmlTokenizerState.Data:
-                        if (ReadDataToken(out token))
-                            return true;
+                        ReadDataToken(out token);
                         break;
                     case HtmlTokenizerState.CharacterReferenceInData:
-                        if (ReadCharacterReferenceInData(out token))
-                            return true;
+                        ReadCharacterReferenceInData(out token);
                         break;
                     case HtmlTokenizerState.RcData:
-                        if (ReadRcData(out token))
-                            return true;
+                        ReadRcData(out token);
                         break;
                     case HtmlTokenizerState.CharacterReferenceInRcData:
-                        if (ReadCharacterReferenceInRcData(out token))
-                            return true;
+                        ReadCharacterReferenceInRcData(out token);
                         break;
                     case HtmlTokenizerState.RawText:
-                        if (ReadRawText(out token))
-                            return true;
+                        ReadRawText(out token);
                         break;
                     case HtmlTokenizerState.ScriptData:
-                        if (ReadScriptData(out token))
-                            return true;
+                        ReadScriptData(out token);
                         break;
                     case HtmlTokenizerState.PlainText:
-                        if (ReadPlainText(out token))
-                            return true;
+                        ReadPlainText(out token);
                         break;
                     case HtmlTokenizerState.TagOpen:
-                        if (ReadTagOpen(out token))
-                            return true;
+                        ReadTagOpen(out token);
                         break;
                     case HtmlTokenizerState.EndTagOpen:
-                        if (ReadEndTagOpen(out token))
-                            return true;
+                        ReadEndTagOpen(out token);
                         break;
                     case HtmlTokenizerState.TagName:
-                        if (ReadTagName(out token))
-                            return true;
+                        ReadTagName(out token);
                         break;
                     case HtmlTokenizerState.RcDataLessThan:
-                        if (ReadRcDataLessThan(out token))
-                            return true;
+                        ReadRcDataLessThan(out token);
                         break;
                     case HtmlTokenizerState.RcDataEndTagOpen:
-                        if (ReadRcDataEndTagOpen(out token))
-                            return true;
+                        ReadRcDataEndTagOpen(out token);
                         break;
                     case HtmlTokenizerState.RcDataEndTagName:
-                        if (ReadRcDataEndTagName(out token))
-                            return true;
+                        ReadRcDataEndTagName(out token);
                         break;
                     case HtmlTokenizerState.RawTextLessThan:
-                        if (ReadRawTextLessThan(out token))
-                            return true;
+                        ReadRawTextLessThan(out token);
                         break;
                     case HtmlTokenizerState.RawTextEndTagOpen:
-                        if (ReadRawTextEndTagOpen(out token))
-                            return true;
+                        ReadRawTextEndTagOpen(out token);
                         break;
                     case HtmlTokenizerState.RawTextEndTagName:
-                        if (ReadRawTextEndTagName(out token))
-                            return true;
+                        ReadRawTextEndTagName(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataLessThan:
-                        if (ReadScriptDataLessThan(out token))
-                            return true;
+                        ReadScriptDataLessThan(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEndTagOpen:
-                        if (ReadScriptDataEndTagOpen(out token))
-                            return true;
+                        ReadScriptDataEndTagOpen(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEndTagName:
-                        if (ReadScriptDataEndTagName(out token))
-                            return true;
+                        ReadScriptDataEndTagName(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEscapeStart:
-                        if (ReadScriptDataEscapeStart(out token))
-                            return true;
+                        ReadScriptDataEscapeStart(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEscapeStartDash:
-                        if (ReadScriptDataEscapeStartDash(out token))
-                            return true;
+                        ReadScriptDataEscapeStartDash(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEscaped:
-                        if (ReadScriptDataEscaped(out token))
-                            return true;
+                        ReadScriptDataEscaped(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEscapedDash:
-                        if (ReadScriptDataEscapedDash(out token))
-                            return true;
+                        ReadScriptDataEscapedDash(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEscapedDashDash:
-                        if (ReadScriptDataEscapedDashDash(out token))
-                            return true;
+                        ReadScriptDataEscapedDashDash(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEscapedLessThan:
-                        if (ReadScriptDataEscapedLessThan(out token))
-                            return true;
+                        ReadScriptDataEscapedLessThan(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEscapedEndTagOpen:
-                        if (ReadScriptDataEscapedEndTagOpen(out token))
-                            return true;
+                        ReadScriptDataEscapedEndTagOpen(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataEscapedEndTagName:
-                        if (ReadScriptDataEscapedEndTagName(out token))
-                            return true;
+                        ReadScriptDataEscapedEndTagName(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataDoubleEscapeStart:
-                        if (ReadScriptDataDoubleEscapeStart(out token))
-                            return true;
+                        ReadScriptDataDoubleEscapeStart(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataDoubleEscaped:
-                        if (ReadScriptDataDoubleEscaped(out token))
-                            return true;
+                        ReadScriptDataDoubleEscaped(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataDoubleEscapedDash:
-                        if (ReadScriptDataDoubleEscapedDash(out token))
-                            return true;
+                        ReadScriptDataDoubleEscapedDash(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataDoubleEscapedDashDash:
-                        if (ReadScriptDataDoubleEscapedDashDash(out token))
-                            return true;
+                        ReadScriptDataDoubleEscapedDashDash(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataDoubleEscapedLessThan:
-                        if (ReadScriptDataDoubleEscapedLessThan(out token))
-                            return true;
+                        ReadScriptDataDoubleEscapedLessThan(out token);
                         break;
                     case HtmlTokenizerState.ScriptDataDoubleEscapeEnd:
-                        if (ReadScriptDataDoubleEscapeEnd(out token))
-                            return true;
+                        ReadScriptDataDoubleEscapeEnd(out token);
                         break;
                     case HtmlTokenizerState.BeforeAttributeName:
-                        if (ReadBeforeAttributeName(out token))
-                            return true;
+                        ReadBeforeAttributeName(out token);
                         break;
                     case HtmlTokenizerState.AttributeName:
-                        if (ReadAttributeName(out token))
-                            return true;
+                        ReadAttributeName(out token);
                         break;
                     case HtmlTokenizerState.AfterAttributeName:
-                        if (ReadAfterAttributeName(out token))
-                            return true;
+                        ReadAfterAttributeName(out token);
                         break;
                     case HtmlTokenizerState.BeforeAttributeValue:
-                        if (ReadBeforeAttributeValue(out token))
-                            return true;
+                        ReadBeforeAttributeValue(out token);
                         break;
                     case HtmlTokenizerState.AttributeValueQuoted:
-                        if (ReadAttributeValueQuoted(out token))
-                            return true;
+                        ReadAttributeValueQuoted(out token);
                         break;
                     case HtmlTokenizerState.AttributeValueUnquoted:
-                        if (ReadAttributeValueUnquoted(out token))
-                            return true;
+                        ReadAttributeValueUnquoted(out token);
                         break;
                     case HtmlTokenizerState.CharacterReferenceInAttributeValue:
-                        if (ReadCharacterReferenceInAttributeValue(out token))
-                            return true;
+                        ReadCharacterReferenceInAttributeValue(out token);
                         break;
                     case HtmlTokenizerState.AfterAttributeValueQuoted:
-                        if (ReadAfterAttributeValueQuoted(out token))
-                            return true;
+                        ReadAfterAttributeValueQuoted(out token);
                         break;
                     case HtmlTokenizerState.SelfClosingStartTag:
-                        if (ReadSelfClosingStartTag(out token))
-                            return true;
+                        ReadSelfClosingStartTag(out token);
                         break;
                     case HtmlTokenizerState.BogusComment:
-                        if (ReadBogusComment(out token))
-                            return true;
+                        ReadBogusComment(out token);
                         break;
                     case HtmlTokenizerState.MarkupDeclarationOpen:
-                        if (ReadMarkupDeclarationOpen(out token))
-                            return true;
+                        ReadMarkupDeclarationOpen(out token);
                         break;
                     case HtmlTokenizerState.CommentStart:
-                        if (ReadCommentStart(out token))
-                            return true;
+                        ReadCommentStart(out token);
                         break;
                     case HtmlTokenizerState.CommentStartDash:
-                        if (ReadCommentStartDash(out token))
-                            return true;
+                        ReadCommentStartDash(out token);
                         break;
                     case HtmlTokenizerState.Comment:
-                        if (ReadComment(out token))
-                            return true;
+                        ReadComment(out token);
                         break;
                     case HtmlTokenizerState.CommentEndDash:
-                        if (ReadCommentEndDash(out token))
-                            return true;
+                        ReadCommentEndDash(out token);
                         break;
                     case HtmlTokenizerState.CommentEnd:
-                        if (ReadCommentEnd(out token))
-                            return true;
+                        ReadCommentEnd(out token);
                         break;
                     case HtmlTokenizerState.CommentEndBang:
-                        if (ReadCommentEndBang(out token))
-                            return true;
+                        ReadCommentEndBang(out token);
                         break;
                     case HtmlTokenizerState.DocType:
-                        if (ReadDocType(out token))
-                            return true;
+                        ReadDocType(out token);
                         break;
                     case HtmlTokenizerState.BeforeDocTypeName:
-                        if (ReadBeforeDocTypeName(out token))
-                            return true;
+                        ReadBeforeDocTypeName(out token);
                         break;
                     case HtmlTokenizerState.DocTypeName:
-                        if (ReadDocTypeName(out token))
-                            return true;
+                        ReadDocTypeName(out token);
                         break;
                     case HtmlTokenizerState.AfterDocTypeName:
-                        if (ReadAfterDocTypeName(out token))
-                            return true;
+                        ReadAfterDocTypeName(out token);
                         break;
                     case HtmlTokenizerState.AfterDocTypePublicKeyword:
-                        if (ReadAfterDocTypePublicKeyword(out token))
-                            return true;
+                        ReadAfterDocTypePublicKeyword(out token);
                         break;
                     case HtmlTokenizerState.BeforeDocTypePublicIdentifier:
-                        if (ReadBeforeDocTypePublicIdentifier(out token))
-                            return true;
+                        ReadBeforeDocTypePublicIdentifier(out token);
                         break;
                     case HtmlTokenizerState.DocTypePublicIdentifierQuoted:
-                        if (ReadDocTypePublicIdentifierQuoted(out token))
-                            return true;
+                        ReadDocTypePublicIdentifierQuoted(out token);
                         break;
                     case HtmlTokenizerState.AfterDocTypePublicIdentifier:
-                        if (ReadAfterDocTypePublicIdentifier(out token))
-                            return true;
+                        ReadAfterDocTypePublicIdentifier(out token);
                         break;
                     case HtmlTokenizerState.BetweenDocTypePublicAndSystemIdentifiers:
-                        if (ReadBetweenDocTypePublicAndSystemIdentifiers(out token))
-                            return true;
+                        ReadBetweenDocTypePublicAndSystemIdentifiers(out token);
                         break;
                     case HtmlTokenizerState.AfterDocTypeSystemKeyword:
-                        if (ReadAfterDocTypeSystemKeyword(out token))
-                            return true;
+                        ReadAfterDocTypeSystemKeyword(out token);
                         break;
                     case HtmlTokenizerState.BeforeDocTypeSystemIdentifier:
-                        if (ReadBeforeDocTypeSystemIdentifier(out token))
-                            return true;
+                        ReadBeforeDocTypeSystemIdentifier(out token);
                         break;
                     case HtmlTokenizerState.DocTypeSystemIdentifierQuoted:
-                        if (ReadDocTypeSystemIdentifierQuoted(out token))
-                            return true;
+                        ReadDocTypeSystemIdentifierQuoted(out token);
                         break;
                     case HtmlTokenizerState.AfterDocTypeSystemIdentifier:
-                        if (ReadAfterDocTypeSystemIdentifier(out token))
-                            return true;
+                        ReadAfterDocTypeSystemIdentifier(out token);
                         break;
                     case HtmlTokenizerState.BogusDocType:
-                        if (ReadBogusDocType(out token))
-                            return true;
+                        ReadBogusDocType(out token);
                         break;
                     case HtmlTokenizerState.CDataSection:
-                        if (ReadCDataSection(out token))
-                            return true;
+                        ReadCDataSection(out token);
                         break;
                     case HtmlTokenizerState.EndOfFile:
                         token = null;
                         return false;
                 }
-            } while (true);
+
+
+                if ((_nextEmitToken = token) != null)
+                {
+                    return true;//found next token 
+                }
+            }
+            //3.
+            token = null;
+            return false;
         }
     }
 }
