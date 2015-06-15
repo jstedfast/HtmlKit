@@ -269,11 +269,11 @@ namespace HtmlKit {
 			return true;
 		}
 
-        void EmitCommentToken (StringBuilder comment, out HtmlToken token)
+        void EmitCommentToken (StringBuilder comment)
 		{
-			EmitCommentToken (comment.ToString (), out token);
+			EmitCommentToken (comment.ToString ());
 		} 
-        void EmitDataToken (out HtmlToken token, bool encodeEntities)
+        void EmitDataToken (bool encodeEntities)
 		{
             
             if (data.Length > 0) {
@@ -285,7 +285,7 @@ namespace HtmlKit {
 			token = null;
 		}
 
-		void EmitTagToken (out HtmlToken token)
+		void EmitTagToken ()
 		{
 			if (!tag.IsEndTag && !tag.IsEmptyElement) {
 				switch (tag.Id) {
@@ -333,7 +333,7 @@ namespace HtmlKit {
 			tag = null;			 
 		}
 
-		void ReadCharacterReference (out HtmlToken token, HtmlTokenizerState next)
+		void ReadCharacterReference (HtmlTokenizerState next)
 		{
 			int nc = Peek ();
 			char c;
@@ -342,7 +342,7 @@ namespace HtmlKit {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
 				data.Append ('&');
 
-			    EmitDataToken (out token, true);
+			    EmitDataToken ( true);
                 return;
 			}
 
@@ -367,7 +367,7 @@ namespace HtmlKit {
 					data.Append (entity.GetPushedInput ());
 					entity.Reset ();
 
-					EmitDataToken (out token, true);
+					EmitDataToken (true);
                     return;
 				}
 
@@ -387,7 +387,7 @@ namespace HtmlKit {
             
 		}
 
-		void ReadGenericRawTextLessThan (out HtmlToken token, HtmlTokenizerState rawText, HtmlTokenizerState rawTextEndTagOpen)
+		void ReadGenericRawTextLessThan ( HtmlTokenizerState rawText, HtmlTokenizerState rawTextEndTagOpen)
 		{
 			int nc = Peek ();
 
@@ -408,14 +408,14 @@ namespace HtmlKit {
 			token = null;             
 		}
 
-		void ReadGenericRawTextEndTagOpen (out HtmlToken token, bool decoded, HtmlTokenizerState rawText, HtmlTokenizerState rawTextEndTagName)
+		void ReadGenericRawTextEndTagOpen (bool decoded, HtmlTokenizerState rawText, HtmlTokenizerState rawTextEndTagName)
 		{
 			int nc = Peek ();
 			char c;
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-			    EmitDataToken (out token, decoded);
+			    EmitDataToken ( decoded);
                 return;
 			}
 
@@ -433,7 +433,7 @@ namespace HtmlKit {
 			token = null;             
 		}
 
-		void ReadGenericRawTextEndTagName (out HtmlToken token, bool decoded, HtmlTokenizerState rawText)
+		void ReadGenericRawTextEndTagName ( bool decoded, HtmlTokenizerState rawText)
 		{
 			var current = TokenizerState;
 
@@ -445,7 +445,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					EmitDataToken (out token, decoded);
+					EmitDataToken ( decoded);
                     return;
 				}
 
@@ -494,7 +494,7 @@ namespace HtmlKit {
 			token = null;			 
 		}
 
-		void ReadDataToken(out HtmlToken token)
+		void ReadDataToken()
 		{
 			do {
 				int nc = Read ();
@@ -526,7 +526,7 @@ namespace HtmlKit {
 					// Note: we emit at 1024 characters simply to avoid
 					// consuming too much memory.
 					if (data.Length >= 1024) { 
-						EmitDataToken (out token, DecodeCharacterReferences);
+						EmitDataToken ( DecodeCharacterReferences);
                         return;
                     }
 
@@ -534,15 +534,15 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.Data);
 
-			EmitDataToken (out token, DecodeCharacterReferences);
+			EmitDataToken (DecodeCharacterReferences);
 		}
 
-		void ReadCharacterReferenceInData (out HtmlToken token)
+		void ReadCharacterReferenceInData ()
 		{
-			ReadCharacterReference (out token, HtmlTokenizerState.Data);
+			ReadCharacterReference ( HtmlTokenizerState.Data);
 		}
 
-		void ReadRcData (out HtmlToken token)
+		void ReadRcData ()
 		{
 			do {
 				int nc = Read ();
@@ -566,7 +566,7 @@ namespace HtmlKit {
 					goto default;
 				case '<':
 					TokenizerState = HtmlTokenizerState.RcDataLessThan;
-					EmitDataToken (out token, DecodeCharacterReferences);
+					EmitDataToken ( DecodeCharacterReferences);
                     return;
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
@@ -574,7 +574,7 @@ namespace HtmlKit {
 					// Note: we emit at 1024 characters simply to avoid
 					// consuming too much memory.
 					if (data.Length >= 1024) { 
-						  EmitDataToken (out token, DecodeCharacterReferences);
+						  EmitDataToken (DecodeCharacterReferences);
                     }
 
 					break;
@@ -589,13 +589,13 @@ namespace HtmlKit {
 			token = null; 
 		}
 
-		void ReadCharacterReferenceInRcData (out HtmlToken token)
+		void ReadCharacterReferenceInRcData ()
 		{
-			 ReadCharacterReference (out token, HtmlTokenizerState.RcData);
+			 ReadCharacterReference ( HtmlTokenizerState.RcData);
             
 		}
 
-		void ReadRawText (out HtmlToken token)
+		void ReadRawText ()
 		{
 			do {
 				int nc = Read ();
@@ -635,7 +635,7 @@ namespace HtmlKit {
 			token = null; 
 		}
 
-		void ReadScriptData (out HtmlToken token)
+		void ReadScriptData ()
 		{
 			do {
 				int nc = Read ();
