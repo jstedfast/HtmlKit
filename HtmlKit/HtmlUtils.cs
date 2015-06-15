@@ -585,12 +585,10 @@ namespace HtmlKit {
 			if (count < 0 || count > (data.Length - startIndex))
 				throw new ArgumentOutOfRangeException ("count");
 
-			var encoded = new StringBuilder ();
-
-			using (var output = new StringWriter (encoded))
+			using (var output = new StringWriter ()) {
 				HtmlEncode (output, new CharString (data), startIndex, count);
-
-			return encoded.ToString ();
+				return output.ToString ();
+			}
 		}
 
 		/// <summary>
@@ -609,12 +607,163 @@ namespace HtmlKit {
 			if (data == null)
 				throw new ArgumentNullException ("data");
 
-			var encoded = new StringBuilder ();
-
-			using (var output = new StringWriter (encoded))
+			using (var output = new StringWriter ()) {
 				HtmlEncode (output, new CharString (data), 0, data.Length);
+				return output.ToString ();
+			}
+		}
 
-			return encoded.ToString ();
+		/// <summary>
+		/// Decode HTML character data.
+		/// </summary>
+		/// <remarks>
+		/// Decodes HTML character data.
+		/// </remarks>
+		/// <param name="output">The <see cref="System.IO.TextWriter"/> to output the result.</param>
+		/// <param name="data">The character data to decode.</param>
+		/// <param name="startIndex">The starting index of the character data.</param>
+		/// <param name="count">The number of characters in the data.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <para><paramref name="output"/> is <c>null</c>.</para>
+		/// <para>-or-</para>
+		/// <para><paramref name="data"/> is <c>null</c>.</para>
+		/// </exception>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <para><paramref name="startIndex"/> and <paramref name="count"/> do not specify
+		/// a valid range in the data.</para>
+		/// </exception>
+		public static void HtmlDecode (TextWriter output, string data, int startIndex, int count)
+		{
+			if (output == null)
+				throw new ArgumentNullException ("output");
+
+			if (data == null)
+				throw new ArgumentNullException ("data");
+
+			if (startIndex < 0 || startIndex >= data.Length)
+				throw new ArgumentOutOfRangeException ("startIndex");
+
+			if (count < 0 || count > (data.Length - startIndex))
+				throw new ArgumentOutOfRangeException ("count");
+
+			int index = data.IndexOf ('&', startIndex, count);
+			int endIndex = startIndex + count;
+			int start = startIndex;
+
+			if (index == -1 || index >= endIndex) {
+				output.Write (data);
+				return;
+			}
+
+			var entity = new HtmlEntityDecoder ();
+
+			while (index < endIndex) {
+				if (index > start)
+					output.Write (data, startIndex, index - start);
+
+				// at this point, text[index] is an '&' character
+				while (index < endIndex && entity.Push (data[index]))
+					index++;
+
+				output.Write (entity.GetValue ());
+
+				if (index >= endIndex) {
+					start = index;
+					break;
+				}
+
+				if (data[index] == ';')
+					index++;
+
+				if ((start = index) >= endIndex)
+					break;
+
+				if ((index = data.IndexOf ('&', start, endIndex - start)) == -1)
+					index = endIndex;
+			}
+
+			if (endIndex > start)
+				output.Write (data, startIndex, endIndex - start);
+		}
+
+		/// <summary>
+		/// Decode HTML character data.
+		/// </summary>
+		/// <remarks>
+		/// Decodes HTML character data.
+		/// </remarks>
+		/// <param name="output">The <see cref="System.IO.TextWriter"/> to output the result.</param>
+		/// <param name="data">The character data to decode.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <para><paramref name="output"/> is <c>null</c>.</para>
+		/// <para>-or-</para>
+		/// <para><paramref name="data"/> is <c>null</c>.</para>
+		/// </exception>
+		public static void HtmlDecode (TextWriter output, string data)
+		{
+			if (output == null)
+				throw new ArgumentNullException ("output");
+
+			if (data == null)
+				throw new ArgumentNullException ("data");
+
+			HtmlDecode (output, data, 0, data.Length);
+		}
+
+		/// <summary>
+		/// Decode HTML character data.
+		/// </summary>
+		/// <remarks>
+		/// Decodes HTML character data.
+		/// </remarks>
+		/// <returns>The decoded character data.</returns>
+		/// <param name="data">The character data to decode.</param>
+		/// <param name="startIndex">The starting index of the character data.</param>
+		/// <param name="count">The number of characters in the data.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="data"/> is <c>null</c>.
+		/// </exception>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <para><paramref name="startIndex"/> and <paramref name="count"/> do not specify
+		/// a valid range in the data.</para>
+		/// </exception>
+		public static string HtmlDecode (string data, int startIndex, int count)
+		{
+			if (data == null)
+				throw new ArgumentNullException ("data");
+
+			if (startIndex < 0 || startIndex >= data.Length)
+				throw new ArgumentOutOfRangeException ("startIndex");
+
+			if (count < 0 || count > (data.Length - startIndex))
+				throw new ArgumentOutOfRangeException ("count");
+
+			using (var output = new StringWriter ()) {
+				HtmlDecode (output, data, startIndex, count);
+				return output.ToString ();
+			}
+		}
+
+		/// <summary>
+		/// Decode HTML character data.
+		/// </summary>
+		/// <remarks>
+		/// Decodes HTML character data.
+		/// </remarks>
+		/// <returns>The decoded character data.</returns>
+		/// <param name="data">The character data to decode.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="data"/> is <c>null</c>.
+		/// </exception>
+		public static string HtmlDecode (string data)
+		{
+			if (data == null)
+				throw new ArgumentNullException ("data");
+
+			using (var output = new StringWriter ()) {
+				HtmlDecode (output, data, 0, data.Length);
+				return output.ToString ();
+			}
 		}
 	}
 }
