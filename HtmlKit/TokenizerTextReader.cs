@@ -13,9 +13,18 @@ namespace HtmlKit
         {
             this.textReader = textReader;
         }
-        public int Peek()
-        {
-            return textReader.Peek();
+        public bool Peek(out char c)
+        {                
+            int peek = textReader.Peek();
+            if (peek == -1)
+            {
+                c = '\0';
+                return false;
+            }
+            else {
+                c = (char)peek;
+                return true;
+            } 
         }
         public int CurrentLine
         {
@@ -24,6 +33,12 @@ namespace HtmlKit
         public int CurrentColumn
         {
             get { return currentColumn; }
+        }
+        public bool ReadNext()
+        {
+            char c;
+            return ReadNext(out c);               
+                
         }
         public bool ReadNext(out char c)
         {

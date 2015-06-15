@@ -61,7 +61,8 @@ namespace UnitTests {
 			var actual = new StringBuilder ();
 
 			using (var textReader = File.OpenText (path)) {
-				var tokenizer = new HtmlTokenizer (textReader);
+                var tokenizerTextReader = new TokenizerTextReader(textReader);
+				var tokenizer = new HtmlTokenizer (tokenizerTextReader);
 				HtmlToken token;
 
 				Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
