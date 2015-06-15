@@ -29,6 +29,16 @@ using System.Text;
 
 namespace HtmlKit
 {
+    public class TokenizerEventArgs :System.EventArgs
+    {
+        public HtmlTokenKind TokenKind { get; internal set; }
+        public int LineNumber { get; internal set; }
+        public int ColumnNumber { get; internal set; }
+        public string Data { get; set; }
+    }
+
+    public delegate void TokenizerEmit(TokenizerEventArgs e);
+
     /// <summary>
     /// An HTML tokenizer.
     /// </summary>
@@ -37,19 +47,21 @@ namespace HtmlKit
     /// </remarks>
     partial class HtmlTokenizer
     {
+
+        public event TokenizerEmit TokenEmit;
+        public bool UseEventEmitterModel { get; set; }
+        
         HtmlToken token
         {
             get;
             set;
         }
-    
-        HtmlToken _nextEmitToken;
+
+
         public bool ReadNextToken(out HtmlToken output)
         {
-            this.token = token = null;
-            //1. init
-            _nextEmitToken = null;
-            //2. 
+            token = null;
+
             while (TokenizerState != HtmlTokenizerState.EndOfFile)
             {
 
@@ -253,9 +265,10 @@ namespace HtmlKit
                     case HtmlTokenizerState.EndOfFile:
                         output = token = null;
                         return false;
-                } 
+                }
 
-                if (( output = this.token) != null)
+
+                if ((output = token) != null)
                 {
                     return true;//found next token 
                 }
