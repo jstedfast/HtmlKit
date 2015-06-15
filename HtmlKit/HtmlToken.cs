@@ -161,6 +161,36 @@ namespace HtmlKit {
 		/// <remarks>
 		/// Creates a new <see cref="HtmlDataToken"/>.
 		/// </remarks>
+		/// <param name="kind">The kind of character data.</param>
+		/// <param name="data">The character data.</param>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <paramref name="kind"/> is not a valid <see cref="HtmlTokenKind"/>.
+		/// </exception>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="data"/> is <c>null</c>.
+		/// </exception>
+		protected HtmlDataToken (HtmlTokenKind kind, string data) : base (kind)
+		{
+			switch (kind) {
+			default: throw new ArgumentOutOfRangeException ("kind");
+			case HtmlTokenKind.ScriptData:
+			case HtmlTokenKind.CData:
+			case HtmlTokenKind.Data:
+				break;
+			}
+
+			if (data == null)
+				throw new ArgumentNullException ("data");
+
+			Data = data;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="HtmlKit.HtmlDataToken"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="HtmlDataToken"/>.
+		/// </remarks>
 		/// <param name="data">The character data.</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="data"/> is <c>null</c>.
@@ -210,6 +240,93 @@ namespace HtmlKit {
 			}
 
 			HtmlUtils.HtmlEncode (output, Data);
+		}
+	}
+
+	/// <summary>
+	/// An HTML token constisting of <c>[CDATA[</c>.
+	/// </summary>
+	/// <remarks>
+	/// An HTML token consisting of <c>[CDATA[</c>.
+	/// </remarks>
+	public class HtmlCDataToken : HtmlDataToken
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="HtmlKit.HtmlCDataToken"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="HtmlCDataToken"/>.
+		/// </remarks>
+		/// <param name="data">The character data.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="data"/> is <c>null</c>.
+		/// </exception>
+		public HtmlCDataToken (string data) : base (HtmlTokenKind.CData, data)
+		{
+		}
+
+		/// <summary>
+		/// Write the HTML character data to a <see cref="System.IO.TextWriter"/>.
+		/// </summary>
+		/// <remarks>
+		/// Writes the HTML character data to a <see cref="System.IO.TextWriter"/>,
+		/// encoding it if it isn't already encoded.
+		/// </remarks>
+		/// <param name="output">The output.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="output"/> is <c>null</c>.
+		/// </exception>
+		public override void WriteTo (TextWriter output)
+		{
+			if (output == null)
+				throw new ArgumentNullException ("output");
+
+			output.Write ("<![CDATA[");
+			output.Write (Data);
+			output.Write ("]]>");
+		}
+	}
+
+	/// <summary>
+	/// An HTML token constisting of script data.
+	/// </summary>
+	/// <remarks>
+	/// An HTML token consisting of script data.
+	/// </remarks>
+	public class HtmlScriptDataToken : HtmlDataToken
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="HtmlKit.HtmlScriptDataToken"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new <see cref="HtmlScriptDataToken"/>.
+		/// </remarks>
+		/// <param name="data">The script data.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="data"/> is <c>null</c>.
+		/// </exception>
+		public HtmlScriptDataToken (string data) : base (HtmlTokenKind.ScriptData, data)
+		{
+		}
+
+		/// <summary>
+		/// Write the HTML script data to a <see cref="System.IO.TextWriter"/>.
+		/// </summary>
+		/// <remarks>
+		/// Writes the HTML script data to a <see cref="System.IO.TextWriter"/>,
+		/// encoding it if it isn't already encoded.
+		/// </remarks>
+		/// <param name="output">The output.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="output"/> is <c>null</c>.
+		/// </exception>
+		public override void WriteTo (TextWriter output)
+		{
+			if (output == null)
+				throw new ArgumentNullException ("output");
+
+			// FIXME: properly encode/escape the script data
+			output.Write (Data);
 		}
 	}
 

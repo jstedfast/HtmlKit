@@ -177,6 +177,32 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
+		/// Create an HTML character data token.
+		/// </summary>
+		/// <remarks>
+		/// Creates an HTML character data token.
+		/// </remarks>
+		/// <returns>The HTML character data token.</returns>
+		/// <param name="data">The character data.</param>
+		protected virtual HtmlCDataToken CreateCDataToken (string data)
+		{
+			return new HtmlCDataToken (data);
+		}
+
+		/// <summary>
+		/// Create an HTML script data token.
+		/// </summary>
+		/// <remarks>
+		/// Creates an HTML script data token.
+		/// </remarks>
+		/// <returns>The HTML script data token.</returns>
+		/// <param name="data">The script data.</param>
+		protected virtual HtmlScriptDataToken CreateScriptDataToken (string data)
+		{
+			return new HtmlScriptDataToken (data);
+		}
+
+		/// <summary>
 		/// Create an HTML tag token.
 		/// </summary>
 		/// <remarks>
@@ -280,6 +306,32 @@ namespace HtmlKit {
 				var dataToken = CreateDataToken (data.ToString ());
 				dataToken.EncodeEntities = encodeEntities;
 				token = dataToken;
+				data.Length = 0;
+				return true;
+			}
+
+			token = null;
+
+			return false;
+		}
+
+		bool EmitCDataToken (out HtmlToken token)
+		{
+			if (data.Length > 0) {
+				token = CreateCDataToken (data.ToString ());
+				data.Length = 0;
+				return true;
+			}
+
+			token = null;
+
+			return false;
+		}
+
+		bool EmitScriptDataToken (out HtmlToken token)
+		{
+			if (data.Length > 0) {
+				token = CreateScriptDataToken (data.ToString ());
 				data.Length = 0;
 				return true;
 			}
@@ -530,12 +582,6 @@ namespace HtmlKit {
 				//case 0: // parse error, but emit it anyway
 				default:
 					data.Append (c);
-
-					// Note: we emit at 1024 characters simply to avoid
-					// consuming too much memory.
-					if (data.Length >= 1024)
-						return EmitDataToken (out token, DecodeCharacterReferences);
-
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.Data);
@@ -575,22 +621,11 @@ namespace HtmlKit {
 					return EmitDataToken (out token, DecodeCharacterReferences);
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
-
-					// Note: we emit at 1024 characters simply to avoid
-					// consuming too much memory.
-					if (data.Length >= 1024)
-						return EmitDataToken (out token, DecodeCharacterReferences);
-
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.RcData);
 
-			if (data.Length > 0)
-				return EmitDataToken (out token, DecodeCharacterReferences);
-
-			token = null;
-
-			return false;
+			return EmitDataToken (out token, DecodeCharacterReferences);
 		}
 
 		bool ReadCharacterReferenceInRcData (out HtmlToken token)
@@ -617,22 +652,11 @@ namespace HtmlKit {
 					return EmitDataToken (out token, false);
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
-
-					// Note: we emit at 1024 characters simply to avoid
-					// consuming too much memory.
-					if (data.Length >= 1024)
-						return EmitDataToken (out token, false);
-
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.RawText);
 
-			if (data.Length > 0)
-				return EmitDataToken (out token, false);
-
-			token = null;
-
-			return false;
+			return EmitDataToken (out token, false);
 		}
 
 		bool ReadScriptData (out HtmlToken token)
@@ -651,25 +675,14 @@ namespace HtmlKit {
 				switch (c) {
 				case '<':
 					TokenizerState = HtmlTokenizerState.ScriptDataLessThan;
-					return EmitDataToken (out token, false);
+					return EmitScriptDataToken (out token);
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
-
-					// Note: we emit at 1024 characters simply to avoid
-					// consuming too much memory.
-					if (data.Length >= 1024)
-						return EmitDataToken (out token, false);
-
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptData);
 
-			if (data.Length > 0)
-				return EmitDataToken (out token, false);
-
-			token = null;
-
-			return false;
+			return EmitScriptDataToken (out token);
 		}
 
 		bool ReadPlainText (out HtmlToken token)
@@ -680,12 +693,6 @@ namespace HtmlKit {
 				char c = (char) nc;
 
 				data.Append (c == '\0' ? '\uFFFD' : c);
-
-				// Note: we emit at 1024 characters simply to avoid
-				// consuming too much memory.
-				if (data.Length >= 1024)
-					return EmitDataToken (out token, false);
-
 				nc = Read ();
 			}
 
@@ -794,11 +801,11 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 					break;
 				case '>':
-					token = CreateTagToken (name.ToString (), isEndTag);
-					TokenizerState = HtmlTokenizerState.Data;
+					tag = CreateTagToken (name.ToString (), isEndTag);
 					data.Length = 0;
 					name.Length = 0;
-					return true;
+
+					return EmitTagToken (out token);
 				default:
 					name.Append (c == '\0' ? '\uFFFD' : c);
 					break;
@@ -877,7 +884,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitDataToken (out token, false);
+				return EmitScriptDataToken (out token);
 			}
 
 			c = (char) nc;
@@ -906,7 +913,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitDataToken (out token, false);
+					return EmitScriptDataToken (out token);
 				}
 
 				c = (char) nc;
@@ -996,7 +1003,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitDataToken (out token, false);
+					return EmitScriptDataToken (out token);
 				}
 
 				c = (char) nc;
@@ -1027,7 +1034,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitDataToken (out token, false);
+				return EmitScriptDataToken (out token);
 			}
 
 			switch ((c = (char) nc)) {
@@ -1057,7 +1064,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitDataToken (out token, false);
+					return EmitScriptDataToken (out token);
 				}
 
 				c = (char) nc;
@@ -1120,7 +1127,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitDataToken (out token, false);
+				return EmitScriptDataToken (out token);
 			}
 
 			c = (char) nc;
@@ -1148,7 +1155,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitDataToken (out token, false);
+					return EmitScriptDataToken (out token);
 				}
 
 				c = (char) nc;
@@ -1209,7 +1216,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitDataToken (out token, false);
+					return EmitScriptDataToken (out token);
 				}
 
 				c = (char) nc;
@@ -1246,7 +1253,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitDataToken (out token, false);
+					return EmitScriptDataToken (out token);
 				}
 
 				c = (char) nc;
@@ -1277,7 +1284,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitDataToken (out token, false);
+				return EmitScriptDataToken (out token);
 			}
 
 			switch ((c = (char) nc)) {
@@ -1307,7 +1314,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitDataToken (out token, false);
+					return EmitScriptDataToken (out token);
 				}
 
 				c = (char) nc;
@@ -1851,8 +1858,8 @@ namespace HtmlKit {
 				// Note: we save the data in case we hit a parse error and have to emit a data token
 				data.Append (c);
 				name.Append (c);
-				Read ();
 				count = 1;
+				Read ();
 
 				while (count < 7) {
 					if ((nc = Read ()) == -1) {
@@ -1880,8 +1887,8 @@ namespace HtmlKit {
 			} else if (c == '[') {
 				// Note: we save the data in case we hit a parse error and have to emit a data token
 				data.Append (c);
-				Read ();
 				count = 1;
+				Read ();
 
 				while (count < 7) {
 					if ((nc = Read ()) == -1) {
@@ -2734,7 +2741,6 @@ namespace HtmlKit {
 
 		bool ReadCDataSection (out HtmlToken token)
 		{
-			// FIXME: maybe we should have a CDATA token?
 			int nc = Read ();
 
 			while (nc != -1) {
@@ -2750,11 +2756,8 @@ namespace HtmlKit {
 						TokenizerState = HtmlTokenizerState.Data;
 						cdataIndex = 0;
 
-						return EmitDataToken (out token, true);
+						return EmitCDataToken (out token);
 					}
-
-					if (data.Length > 1024)
-						return EmitDataToken (out token, true);
 				} else {
 					cdata[cdataIndex++] = c;
 				}
@@ -2769,7 +2772,7 @@ namespace HtmlKit {
 
 			cdataIndex = 0;
 
-			return EmitDataToken (out token, true);
+			return EmitCDataToken (out token);
 		}
 
 		public bool ReadNextToken (out HtmlToken token)
