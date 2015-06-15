@@ -1107,7 +1107,7 @@ namespace HtmlKit {
 			
 		}
 
-		bool ReadScriptDataEscapedEndTagOpen (out HtmlToken token)
+		void ReadScriptDataEscapedEndTagOpen (out HtmlToken token)
 		{
 			int nc = Peek ();
 			char c;
@@ -1116,7 +1116,8 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitDataToken (out token, false);
+				EmitDataToken (out token, false);
+                return;
 			}
 
 			c = (char) nc;
@@ -1131,10 +1132,10 @@ namespace HtmlKit {
 
 			token = null;
 
-			return false;
+			 
 		}
 
-		bool ReadScriptDataEscapedEndTagName (out HtmlToken token)
+		void ReadScriptDataEscapedEndTagName (out HtmlToken token)
 		{
 			do {
 				int nc = Read ();
@@ -1144,7 +1145,8 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitDataToken (out token, false);
+			        EmitDataToken (out token, false);
+                    return;
 				}
 
 				c = (char) nc;
@@ -1172,7 +1174,7 @@ namespace HtmlKit {
 						TokenizerState = HtmlTokenizerState.Data;
 						data.Length = 0;
 						name.Length = 0;
-						return true;
+                        return;
 					}
 					goto default;
 				default:
@@ -1180,7 +1182,7 @@ namespace HtmlKit {
 						TokenizerState = HtmlTokenizerState.ScriptData;
 						data.Append (c);
 						token = null;
-						return false;
+						return;
 					}
 
 					name.Append (c);
@@ -1192,10 +1194,10 @@ namespace HtmlKit {
 			name.Length = 0;
 			token = null;
 
-			return false;
+			 
 		}
 
-		bool ReadScriptDataDoubleEscapeStart (out HtmlToken token)
+		void ReadScriptDataDoubleEscapeStart (out HtmlToken token)
 		{
 			do {
 				int nc = Read ();
@@ -1205,7 +1207,8 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitDataToken (out token, false);
+					EmitDataToken (out token, false);
+                    return;
 				}
 
 				c = (char) nc;
@@ -1231,10 +1234,10 @@ namespace HtmlKit {
 
 			token = null;
 
-			return false;
+			
 		}
 
-		bool ReadScriptDataDoubleEscaped (out HtmlToken token)
+		void ReadScriptDataDoubleEscaped (out HtmlToken token)
 		{
 			do {
 				int nc = Read ();
@@ -1242,7 +1245,8 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitDataToken (out token, false);
+					EmitDataToken (out token, false);
+                    return;
 				}
 
 				c = (char) nc;
@@ -1263,17 +1267,18 @@ namespace HtmlKit {
 
 			token = null;
 
-			return false;
+			
 		}
 
-		bool ReadScriptDataDoubleEscapedDash (out HtmlToken token)
+		void ReadScriptDataDoubleEscapedDash (out HtmlToken token)
 		{
 			int nc = Peek ();
 			char c;
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitDataToken (out token, false);
+			    EmitDataToken (out token, false);
+                return;
 			}
 
 			switch ((c = (char) nc)) {
@@ -1292,10 +1297,10 @@ namespace HtmlKit {
 
 			token = null;
 
-			return false;
+			
 		}
 
-		bool ReadScriptDataDoubleEscapedDashDash (out HtmlToken token)
+		void ReadScriptDataDoubleEscapedDashDash (out HtmlToken token)
 		{
 			do {
 				int nc = Read ();
@@ -1303,7 +1308,8 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitDataToken (out token, false);
+					EmitDataToken (out token, false);
+                    return;
 				}
 
 				c = (char) nc;
