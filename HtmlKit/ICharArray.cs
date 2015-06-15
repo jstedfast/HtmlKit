@@ -24,7 +24,6 @@
 // THE SOFTWARE.
 //
 
-using System;
 using System.IO;
 
 namespace HtmlKit {
@@ -69,7 +68,10 @@ namespace HtmlKit {
 
 		public void Write (TextWriter output, int startIndex, int count)
 		{
-			output.Write (array, startIndex, count);
+			int endIndex = startIndex + count;
+
+			for (int i = startIndex; i < endIndex; i++)
+				output.Write (array[i]);
 		}
 	}
 }
