@@ -815,37 +815,37 @@ namespace HtmlKit {
 			
 		}
 
-		void ReadRcDataLessThan (out HtmlToken token)
+		void ReadRcDataLessThan ()
 		{
-			  ReadGenericRawTextLessThan (out token, HtmlTokenizerState.RcData, HtmlTokenizerState.RcDataEndTagOpen);
+			  ReadGenericRawTextLessThan ( HtmlTokenizerState.RcData, HtmlTokenizerState.RcDataEndTagOpen);
 		}
 
-        void ReadRcDataEndTagOpen (out HtmlToken token)
+        void ReadRcDataEndTagOpen ()
 		{
-			  ReadGenericRawTextEndTagOpen (out token, DecodeCharacterReferences, HtmlTokenizerState.RcData, HtmlTokenizerState.RcDataEndTagName);
+			  ReadGenericRawTextEndTagOpen (DecodeCharacterReferences, HtmlTokenizerState.RcData, HtmlTokenizerState.RcDataEndTagName);
 		}
 
-        void ReadRcDataEndTagName (out HtmlToken token)
+        void ReadRcDataEndTagName ()
 		{
-			  ReadGenericRawTextEndTagName (out token, DecodeCharacterReferences, HtmlTokenizerState.RcData);
+			  ReadGenericRawTextEndTagName( DecodeCharacterReferences, HtmlTokenizerState.RcData);
 		}
 
-	   void ReadRawTextLessThan (out HtmlToken token)
+	   void ReadRawTextLessThan ()
 		{
-			 ReadGenericRawTextLessThan (out token, HtmlTokenizerState.RawText, HtmlTokenizerState.RawTextEndTagOpen);
+			 ReadGenericRawTextLessThan (HtmlTokenizerState.RawText, HtmlTokenizerState.RawTextEndTagOpen);
 		}
 
-	    void ReadRawTextEndTagOpen (out HtmlToken token)
+	    void ReadRawTextEndTagOpen ()
 		{
-		     ReadGenericRawTextEndTagOpen (out token, false, HtmlTokenizerState.RawText, HtmlTokenizerState.RawTextEndTagName);
+		     ReadGenericRawTextEndTagOpen ( false, HtmlTokenizerState.RawText, HtmlTokenizerState.RawTextEndTagName);
 		}
 
-		void ReadRawTextEndTagName (out HtmlToken token)
+		void ReadRawTextEndTagName ()
 		{
-			ReadGenericRawTextEndTagName (out token, false, HtmlTokenizerState.RawText);
+			ReadGenericRawTextEndTagName (false, HtmlTokenizerState.RawText);
 		}
 
-		void ReadScriptDataLessThan (out HtmlToken token)
+		void ReadScriptDataLessThan ()
 		{
 			int nc = Peek ();
 
@@ -871,14 +871,14 @@ namespace HtmlKit {
 			token = null;
 		}
 
-		void ReadScriptDataEndTagOpen (out HtmlToken token)
+		void ReadScriptDataEndTagOpen ()
 		{
 			int nc = Peek ();
 			char c;
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-			    EmitDataToken (out token, false);
+			    EmitDataToken ( false);
                 return;
 			}
 
@@ -1298,7 +1298,7 @@ namespace HtmlKit {
 			
 		}
 
-		void ReadScriptDataDoubleEscapedDashDash (out HtmlToken token)
+		void ReadScriptDataDoubleEscapedDashDash ()
 		{
 			do {
 				int nc = Read ();
@@ -1306,7 +1306,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					EmitDataToken (out token, false);
+					EmitDataToken (false);
                     return;
 				}
 
@@ -1336,7 +1336,7 @@ namespace HtmlKit {
 			
 		}
 
-		void ReadScriptDataDoubleEscapedLessThan (out HtmlToken token)
+		void ReadScriptDataDoubleEscapedLessThan ()
 		{
 			int nc = Peek ();
 
@@ -1353,7 +1353,7 @@ namespace HtmlKit {
 			 
 		}
 
-		void ReadScriptDataDoubleEscapeEnd (out HtmlToken token)
+		void ReadScriptDataDoubleEscapeEnd ()
 		{
 			do {
 				int nc = Peek ();
@@ -1397,7 +1397,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					tag = null;
 
-					EmitDataToken (out token, false);
+					EmitDataToken ( false);
                     return;
 				}
 
@@ -1426,7 +1426,7 @@ namespace HtmlKit {
 			} while (true);
 		}
 
-		void ReadAttributeName (out HtmlToken token)
+		void ReadAttributeName ()
 		{
 			token = null;
 
@@ -1438,7 +1438,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 					tag = null;
-					EmitDataToken (out token, false);
+					EmitDataToken (false);
                     return;
                 }
 
@@ -1527,7 +1527,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					tag = null;
 
-				    EmitDataToken (out token, false);
+				    EmitDataToken (false);
                     return;
 				}
 
@@ -1546,7 +1546,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
                     return;
                 case '>':
-					 EmitTagToken (out token);
+					 EmitTagToken ();
                      return;
 				case '<': case '=': case '`':
 					// parse error
@@ -1738,7 +1738,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				EmitDataToken (out token, false);
+				EmitDataToken ( false);
                 return;
 			}
 
@@ -1755,7 +1755,7 @@ namespace HtmlKit {
 				consume = true;
 				break;
 			case '>':
-				EmitTagToken (out token);
+				EmitTagToken ();
 				consume = true;
 				break;
 			default:
@@ -1768,14 +1768,14 @@ namespace HtmlKit {
 				Read ();			
 		}
 
-		void ReadSelfClosingStartTag (out HtmlToken token)
+		void ReadSelfClosingStartTag ()
 		{
 			int nc = Read ();
 			char c;
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-			    EmitDataToken (out token, false);
+			    EmitDataToken (false);
                 return;
 			}
 
@@ -1784,7 +1784,7 @@ namespace HtmlKit {
 			if (c == '>') {
 				tag.IsEmptyElement = true;
 
-				EmitTagToken (out token);
+				EmitTagToken ();
                 return;
 			}
 
@@ -1799,7 +1799,7 @@ namespace HtmlKit {
 			
 		}
 
-		void ReadBogusComment (out HtmlToken token)
+		void ReadBogusComment ()
 		{
 			int nc;
 			char c;
@@ -1822,10 +1822,10 @@ namespace HtmlKit {
 				data.Append (c == '\0' ? '\uFFFD' : c);
 			} while (true);
 
-		     EmitCommentToken (data, out token);
+		     EmitCommentToken (data);
 		}
 
-		void ReadMarkupDeclarationOpen (out HtmlToken token)
+		void ReadMarkupDeclarationOpen ()
 		{
 			int count = 0, nc;
 			char c = '\0';
@@ -1833,7 +1833,7 @@ namespace HtmlKit {
 			while (count < 2) {
 				if ((nc = Peek ()) == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					EmitDataToken (out token, false);
+					EmitDataToken ( false);
                     return;
 				}
 
@@ -1870,7 +1870,7 @@ namespace HtmlKit {
 				while (count < 7) {
 					if ((nc = Read ()) == -1) {
 						TokenizerState = HtmlTokenizerState.EndOfFile;
-						EmitDataToken (out token, false);
+						EmitDataToken ( false);
                         return;
 					}
 
@@ -1900,7 +1900,7 @@ namespace HtmlKit {
 				while (count < 7) {
 					if ((nc = Read ()) == -1) {
 						TokenizerState = HtmlTokenizerState.EndOfFile;
-						EmitDataToken (out token, false);
+						EmitDataToken ( false);
                         return;
 					}
 
@@ -2056,7 +2056,7 @@ namespace HtmlKit {
 			 
 		}
 
-		void ReadCommentEnd (out HtmlToken token)
+		void ReadCommentEnd ()
 		{
 			token = null;
 
@@ -2630,7 +2630,7 @@ namespace HtmlKit {
 			} while (true);
 		}
 
-		bool ReadDocTypeSystemIdentifierQuoted (out HtmlToken token)
+		bool ReadDocTypeSystemIdentifierQuoted ()
 		{
 			token = null;
 
@@ -2754,7 +2754,7 @@ namespace HtmlKit {
 			} while (true);
 		}
 
-		void ReadCDataSection (out HtmlToken token)
+		void ReadCDataSection ()
 		{
 			// FIXME: maybe we should have a CDATA token?
 			int nc = Read ();
