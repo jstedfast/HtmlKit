@@ -102,7 +102,7 @@ namespace HtmlKit {
 				case '>': output.Write ("&gt;"); break;
 				default:
 					if (c < 32 || (c >= 127 && c < 160)) {
-						// illegal character
+						// illegal control character
 						break;
 					}
 
@@ -411,7 +411,7 @@ namespace HtmlKit {
 				case '>': output.Write ("&gt;"); break;
 				default:
 					if (c < 32 || (c >= 127 && c < 160)) {
-						// illegal character
+						// illegal control character
 						break;
 					}
 
