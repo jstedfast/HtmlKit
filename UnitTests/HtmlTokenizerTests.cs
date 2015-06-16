@@ -70,6 +70,8 @@ namespace UnitTests {
 					actual.AppendFormat ("{0}: ", token.Kind);
 
 					switch (token.Kind) {
+					case HtmlTokenKind.ScriptData:
+					case HtmlTokenKind.CData:
 					case HtmlTokenKind.Data:
 						var text = (HtmlDataToken) token;
 
@@ -157,6 +159,17 @@ namespace UnitTests {
 		public void TestTokenizer ()
 		{
 			VerifyHtmlTokenizerOutput (Path.Combine ("..", "..", "TestData", "html", "test.html"));
+		}
+
+		[Test]
+		public void TestHtmlDecode ()
+		{
+			const string encoded = "&lt;&pound;&euro;&cent;&yen;&nbsp;&copy;&reg;&gt;";
+			const string expected = "<£€¢¥\u00a0©®>";
+
+			var decoded = HtmlUtils.HtmlDecode (encoded);
+
+			Assert.AreEqual (expected, decoded);
 		}
 	}
 }
