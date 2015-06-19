@@ -391,7 +391,12 @@ namespace HtmlKit {
 
 			return token;
 		}
-
+		/// <summary>
+		/// 8.2.4.69 Tokenizing character references
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#tokenizing-character-references"/> 
+		/// </summary>
+		/// <returns>The character reference.</returns>
+		/// <param name="next">Next.</param>
 		HtmlToken ReadCharacterReference (HtmlTokenizerState next)
 		{
 			int nc = Peek ();
@@ -547,8 +552,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadDataToken ()
+		/// <summary>
+		/// 8.2.4.1 Data state 
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#data-state"/> 
+		/// </summary>
+		/// <returns>The data token.</returns>
+		HtmlToken R01_DataToken ()
 		{
 			do {
 				int nc = Read ();
@@ -581,13 +590,21 @@ namespace HtmlKit {
 
 			return EmitDataToken (DecodeCharacterReferences);
 		}
-
-		HtmlToken ReadCharacterReferenceInData ()
+		/// <summary>
+		/// 8.2.4.2 Character reference in data state
+		/// <see cref=" http://www.w3.org/TR/html5/syntax.html#character-reference-in-data-state"/>
+		/// </summary>
+		/// <returns>The character reference in data.</returns>
+		HtmlToken R02_CharacterReferenceInData ()
 		{
 			return ReadCharacterReference (HtmlTokenizerState.Data);
 		}
-
-		HtmlToken ReadRcData ()
+		/// <summary>
+		/// 8.2.4.3 RCDATA state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#rcdata-state"/> 
+		/// </summary>
+		/// <returns>The rc data.</returns>
+		HtmlToken R03_RcData ()
 		{
 			do {
 				int nc = Read ();
@@ -619,13 +636,21 @@ namespace HtmlKit {
 
 			return EmitDataToken (DecodeCharacterReferences);
 		}
-
-		HtmlToken ReadCharacterReferenceInRcData ()
+		/// <summary>
+		/// 8.2.4.4 Character reference in RCDATA state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#character-reference-in-rcdata-state"/> 
+		/// </summary>
+		/// <returns>The character reference in rc data.</returns>
+		HtmlToken R04_CharacterReferenceInRcData ()
 		{
 			return ReadCharacterReference (HtmlTokenizerState.RcData);
 		}
-
-		HtmlToken ReadRawText ()
+		/// <summary>
+		/// 8.2.4.5 RAWTEXT state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#rawtext-state"/> 
+		/// </summary>
+		/// <returns>The raw text.</returns>
+		HtmlToken R05_RawText ()
 		{
 			do {
 				int nc = Read ();
@@ -650,8 +675,12 @@ namespace HtmlKit {
 
 			return EmitDataToken (false);
 		}
-
-		HtmlToken ReadScriptData ()
+		/// <summary>
+		/// 8.2.4.6 Script data state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-state"/> 
+		/// </summary>
+		/// <returns>The script data.</returns>
+		HtmlToken R06_ScriptData ()
 		{
 			do {
 				int nc = Read ();
@@ -676,8 +705,12 @@ namespace HtmlKit {
 
 			return EmitScriptDataToken ();
 		}
-
-		HtmlToken ReadPlainText ()
+		/// <summary>
+		/// 8.2.4.7 PLAINTEXT state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#plaintext-state"/> 
+		/// </summary>
+		/// <returns>The plain text.</returns>
+		HtmlToken R07_PlainText ()
 		{
 			int nc = Read ();
 
@@ -692,8 +725,12 @@ namespace HtmlKit {
 
 			return EmitDataToken (false);
 		}
-
-		HtmlToken ReadTagOpen ()
+		/// <summary>
+		/// 8.2.4.8 Tag open state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#tag-open-state"/> 
+		/// </summary>
+		/// <returns>The tag open.</returns>
+		HtmlToken R08_TagOpen ()
 		{
 			int nc = Read ();
 			char c;
@@ -727,8 +764,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadEndTagOpen ()
+		/// <summary>
+		/// 8.2.4.9 End tag open state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#end-tag-open-state"/> 
+		/// </summary>
+		/// <returns>The end tag open.</returns>
+		HtmlToken R09_EndTagOpen ()
 		{
 			int nc = Read ();
 			char c;
@@ -761,8 +802,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadTagName ()
+		/// <summary>
+		/// 8.2.4.10 Tag name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#tag-name-state"/> 
+		/// </summary>
+		/// <returns>The tag name.</returns>
+		HtmlToken R10_TagName ()
 		{
 			do {
 				int nc = Read ();
@@ -804,38 +849,66 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadRcDataLessThan ()
+		/// <summary>
+		/// 8.2.4.11 RCDATA less-than sign state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#rcdata-less-than-sign-state"/> 
+		/// </summary>
+		/// <returns>The rc data less than.</returns>
+		HtmlToken R11_ReadRcDataLessThan ()
 		{
 			return ReadGenericRawTextLessThan (HtmlTokenizerState.RcData, HtmlTokenizerState.RcDataEndTagOpen);
 		}
-
-		HtmlToken ReadRcDataEndTagOpen ()
+		/// <summary>
+		/// 8.2.4.12 RCDATA end tag open state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#rcdata-end-tag-open-state"/> 
+		/// </summary>
+		/// <returns>The rc data end tag open.</returns>
+		HtmlToken R12_RcDataEndTagOpen ()
 		{
 			return ReadGenericRawTextEndTagOpen (DecodeCharacterReferences, HtmlTokenizerState.RcData, HtmlTokenizerState.RcDataEndTagName);
 		}
-
-		HtmlToken ReadRcDataEndTagName ()
+		/// <summary>
+		/// 8.2.4.13 RCDATA end tag name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#rcdata-end-tag-name-state"/> 
+		/// </summary>
+		/// <returns>The rc data end tag name.</returns>
+		HtmlToken R13_RcDataEndTagName ()
 		{
 			return ReadGenericRawTextEndTagName (DecodeCharacterReferences, HtmlTokenizerState.RcData);
 		}
-
-		HtmlToken ReadRawTextLessThan ()
+		/// <summary>
+		/// 8.2.4.14 RAWTEXT less-than sign state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#rawtext-less-than-sign-state"/> 
+		/// </summary>
+		/// <returns>The raw text less than.</returns>
+		HtmlToken R14_RawTextLessThan ()
 		{
 			return ReadGenericRawTextLessThan (HtmlTokenizerState.RawText, HtmlTokenizerState.RawTextEndTagOpen);
 		}
-
-		HtmlToken ReadRawTextEndTagOpen ()
+		/// <summary>
+		/// 8.2.4.15 RAWTEXT end tag open state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#rawtext-end-tag-open-state"/> 
+		/// </summary>
+		/// <returns>The raw text end tag open.</returns>
+		HtmlToken R15_RawTextEndTagOpen ()
 		{
 			return ReadGenericRawTextEndTagOpen (false, HtmlTokenizerState.RawText, HtmlTokenizerState.RawTextEndTagName);
 		}
-
-		HtmlToken ReadRawTextEndTagName ()
+		/// <summary>
+		/// 8.2.4.16 RAWTEXT end tag name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#rawtext-end-tag-name-state"/> 
+		/// </summary>
+		/// <returns>The raw text end tag name.</returns>
+		HtmlToken R16_RawTextEndTagName ()
 		{
 			return ReadGenericRawTextEndTagName (false, HtmlTokenizerState.RawText);
 		}
-
-		HtmlToken ReadScriptDataLessThan ()
+		/// <summary>
+		/// 8.2.4.17 Script data less-than sign state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-less-than-sign-state"/> 
+		/// </summary>
+		/// <returns>The script data less than.</returns>
+		HtmlToken R17_ScriptDataLessThan ()
 		{
 			int nc = Peek ();
 
@@ -860,8 +933,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataEndTagOpen ()
+		/// <summary>
+		/// 8.2.4.18 Script data end tag open state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-end-tag-open-state"/> 
+		/// </summary>
+		/// <returns>The script data end tag open.</returns>
+		HtmlToken R18_ScriptDataEndTagOpen ()
 		{
 			int nc = Peek ();
 			char c;
@@ -884,7 +961,11 @@ namespace HtmlKit {
 
 			return null;
 		}
-
+		/// <summary>
+		/// 8.2.4.19 Script data end tag name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-end-tag-name-state"/> 
+		/// </summary>
+		/// <returns>The script data end tag name.</returns>
 		HtmlToken ReadScriptDataEndTagName ()
 		{
 			do {
@@ -942,8 +1023,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataEscapeStart ()
+		/// <summary>
+		/// 8.2.4.20 Script data escape start state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-escape-start-state"/> 
+		/// </summary>
+		/// <returns>The script data escape start.</returns>
+		HtmlToken R20_ScriptDataEscapeStart ()
 		{
 			int nc = Peek ();
 
@@ -956,8 +1041,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataEscapeStartDash ()
+		/// <summary>
+		/// 8.2.4.21 Script data escape start dash state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-escape-start-dash-state"/> 
+		/// </summary>
+		/// <returns>The script data escape start dash.</returns>
+		HtmlToken R21_ReadScriptDataEscapeStartDash ()
 		{
 			int nc = Peek ();
 
@@ -970,8 +1059,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataEscaped ()
+		/// <summary>
+		/// 8.2.4.22 Script data escaped state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-escaped-state"/> 
+		/// </summary>
+		/// <returns>The script data escaped.</returns>
+		HtmlToken R22_ReadScriptDataEscaped ()
 		{
 			do {
 				int nc = Read ();
@@ -1000,8 +1093,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataEscapedDash ()
+		/// <summary>
+		/// Reads the script data escaped dash.
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-escaped-dash-state"/> 
+		/// </summary>
+		/// <returns>The script data escaped dash.</returns>
+		HtmlToken R23_ReadScriptDataEscapedDash ()
 		{
 			int nc = Peek ();
 			char c;
@@ -1026,11 +1123,17 @@ namespace HtmlKit {
 			}
 
 			return null;
-		}
-
-		HtmlToken ReadScriptDataEscapedDashDash ()
+        } 
+		/// <summary>
+		/// 8.2.4.24 Script data escaped dash dash state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-escaped-dash-dash-state"/> 
+		/// </summary>
+		/// <returns>The script data escaped dash dash.</returns>
+        HtmlToken R24_ScriptDataEscapedDashDash ()
 		{
-			do {
+            
+            do
+            {
 				int nc = Read ();
 				char c;
 
@@ -1062,8 +1165,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataEscapedLessThan ()
+		/// <summary>
+		/// 8.2.4.25 Script data escaped less-than sign state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-escaped-dash-dash-state"/> 
+		/// </summary>
+		/// <returns>The script data escaped less than.</returns>
+		HtmlToken R25_ScriptDataEscapedLessThan ()
 		{
 			int nc = Peek ();
 			char c = (char) nc;
@@ -1085,8 +1192,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataEscapedEndTagOpen ()
+		/// <summary>
+		/// 8.2.4.26 Script data escaped end tag open state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-escaped-end-tag-open-state"/> 
+		/// </summary>
+		/// <returns>The script data escaped end tag open.</returns>
+		HtmlToken R26_ScriptDataEscapedEndTagOpen ()
 		{
 			int nc = Peek ();
 			char c;
@@ -1110,8 +1221,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataEscapedEndTagName ()
+		/// <summary>
+		/// 8.2.4.27 Script data escaped end tag name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-escaped-end-tag-name-state"/> 
+		/// </summary>
+		/// <returns>The script data escaped end tag name.</returns>
+		HtmlToken R27_ScriptDataEscapedEndTagName ()
 		{
 			do {
 				int nc = Read ();
@@ -1169,8 +1284,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataDoubleEscapeStart ()
+		/// <summary>
+		/// 8.2.4.28 Script data double escape start state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-double-escape-start-state"/> 
+		/// </summary>
+		/// <returns>The script data double escape start.</returns>
+		HtmlToken R28_ScriptDataDoubleEscapeStart ()
 		{
 			do {
 				int nc = Read ();
@@ -1206,8 +1325,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataDoubleEscaped ()
+		/// <summary>
+		/// 8.2.4.29 Script data double escaped state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-double-escaped-state"/> 
+		/// </summary>
+		/// <returns>The script data double escaped.</returns>
+		HtmlToken R29_ScriptDataDoubleEscaped ()
 		{
 			do {
 				int nc = Read ();
@@ -1236,8 +1359,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataDoubleEscapedDash ()
+		/// <summary>
+		/// 8.2.4.30 Script data double escaped dash state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-double-escaped-dash-state"/> 
+		/// </summary>
+		/// <returns>The script data double escaped dash.</returns>
+		HtmlToken R30_ScriptDataDoubleEscapedDash ()
 		{
 			int nc = Peek ();
 			char c;
@@ -1263,8 +1390,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataDoubleEscapedDashDash ()
+		/// <summary>
+		/// 8.2.4.31 Script data double escaped dash dash state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-double-escaped-dash-dash-state"/> 
+		/// </summary>
+		/// <returns>The script data double escaped dash dash.</returns>
+		HtmlToken R31_ScriptDataDoubleEscapedDashDash ()
 		{
 			do {
 				int nc = Read ();
@@ -1298,8 +1429,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataDoubleEscapedLessThan ()
+		/// <summary>
+		/// 8.2.4.32 Script data double escaped less-than sign state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-double-escaped-less-than-sign-state"/> 
+		/// </summary>
+		/// <returns>The script data double escaped less than.</returns>
+		HtmlToken R32_ScriptDataDoubleEscapedLessThan ()
 		{
 			int nc = Peek ();
 
@@ -1313,8 +1448,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadScriptDataDoubleEscapeEnd ()
+		/// <summary>
+		/// 8.2.4.33 Script data double escape end state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#script-data-double-escape-end-state"/> 
+		/// </summary>
+		/// <returns>The script data double escape end.</returns>
+		HtmlToken R33_ScriptDataDoubleEscapeEnd ()
 		{
 			do {
 				int nc = Peek ();
@@ -1343,8 +1482,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadBeforeAttributeName ()
+		/// <summary>
+		/// 8.2.4.34 Before attribute name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#before-attribute-name-state"/> 
+		/// </summary>
+		/// <returns>The before attribute name.</returns>
+		HtmlToken R34_BeforeAttributeName ()
 		{
 			do {
 				int nc = Read ();
@@ -1380,8 +1523,12 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadAttributeName ()
+		/// <summary>
+		/// 8.2.4.35 Attribute name state
+		/// <seealso cref="http://www.w3.org/TR/html5/syntax.html#attribute-name-state"/> 
+		/// </summary>
+		/// <returns>The attribute name.</returns>
+		HtmlToken R35_AttributeName ()
 		{
 			do {
 				int nc = Read ();
@@ -1424,8 +1571,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadAfterAttributeName ()
+		/// <summary>
+		/// 8.2.4.36 After attribute name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#after-attribute-name-state"/> 
+		/// </summary>
+		/// <returns>The after attribute name.</returns>
+		HtmlToken R36_AfterAttributeName ()
 		{
 			do {
 				int nc = Read ();
@@ -1464,8 +1615,12 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadBeforeAttributeValue ()
+		/// <summary>
+		/// 8.2.4.37 Before attribute value state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#before-attribute-value-state"/> 
+		/// </summary>
+		/// <returns>The before attribute value.</returns>
+		HtmlToken R37_BeforeAttributeValue ()
 		{
 			do {
 				int nc = Read ();
@@ -1508,8 +1663,14 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadAttributeValueQuoted ()
+		/// <summary>
+		/// 8.2.4.38 Attribute value (double-quoted) state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#attribute-value-%28double-quoted%29-state"/> 
+		/// 8.2.4.39 Attribute value (single-quoted) state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#attribute-value-%28single-quoted%29-state"/> 
+		/// </summary>
+		/// <returns>The attribute value quoted.</returns>
+		HtmlToken R38_39_AttributeValueQuoted ()
 		{
 			do {
 				int nc = Read ();
@@ -1547,8 +1708,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadAttributeValueUnquoted ()
+		/// <summary>
+		/// 8.2.4.40 Attribute value (unquoted) state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#attribute-value-%28unquoted%29-state"/> 
+		/// </summary>
+		/// <returns>The attribute value unquoted.</returns>
+		HtmlToken R40_AttributeValueUnquoted ()
 		{
 			do {
 				int nc = Read ();
@@ -1594,8 +1759,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadCharacterReferenceInAttributeValue ()
+		/// <summary>
+		/// 8.2.4.41 Character reference in attribute value state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#character-reference-in-attribute-value-state"/> 
+		/// </summary>
+		/// <returns>The character reference in attribute value.</returns>
+		HtmlToken R41_CharacterReferenceInAttributeValue ()
 		{
 			char additionalAllowedCharacter = quote == '\0' ? '>' : quote;
 			int nc = Peek ();
@@ -1669,8 +1838,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadAfterAttributeValueQuoted ()
+		/// <summary>
+		/// 8.2.4.42 After attribute value (quoted) state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#after-attribute-value-%28quoted%29-state"/> 
+		/// </summary>
+		/// <returns>The after attribute value quoted.</returns>
+		HtmlToken R42_AfterAttributeValueQuoted ()
 		{
 			HtmlToken token = null;
 			int nc = Peek ();
@@ -1708,8 +1881,12 @@ namespace HtmlKit {
 
 			return token;
 		}
-
-		HtmlToken ReadSelfClosingStartTag ()
+		/// <summary>
+		/// 8.2.4.43 Self-closing start tag state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#self-closing-start-tag-state"/> 
+		/// </summary>
+		/// <returns>The self closing start tag.</returns>
+		HtmlToken R43_SelfClosingStartTag ()
 		{
 			int nc = Read ();
 			char c;
@@ -1735,8 +1912,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadBogusComment ()
+		/// <summary>
+		/// 8.2.4.44 Bogus comment state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#bogus-comment-state"/> 
+		/// </summary>
+		/// <returns>The bogus comment.</returns>
+		HtmlToken R44_BogusComment ()
 		{
 			int nc;
 			char c;
@@ -1761,8 +1942,12 @@ namespace HtmlKit {
 
 			return EmitCommentToken (data);
 		}
-
-		HtmlToken ReadMarkupDeclarationOpen ()
+		/// <summary>
+		/// 8.2.4.45 Markup declaration open state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#markup-declaration-open-state"/> 
+		/// </summary>
+		/// <returns>The markup declaration open.</returns>
+		HtmlToken R45_MarkupDeclarationOpen ()
 		{
 			int count = 0, nc;
 			char c = '\0';
@@ -1855,8 +2040,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadCommentStart ()
+		/// <summary>
+		/// 8.2.4.46 Comment start state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#comment-start-state"/> 
+		/// </summary>
+		/// <returns>The comment start.</returns>
+		HtmlToken R46_CommentStart ()
 		{
 			int nc = Read ();
 			char c;
@@ -1886,8 +2075,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadCommentStartDash ()
+		/// <summary>
+		/// 8.2.4.47 Comment start dash state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#comment-start-dash-state"/> 
+		/// </summary>
+		/// <returns>The comment start dash.</returns>
+		HtmlToken R47_CommentStartDash ()
 		{
 			int nc = Read ();
 			char c;
@@ -1917,8 +2110,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadComment ()
+		/// <summary>
+		/// 8.2.4.48 Comment state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#comment-state"/> 
+		/// </summary>
+		/// <returns>The comment.</returns>
+		HtmlToken R48_Comment ()
 		{
 			do {
 				int nc = Read ();
@@ -1946,7 +2143,12 @@ namespace HtmlKit {
 		}
 
 		// FIXME: this is exactly the same as ReadCommentStartDash
-		HtmlToken ReadCommentEndDash ()
+		/// <summary>
+		/// 8.2.4.49 Comment end dash state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#comment-end-dash-state"/> 
+		/// </summary>
+		/// <returns>The comment end dash.</returns>
+		HtmlToken R49_CommentEndDash ()
 		{
 			int nc = Read ();
 			char c;
@@ -1976,8 +2178,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadCommentEnd ()
+		/// <summary>
+		/// 8.2.4.50 Comment end state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#comment-end-state"/> 
+		/// </summary>
+		/// <returns>The comment end.</returns>
+		HtmlToken R50_CommentEnd ()
 		{
 			do {
 				int nc = Read ();
@@ -2010,8 +2216,12 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadCommentEndBang ()
+		/// <summary>
+		/// 8.2.4.51 Comment end bang state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#comment-end-bang-state"/> 
+		/// </summary>
+		/// <returns>The comment end bang.</returns>
+		HtmlToken R51_CommentEndBang ()
 		{
 			int nc = Read ();
 			char c;
@@ -2042,8 +2252,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadDocType ()
+		/// <summary>
+		/// 8.2.4.52 DOCTYPE state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#doctype-state"/> 
+		/// </summary>
+		/// <returns>The document type.</returns>
+		HtmlToken R52_DocType ()
 		{
 			int nc = Peek ();
 			char c;
@@ -2068,8 +2282,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadBeforeDocTypeName ()
+		/// <summary>
+		/// 8.2.4.53 Before DOCTYPE name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#before-doctype-name-state"/> 
+		/// </summary>
+		/// <returns>The before document type name.</returns>
+		HtmlToken R53_BeforeDocTypeName ()
 		{
 			do {
 				int nc = Read ();
@@ -2104,8 +2322,12 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadDocTypeName ()
+		/// <summary>
+		/// 8.2.4.54 DOCTYPE name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#doctype-name-state"/> 
+		/// </summary>
+		/// <returns>The document type name.</returns>
+		HtmlToken R54_DocTypeName ()
 		{
 			do {
 				int nc = Read ();
@@ -2149,8 +2371,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadAfterDocTypeName ()
+		/// <summary>
+		/// 8.2.4.55 After DOCTYPE name state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#after-doctype-name-state"/> 
+		/// </summary>
+		/// <returns>The after document type name.</returns>
+		HtmlToken R55_AfterDocTypeName ()
 		{
 			do {
 				int nc = Read ();
@@ -2193,8 +2419,12 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadAfterDocTypePublicKeyword ()
+		/// <summary>
+		/// 8.2.4.56 After DOCTYPE public keyword state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#after-doctype-public-keyword-state"/> 
+		/// </summary>
+		/// <returns>The after document type public keyword.</returns>
+		HtmlToken R56_AfterDocTypePublicKeyword ()
 		{
 			int nc = Read ();
 			char c;
@@ -2231,8 +2461,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadBeforeDocTypePublicIdentifier ()
+		/// <summary>
+		/// 8.2.4.57 Before DOCTYPE public identifier state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#before-doctype-public-identifier-state"/> 
+		/// </summary>
+		/// <returns>The before document type public identifier.</returns>
+		HtmlToken R57_BeforeDocTypePublicIdentifier ()
 		{
 			do {
 				int nc = Read ();
@@ -2268,8 +2502,14 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadDocTypePublicIdentifierQuoted ()
+		/// <summary>
+		/// 8.2.4.58 DOCTYPE public identifier (double-quoted) state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#doctype-public-identifier-%28double-quoted%29-state"/> 
+		/// 8.2.4.59 DOCTYPE public identifier (single-quoted) state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#doctype-public-identifier-%28single-quoted%29-state"/> 
+		/// </summary>
+		/// <returns>The document type public identifier quoted.</returns>
+		HtmlToken R58_59_DocTypePublicIdentifierQuoted ()
 		{
 			do {
 				int nc = Read ();
@@ -2316,8 +2556,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadAfterDocTypePublicIdentifier ()
+		/// <summary>
+		/// 8.2.4.60 After DOCTYPE public identifier state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#after-doctype-public-identifier-state"/> 
+		/// </summary>
+		/// <returns>The after document type public identifier.</returns>
+		HtmlToken R60_AfterDocTypePublicIdentifier ()
 		{
 			int nc = Read ();
 			char c;
@@ -2353,8 +2597,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadBetweenDocTypePublicAndSystemIdentifiers ()
+		/// <summary>
+		/// 8.2.4.61 Between DOCTYPE public and system identifiers state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#between-doctype-public-and-system-identifiers-state"/> 
+		/// </summary>
+		/// <returns>The between document type public and system identifiers.</returns>
+		HtmlToken R61_BetweenDocTypePublicAndSystemIdentifiers ()
 		{
 			do {
 				int nc = Read ();
@@ -2389,8 +2637,12 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadAfterDocTypeSystemKeyword ()
+		/// <summary>
+		/// 8.2.4.62 After DOCTYPE system keyword state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#after-doctype-system-keyword-state"/> 
+		/// </summary>
+		/// <returns>The after document type system keyword.</returns>
+		HtmlToken R62_AfterDocTypeSystemKeyword ()
 		{
 			int nc = Read ();
 			char c;
@@ -2427,8 +2679,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadBeforeDocTypeSystemIdentifier ()
+		/// <summary>
+		/// 8.2.4.63 Before DOCTYPE system identifier state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#before-doctype-system-identifier-state"/> 
+		/// </summary>
+		/// <returns>The before document type system identifier.</returns>
+		HtmlToken R63_BeforeDocTypeSystemIdentifier ()
 		{
 			do {
 				int nc = Read ();
@@ -2464,8 +2720,14 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadDocTypeSystemIdentifierQuoted ()
+		/// <summary>
+		/// 8.2.4.64 DOCTYPE system identifier (double-quoted) state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#doctype-system-identifier-%28double-quoted%29-state"/> 
+		/// 8.2.4.65 DOCTYPE system identifier (single-quoted) state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#doctype-system-identifier-%28single-quoted%29-state"/> 
+		/// </summary>
+		/// <returns>The document type system identifier quoted.</returns>
+		HtmlToken R64_65_DocTypeSystemIdentifierQuoted ()
 		{
 			do {
 				int nc = Read ();
@@ -2512,8 +2774,12 @@ namespace HtmlKit {
 
 			return null;
 		}
-
-		HtmlToken ReadAfterDocTypeSystemIdentifier ()
+		/// <summary>
+		/// 8.2.4.66 After DOCTYPE system identifier state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#after-doctype-system-identifier-state"/> 
+		/// </summary>
+		/// <returns>The after document type system identifier.</returns>
+		HtmlToken R66_AfterDocTypeSystemIdentifier ()
 		{
 			do {
 				int nc = Read ();
@@ -2542,8 +2808,12 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadBogusDocType ()
+		/// <summary>
+		/// 8.2.4.67 Bogus DOCTYPE state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#bogus-doctype-state"/> 
+		/// </summary>
+		/// <returns>The bogus document type.</returns>
+		HtmlToken R67_BogusDocType ()
 		{
 			do {
 				int nc = Read ();
@@ -2566,8 +2836,12 @@ namespace HtmlKit {
 				}
 			} while (true);
 		}
-
-		HtmlToken ReadCDataSection ()
+		/// <summary>
+		/// 8.2.4.68 CDATA section state
+		/// <see cref="http://www.w3.org/TR/html5/syntax.html#cdata-section-state"/> 
+		/// </summary>
+		/// <returns>The C data section.</returns>
+		HtmlToken R68_CDataSection ()
 		{
 			int nc = Read ();
 
@@ -2608,199 +2882,199 @@ namespace HtmlKit {
 			do {
 				switch (TokenizerState) {
 				case HtmlTokenizerState.Data:
-					token = ReadDataToken ();
+					token = R01_DataToken ();
 					break;
 				case HtmlTokenizerState.CharacterReferenceInData:
-					token = ReadCharacterReferenceInData ();
+					token = R02_CharacterReferenceInData ();
 					break;
 				case HtmlTokenizerState.RcData:
-					token = ReadRcData ();
+					token = R03_RcData ();
 					break;
 				case HtmlTokenizerState.CharacterReferenceInRcData:
-					token = ReadCharacterReferenceInRcData ();
+					token = R04_CharacterReferenceInRcData ();
 					break;
 				case HtmlTokenizerState.RawText:
-					token = ReadRawText ();
+					token = R05_RawText ();
 					break;
 				case HtmlTokenizerState.ScriptData:
-					token = ReadScriptData ();
+					token = R06_ScriptData ();
 					break;
 				case HtmlTokenizerState.PlainText:
-					token = ReadPlainText ();
+					token = R07_PlainText ();
 					break;
 				case HtmlTokenizerState.TagOpen:
-					token = ReadTagOpen ();
+					token = R08_TagOpen ();
 					break;
 				case HtmlTokenizerState.EndTagOpen:
-					token = ReadEndTagOpen ();
+					token = R09_EndTagOpen ();
 					break;
 				case HtmlTokenizerState.TagName:
-					token = ReadTagName ();
+					token = R10_TagName ();
 					break;
 				case HtmlTokenizerState.RcDataLessThan:
-					token = ReadRcDataLessThan ();
+					token = R11_ReadRcDataLessThan ();
 					break;
 				case HtmlTokenizerState.RcDataEndTagOpen:
-					token = ReadRcDataEndTagOpen ();
+					token = R12_RcDataEndTagOpen ();
 					break;
 				case HtmlTokenizerState.RcDataEndTagName:
-					token = ReadRcDataEndTagName ();
+					token = R13_RcDataEndTagName ();
 					break;
 				case HtmlTokenizerState.RawTextLessThan:
-					token = ReadRawTextLessThan ();
+					token = R14_RawTextLessThan ();
 					break;
 				case HtmlTokenizerState.RawTextEndTagOpen:
-					token = ReadRawTextEndTagOpen ();
+					token = R15_RawTextEndTagOpen ();
 					break;
 				case HtmlTokenizerState.RawTextEndTagName:
-					token = ReadRawTextEndTagName ();
+					token = R16_RawTextEndTagName ();
 					break;
 				case HtmlTokenizerState.ScriptDataLessThan:
-					token = ReadScriptDataLessThan ();
+					token = R17_ScriptDataLessThan ();
 					break;
 				case HtmlTokenizerState.ScriptDataEndTagOpen:
-					token = ReadScriptDataEndTagOpen ();
+					token = R18_ScriptDataEndTagOpen ();
 					break;
 				case HtmlTokenizerState.ScriptDataEndTagName:
 					token = ReadScriptDataEndTagName ();
 					break;
 				case HtmlTokenizerState.ScriptDataEscapeStart:
-					token = ReadScriptDataEscapeStart ();
+					token = R20_ScriptDataEscapeStart ();
 					break;
 				case HtmlTokenizerState.ScriptDataEscapeStartDash:
-					token = ReadScriptDataEscapeStartDash ();
+					token = R21_ReadScriptDataEscapeStartDash ();
 					break;
 				case HtmlTokenizerState.ScriptDataEscaped:
-					token = ReadScriptDataEscaped ();
+					token = R22_ReadScriptDataEscaped ();
 					break;
 				case HtmlTokenizerState.ScriptDataEscapedDash:
-					token = ReadScriptDataEscapedDash ();
+					token = R23_ReadScriptDataEscapedDash ();
 					break;
 				case HtmlTokenizerState.ScriptDataEscapedDashDash:
-					token = ReadScriptDataEscapedDashDash ();
+					token = R24_ScriptDataEscapedDashDash ();
 					break;
 				case HtmlTokenizerState.ScriptDataEscapedLessThan:
-					token = ReadScriptDataEscapedLessThan ();
+					token = R25_ScriptDataEscapedLessThan ();
 					break;
 				case HtmlTokenizerState.ScriptDataEscapedEndTagOpen:
-					token = ReadScriptDataEscapedEndTagOpen ();
+					token = R26_ScriptDataEscapedEndTagOpen ();
 					break;
 				case HtmlTokenizerState.ScriptDataEscapedEndTagName:
-					token = ReadScriptDataEscapedEndTagName ();
+					token = R27_ScriptDataEscapedEndTagName ();
 					break;
 				case HtmlTokenizerState.ScriptDataDoubleEscapeStart:
-					token = ReadScriptDataDoubleEscapeStart ();
+					token = R28_ScriptDataDoubleEscapeStart ();
 					break;
 				case HtmlTokenizerState.ScriptDataDoubleEscaped:
-					token = ReadScriptDataDoubleEscaped ();
+					token = R29_ScriptDataDoubleEscaped ();
 					break;
 				case HtmlTokenizerState.ScriptDataDoubleEscapedDash:
-					token = ReadScriptDataDoubleEscapedDash ();
+					token = R30_ScriptDataDoubleEscapedDash ();
 					break;
 				case HtmlTokenizerState.ScriptDataDoubleEscapedDashDash:
-					token = ReadScriptDataDoubleEscapedDashDash ();
+					token = R31_ScriptDataDoubleEscapedDashDash ();
 					break;
 				case HtmlTokenizerState.ScriptDataDoubleEscapedLessThan:
-					token = ReadScriptDataDoubleEscapedLessThan ();
+					token = R32_ScriptDataDoubleEscapedLessThan ();
 					break;
 				case HtmlTokenizerState.ScriptDataDoubleEscapeEnd:
-					token = ReadScriptDataDoubleEscapeEnd ();
+					token = R33_ScriptDataDoubleEscapeEnd ();
 					break;
 				case HtmlTokenizerState.BeforeAttributeName:
-					token = ReadBeforeAttributeName ();
+					token = R34_BeforeAttributeName ();
 					break;
 				case HtmlTokenizerState.AttributeName:
-					token = ReadAttributeName ();
+					token = R35_AttributeName ();
 					break;
 				case HtmlTokenizerState.AfterAttributeName:
-					token = ReadAfterAttributeName ();
+					token = R36_AfterAttributeName ();
 					break;
 				case HtmlTokenizerState.BeforeAttributeValue:
-					token = ReadBeforeAttributeValue ();
+					token = R37_BeforeAttributeValue ();
 					break;
 				case HtmlTokenizerState.AttributeValueQuoted:
-					token = ReadAttributeValueQuoted ();
+					token = R38_39_AttributeValueQuoted ();
 					break;
 				case HtmlTokenizerState.AttributeValueUnquoted:
-					token = ReadAttributeValueUnquoted ();
+					token = R40_AttributeValueUnquoted ();
 					break;
 				case HtmlTokenizerState.CharacterReferenceInAttributeValue:
-					token = ReadCharacterReferenceInAttributeValue ();
+					token = R41_CharacterReferenceInAttributeValue ();
 					break;
 				case HtmlTokenizerState.AfterAttributeValueQuoted:
-					token = ReadAfterAttributeValueQuoted ();
+					token = R42_AfterAttributeValueQuoted ();
 					break;
 				case HtmlTokenizerState.SelfClosingStartTag:
-					token = ReadSelfClosingStartTag ();
+					token = R43_SelfClosingStartTag ();
 					break;
 				case HtmlTokenizerState.BogusComment:
-					token = ReadBogusComment ();
+					token = R44_BogusComment ();
 					break;
 				case HtmlTokenizerState.MarkupDeclarationOpen:
-					token = ReadMarkupDeclarationOpen ();
+					token = R45_MarkupDeclarationOpen ();
 					break;
 				case HtmlTokenizerState.CommentStart:
-					token = ReadCommentStart ();
+					token = R46_CommentStart ();
 					break;
 				case HtmlTokenizerState.CommentStartDash:
-					token = ReadCommentStartDash ();
+					token = R47_CommentStartDash ();
 					break;
 				case HtmlTokenizerState.Comment:
-					token = ReadComment ();
+					token = R48_Comment ();
 					break;
 				case HtmlTokenizerState.CommentEndDash:
-					token = ReadCommentEndDash ();
+					token = R49_CommentEndDash ();
 					break;
 				case HtmlTokenizerState.CommentEnd:
-					token = ReadCommentEnd ();
+					token = R50_CommentEnd ();
 					break;
 				case HtmlTokenizerState.CommentEndBang:
-					token = ReadCommentEndBang ();
+					token = R51_CommentEndBang ();
 					break;
 				case HtmlTokenizerState.DocType:
-					token = ReadDocType ();
+					token = R52_DocType ();
 					break;
 				case HtmlTokenizerState.BeforeDocTypeName:
-					token = ReadBeforeDocTypeName ();
+					token = R53_BeforeDocTypeName ();
 					break;
 				case HtmlTokenizerState.DocTypeName:
-					token = ReadDocTypeName ();
+					token = R54_DocTypeName ();
 					break;
 				case HtmlTokenizerState.AfterDocTypeName:
-					token = ReadAfterDocTypeName ();
+					token = R55_AfterDocTypeName ();
 					break;
 				case HtmlTokenizerState.AfterDocTypePublicKeyword:
-					token = ReadAfterDocTypePublicKeyword ();
+					token = R56_AfterDocTypePublicKeyword ();
 					break;
 				case HtmlTokenizerState.BeforeDocTypePublicIdentifier:
-					token = ReadBeforeDocTypePublicIdentifier ();
+					token = R57_BeforeDocTypePublicIdentifier ();
 					break;
 				case HtmlTokenizerState.DocTypePublicIdentifierQuoted:
-					token = ReadDocTypePublicIdentifierQuoted ();
+					token = R58_59_DocTypePublicIdentifierQuoted ();
 					break;
 				case HtmlTokenizerState.AfterDocTypePublicIdentifier:
-					token = ReadAfterDocTypePublicIdentifier ();
+					token = R60_AfterDocTypePublicIdentifier ();
 					break;
 				case HtmlTokenizerState.BetweenDocTypePublicAndSystemIdentifiers:
-					token = ReadBetweenDocTypePublicAndSystemIdentifiers ();
+					token = R61_BetweenDocTypePublicAndSystemIdentifiers ();
 					break;
 				case HtmlTokenizerState.AfterDocTypeSystemKeyword:
-					token = ReadAfterDocTypeSystemKeyword ();
+					token = R62_AfterDocTypeSystemKeyword ();
 					break;
 				case HtmlTokenizerState.BeforeDocTypeSystemIdentifier:
-					token = ReadBeforeDocTypeSystemIdentifier ();
+					token = R63_BeforeDocTypeSystemIdentifier ();
 					break;
 				case HtmlTokenizerState.DocTypeSystemIdentifierQuoted:
-					token = ReadDocTypeSystemIdentifierQuoted ();
+					token = R64_65_DocTypeSystemIdentifierQuoted ();
 					break;
 				case HtmlTokenizerState.AfterDocTypeSystemIdentifier:
-					token = ReadAfterDocTypeSystemIdentifier ();
+					token = R66_AfterDocTypeSystemIdentifier ();
 					break;
 				case HtmlTokenizerState.BogusDocType:
-					token = ReadBogusDocType ();
+					token = R67_BogusDocType ();
 					break;
 				case HtmlTokenizerState.CDataSection:
-					token = ReadCDataSection ();
+					token = R68_CDataSection ();
 					break;
 				case HtmlTokenizerState.EndOfFile:
 				default:
