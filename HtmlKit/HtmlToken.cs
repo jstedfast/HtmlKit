@@ -325,7 +325,6 @@ namespace HtmlKit {
 			if (output == null)
 				throw new ArgumentNullException ("output");
 
-			// FIXME: properly encode/escape the script data
 			output.Write (Data);
 		}
 	}
