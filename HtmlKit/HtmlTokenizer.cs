@@ -548,7 +548,7 @@ namespace HtmlKit {
 			return null;
 		}
 
-		HtmlToken ReadDataToken ()
+		HtmlToken ReadData ()
 		{
 			do {
 				int nc = Read ();
@@ -2608,7 +2608,7 @@ namespace HtmlKit {
 			do {
 				switch (TokenizerState) {
 				case HtmlTokenizerState.Data:
-					token = ReadDataToken ();
+					token = ReadData ();
 					break;
 				case HtmlTokenizerState.CharacterReferenceInData:
 					token = ReadCharacterReferenceInData ();
