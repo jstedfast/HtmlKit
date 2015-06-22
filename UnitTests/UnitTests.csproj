@@ -46,6 +46,8 @@
     <None Include="TestData\html\xamarin3.html" />
     <None Include="TestData\html\xamarin3.tokens" />
     <None Include="TestData\html\xamarin3.xhtml" />
+    <None Include="TestData\html\papercut.html" />
+    <None Include="TestData\html\papercut.tokens" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HtmlKit\HtmlKit.csproj">
