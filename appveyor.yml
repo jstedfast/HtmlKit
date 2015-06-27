@@ -8,4 +8,4 @@ install:
 
 build:
   project: HtmlKit.sln
-  verbosity: detailed
+  verbosity: minimal
