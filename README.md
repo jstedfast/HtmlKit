@@ -1,6 +1,6 @@
 # HtmlKit
 
-[![Build status](https://ci.appveyor.com/api/projects/status/cqtm6o7swyh4wri4?svg=true)](https://ci.appveyor.com/project/jstedfast/HtmlKit)
+[![Build status](https://ci.appveyor.com/api/projects/status/cqtm6o7swyh4wri4/branch/master?svg=true)](https://ci.appveyor.com/project/jstedfast/htmlkit/branch/master)
 
 ## What is HtmlKit?
 
