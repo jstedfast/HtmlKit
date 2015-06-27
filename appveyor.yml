@@ -1,2 +1,11 @@
+version: 1.0.0.{build}
+
+configuration: Debug
+platform: Any CPU
+
 install:
   - cmd: nuget restore
+
+build:
+  project: HtmlKit.sln
+  verbosity: detailed
