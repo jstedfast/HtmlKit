@@ -39,8 +39,6 @@ test_script:
 
     $commitMessage = git show --quiet --format="%s" $revision
 
-    Set-PSDebug -Trace 2
-
     .\packages\coveralls.net.0.5.0\csmacnz.Coveralls.exe `
     --opencover -i opencover.xml `
     --repoToken $Env:COVERALLS_REPO_TOKEN `
