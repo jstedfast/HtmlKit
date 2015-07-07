@@ -44,19 +44,21 @@
   <ItemGroup>
     <None Include="TestData\html\blocked.html" />
     <None Include="TestData\html\blocked.tokens" />
+    <None Include="TestData\html\HtmlEntities.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\html\papercut.html" />
+    <None Include="TestData\html\papercut.tokens" />
+    <None Include="TestData\html\papercut-4.4.html" />
+    <None Include="TestData\html\papercut-4.4.tokens" />
+    <None Include="TestData\html\script-data.html" />
+    <None Include="TestData\html\script-data.tokens" />
     <None Include="TestData\html\test.html" />
     <None Include="TestData\html\test.tokens" />
     <None Include="TestData\html\xamarin3.html" />
     <None Include="TestData\html\xamarin3.tokens" />
     <None Include="TestData\html\xamarin3.xhtml" />
-    <None Include="TestData\html\papercut.html" />
-    <None Include="TestData\html\papercut.tokens" />
-    <None Include="TestData\html\papercut-4.4.html" />
-    <None Include="TestData\html\papercut-4.4.tokens" />
     <None Include="packages.config" />
-    <None Include="TestData\html\HtmlEntities.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HtmlKit\HtmlKit.csproj">
