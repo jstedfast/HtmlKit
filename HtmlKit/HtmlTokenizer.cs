@@ -1033,35 +1033,33 @@ namespace HtmlKit {
 
 		HtmlToken ReadScriptDataEscapedDashDash ()
 		{
-			do {
-				int nc = Read ();
-				char c;
+			int nc = Read ();
+			char c;
 
-				if (nc == -1) {
-					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitScriptDataToken ();
-				}
+			if (nc == -1) {
+				TokenizerState = HtmlTokenizerState.EndOfFile;
+				return EmitScriptDataToken ();
+			}
 
-				c = (char) nc;
+			c = (char) nc;
 
-				switch (c) {
-				case '-':
-					TokenizerState = HtmlTokenizerState.ScriptDataEscapedDash;
-					data.Append ('-');
-					break;
-				case '<':
-					TokenizerState = HtmlTokenizerState.ScriptDataEscapedLessThan;
-					break;
-				case '>':
-					TokenizerState = HtmlTokenizerState.ScriptData;
-					data.Append ('>');
-					break;
-				default:
-					TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
-					data.Append (c);
-					break;
-				}
-			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscaped);
+			switch (c) {
+			case '-':
+				TokenizerState = HtmlTokenizerState.ScriptDataEscapedDash;
+				data.Append ('-');
+				break;
+			case '<':
+				TokenizerState = HtmlTokenizerState.ScriptDataEscapedLessThan;
+				break;
+			case '>':
+				TokenizerState = HtmlTokenizerState.ScriptData;
+				data.Append ('>');
+				break;
+			default:
+				TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
+				data.Append (c);
+				break;
+			}
 
 			return null;
 		}
