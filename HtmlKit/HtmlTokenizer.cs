@@ -668,7 +668,7 @@ namespace HtmlKit {
 				switch (c) {
 				case '<':
 					TokenizerState = HtmlTokenizerState.ScriptDataLessThan;
-					return EmitScriptDataToken ();
+					break;
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
 					break;
