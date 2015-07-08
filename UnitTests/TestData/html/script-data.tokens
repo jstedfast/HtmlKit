@@ -28,6 +28,18 @@ ScriptData: <!--
 ScriptData: <--
 ScriptData: <script>double escaped!</script>
 Tag: </script>
+Data: \n    
+Tag: <script>
+ScriptData: <!--
+ScriptData: <--
+ScriptData: <script>double escaped!-</script>
+Tag: </script>
+Data: \n    
+Tag: <script>
+ScriptData: <!--
+ScriptData: <--
+ScriptData: <script>double escaped!--<</script>
+Tag: </script>
 Data: \n  
 Tag: </head>
 Data: \n  

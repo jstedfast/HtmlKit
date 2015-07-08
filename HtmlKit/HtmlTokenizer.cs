@@ -1266,7 +1266,7 @@ namespace HtmlKit {
 		// 8.2.4.30 Script data double escaped dash state
 		HtmlToken ReadScriptDataDoubleEscapedDash ()
 		{
-			int nc = Peek ();
+			int nc = Read ();
 			char c;
 
 			if (nc == -1) {
@@ -1281,6 +1281,7 @@ namespace HtmlKit {
 				break;
 			case '<':
 				TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscapedLessThan;
+				data.Append ('<');
 				break;
 			default:
 				TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
