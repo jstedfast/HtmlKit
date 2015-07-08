@@ -44,6 +44,8 @@
   <ItemGroup>
     <None Include="TestData\html\blocked.html" />
     <None Include="TestData\html\blocked.tokens" />
+    <None Include="TestData\html\cdata.html" />
+    <None Include="TestData\html\cdata.tokens" />
     <None Include="TestData\html\HtmlEntities.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
