@@ -15,7 +15,7 @@ Data: \n
 Tag: <script>
 ScriptData: <!----
 ScriptData: </head>-->
-Tag: </script>
+Tag: </script/>
 Data: \n    
 Tag: <script>
 ScriptData: <!--

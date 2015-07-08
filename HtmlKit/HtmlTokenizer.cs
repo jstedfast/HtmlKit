@@ -913,7 +913,6 @@ namespace HtmlKit {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
 					}
-
 					goto default;
 				case '/':
 					if (NameIs ("script")) {
@@ -933,6 +932,7 @@ namespace HtmlKit {
 				default:
 					if (!IsAsciiLetter (c)) {
 						TokenizerState = HtmlTokenizerState.ScriptData;
+						name.Length = 0;
 						return null;
 					}
 
