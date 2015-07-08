@@ -982,6 +982,8 @@ namespace HtmlKit {
 		// 8.2.4.22 Script data escaped state
 		HtmlToken ReadScriptDataEscaped ()
 		{
+			HtmlToken token = null;
+
 			do {
 				int nc = Read ();
 				char c;
@@ -1000,6 +1002,7 @@ namespace HtmlKit {
 					break;
 				case '<':
 					TokenizerState = HtmlTokenizerState.ScriptDataEscapedLessThan;
+					token = EmitScriptDataToken ();
 					data.Append ('<');
 					break;
 				default:
@@ -1008,12 +1011,13 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscaped);
 
-			return null;
+			return token;
 		}
 
 		// 8.2.4.23 Script data escaped dash state
 		HtmlToken ReadScriptDataEscapedDash ()
 		{
+			HtmlToken token = null;
 			int nc = Peek ();
 			char c;
 
@@ -1030,6 +1034,7 @@ namespace HtmlKit {
 				break;
 			case '<':
 				TokenizerState = HtmlTokenizerState.ScriptDataEscapedLessThan;
+				token = EmitScriptDataToken ();
 				data.Append ('<');
 				Read ();
 				break;
@@ -1039,12 +1044,14 @@ namespace HtmlKit {
 				break;
 			}
 
-			return null;
+			return token;
 		}
 
 		// 8.2.4.24 Script data escaped dash dash state
 		HtmlToken ReadScriptDataEscapedDashDash ()
 		{
+			HtmlToken token = null;
+
 			do {
 				int nc = Read ();
 				char c;
@@ -1056,24 +1063,27 @@ namespace HtmlKit {
 
 				c = (char) nc;
 
-				data.Append (c);
-
 				switch (c) {
 				case '-':
+					data.Append ('-');
 					break;
 				case '<':
 					TokenizerState = HtmlTokenizerState.ScriptDataEscapedLessThan;
+					token = EmitScriptDataToken ();
+					data.Append ('<');
 					break;
 				case '>':
 					TokenizerState = HtmlTokenizerState.ScriptData;
+					data.Append ('>');
 					break;
 				default:
 					TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
+					data.Append (c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscapedDashDash);
 
-			return null;
+			return token;
 		}
 
 		// 8.2.4.25 Script data escaped less-than sign state
@@ -1088,7 +1098,7 @@ namespace HtmlKit {
 				name.Length = 0;
 				Read ();
 			} else if (IsAsciiLetter (c)) {
-				TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
+				TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscapeStart;
 				data.Append (c);
 				name.Append (c);
 				Read ();
@@ -1242,6 +1252,7 @@ namespace HtmlKit {
 					break;
 				case '<':
 					TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscapedLessThan;
+					data.Append ('<');
 					break;
 				default:
 					data.Append (c == '\0' ? '\uFFFD' : c);
