@@ -747,7 +747,7 @@ namespace HtmlKit {
 			switch (c) {
 			case '>': // parse error
 				TokenizerState = HtmlTokenizerState.Data;
-				data.Length = 0;
+				data.Length = 0; // FIXME: this is probably wrong
 				break;
 			default:
 				if (IsAsciiLetter (c)) {

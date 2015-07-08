@@ -9,6 +9,10 @@ Data: Script Data Samples
 Tag: </title>
 Data: \n    
 Tag: <script>
+ScriptData: </head>
+Tag: </script>
+Data: \n    
+Tag: <script>
 ScriptData: <!----
 ScriptData: </head>-->
 Tag: </script>
@@ -44,6 +48,8 @@ Data: \n
 Tag: </head>
 Data: \n  
 Tag: <body>
+Data: \n    
+Tag: <br/>
 Data: \n  
 Tag: </body>
 Data: \n
