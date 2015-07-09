@@ -9,13 +9,13 @@ install:
 environment:
   COVERALLS_REPO_TOKEN:
     secure: CtNjB3/AUTKeFrXmEpR71u6zUBqp2z1/bESLf1LRoZvIQhRnuJEqc5GXELWVHKMI
-
+
 build:
   project: HtmlKit.sln
   verbosity: minimal
 
 test_script:
-- ps: >-
+  - ps: >-
     $testDir = ".\UnitTests\bin\Debug\"
 
     $tests = @("$testdir\UnitTests.dll")
