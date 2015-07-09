@@ -373,7 +373,7 @@ namespace HtmlKit {
 						var attr = tag.Attributes[i - 1];
 
 						if (attr.Id == HtmlAttributeId.XmlNS && attr.Value != null) {
-							HtmlNamespace = tag.Attributes[i].Value.ToHtmlNamespace ();
+							HtmlNamespace = attr.Value.ToHtmlNamespace ();
 							break;
 						}
 					}
