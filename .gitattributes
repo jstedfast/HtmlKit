@@ -3,5 +3,6 @@
 *.sln eol=crlf
 *.html text
 *.txt text
+*.yml text
 *.cs text
 *.md text
