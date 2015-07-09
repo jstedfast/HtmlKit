@@ -1977,7 +1977,7 @@ namespace HtmlKit {
 			case '>': // parse error
 				TokenizerState = HtmlTokenizerState.Data;
 				return EmitCommentToken (name);
-			default: // parse error
+			default:
 				TokenizerState = HtmlTokenizerState.Comment;
 				name.Append ('-');
 				name.Append (c == '\0' ? '\uFFFD' : c);
