@@ -15,7 +15,7 @@ build:
   verbosity: minimal
 
 test_script:
-  - ps: >-
+- ps: >-
     $testDir = ".\UnitTests\bin\Debug\"
 
     $tests = @("$testdir\UnitTests.dll")
