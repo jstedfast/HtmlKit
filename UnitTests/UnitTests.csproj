@@ -37,6 +37,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HtmlAttributeTests.cs" />
     <Compile Include="HtmlTokenizerTests.cs" />
     <Compile Include="HtmlEntityDecoderTests.cs" />
   </ItemGroup>
