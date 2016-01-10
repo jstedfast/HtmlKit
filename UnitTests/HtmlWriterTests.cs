@@ -94,5 +94,62 @@ namespace UnitTests {
 				Assert.Throws<ArgumentNullException> (() => html.WriteToken (null));
 			}
 		}
+
+		[Test]
+		public void TestHtmlWriter ()
+		{
+			const string expected = "<html ltr=\"true\"><head/><body><p class=\"paragraph\">" +
+				"special characters in this text should get encoded: &lt;&gt;&#39;&amp;\n" +
+				"special characters should not get encoded: &lt;&gt;" +
+				"</p></body></html>";
+			var actual = new StringBuilder ();
+
+			using (var html = new HtmlWriter (new StringWriter (actual))) {
+				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
+
+				// make sure we can't start by writing an attribute since we are in the wrong state
+				Assert.Throws<InvalidOperationException> (() => html.WriteAttribute (new HtmlAttribute (HtmlAttributeId.Action, "invalid state")));
+				Assert.Throws<InvalidOperationException> (() => html.WriteAttribute (HtmlAttributeId.Action, "invalid state"));
+				Assert.Throws<InvalidOperationException> (() => html.WriteAttribute ("action", "invalid state"));
+
+				// write a tag
+				html.WriteStartTag (HtmlTagId.Html);
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				// *now* we should be able to write an attribute
+				html.WriteAttribute (new HtmlAttribute ("ltr", "true"));
+
+				// write en empty element tag, this should change the state to Default
+				html.WriteEmptyElementTag (HtmlTagId.Head);
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				html.WriteStartTag ("body");
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				html.WriteStartTag (HtmlTagId.P);
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				// make sure that we can't write an attribute value yet
+				Assert.Throws<InvalidOperationException> (() => html.WriteAttributeValue ("attrValue"));
+				Assert.Throws<InvalidOperationException> (() => html.WriteAttributeValue ("attrValue".ToCharArray (), 0, 9));
+
+				html.WriteAttributeName (HtmlAttributeId.Class);
+				Assert.AreEqual (HtmlWriterState.Attribute, html.WriterState);
+
+				html.WriteAttributeValue ("paragraph");
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				html.WriteText ("special characters in this text should get encoded: <>'&\n");
+				html.WriteMarkupText ("special characters should not get encoded: &lt;&gt;");
+				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
+
+				html.WriteEndTag (HtmlTagId.P);
+
+				html.WriteEndTag (HtmlTagId.Body);
+				html.WriteEndTag ("html");
+			}
+
+			Assert.AreEqual (expected, actual.ToString ());
+		}
 	}
 }

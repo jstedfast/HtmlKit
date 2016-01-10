@@ -391,7 +391,7 @@ namespace HtmlKit {
 
 			CheckDisposed ();
 
-			EncodeAttributeName (id.ToString ());
+			EncodeAttributeName (id.ToAttributeName ());
 		}
 
 		/// <summary>
