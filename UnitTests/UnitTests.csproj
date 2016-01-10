@@ -41,6 +41,7 @@
     <Compile Include="HtmlTokenizerTests.cs" />
     <Compile Include="HtmlEntityDecoderTests.cs" />
     <Compile Include="HtmlWriterTests.cs" />
+    <Compile Include="HtmlUtilsTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
