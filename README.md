@@ -19,7 +19,7 @@ Maybe someday I'll implement a DOM. Who knows.
 
 ## License Information
 
-HtmlKit is Copyright (C) 2015 Xamarin Inc. and is licensed under the MIT license:
+HtmlKit is Copyright (C) 2015-2016 Xamarin Inc. and is licensed under the MIT license:
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -39,18 +39,60 @@ HtmlKit is Copyright (C) 2015 Xamarin Inc. and is licensed under the MIT license
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
 
+## Installing via NuGet
+
+The easiest way to install HtmlKit is via [NuGet](https://www.nuget.org/packages/HtmlKit/).
+
+In Visual Studio's [Package Manager Console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console),
+simply enter the following command:
+
+    Install-Package HtmlKit
+
+## Getting the Source Code
+
+First, you'll need to clone HtmlKit from my GitHub repository. To do this using the command-line version fo Git,
+you'll need to issue the following command in your terminal:
+
+    git clone https://github.com/jstedfast/HtmlKit.git
+
+If you are using [TortoiseGit](https://tortoisegit.org) on Windows, you'll need to right-click in the directory
+where you'd like to clone HtmlKit and select **Git Clone...** in the menu. Once you do that, you'll get a dialog
+asking you to specify the repository you'd like to clone. In the textbox labeled **URL:**, enter
+**https://github.com/jstedfast/HtmlKit.git** and then click **OK**. This will clone HtmlKit onto your local machine.
+
+## Updating the Source Code
+
+Occasionally you might want to update your local copy of the source code if I have made changes to HtmlKit since you
+downloaded the source code in the step above. To do this using the command-line version fo Git, you'll need to issue
+the following command in your terminal within the HtmlKit directory:
+
+    git pull
+
+If you are using [TortoiseGit](https://tortoisegit.org) on Windows, you'll need to right-click on the HtmlKit
+directory and select **Git Sync...** in the menu. Once you do that, you'll need to click the **Pull** and
+**Submodule Update** buttons in the following dialog:
+
+![Update the source code using TortoiseGit](https://github.com/jstedfast/MimeKit/blob/master/Documentation/media/update.png)
+
+## Building
+
+In the top-level HtmlKit directory, you will find an **HtmlKit.sln** file. You can open this file in either
+[Xamarin Studio](https://www.xamarin.com/download) or [Visual Studio 2015](https://beta.visualstudio.com/vs/community/),
+you can simply choose the **Debug** or **Release** build configuration and then build.
+
+Note: The **Release** build will generate the xml API documentation, but the **Debug** build will not.
+
 ## Contributing
 
-The first thing you'll need to do is fork HtmlKit to your own GitHub repository. Once you do that,
-
-    git clone git@github.com/<your-account>/HtmlKit.git
+The first thing you'll need to do is fork HtmlKit to your own GitHub repository. For instructions on how to
+do that, see the section titled **Getting the Source Code**.
 
 If you use [Xamarin Studio](http://xamarin.com/studio) or [MonoDevelop](http://monodevelop.com), all of the
 solution files are configured with the coding style used by HtmlKit. If you use Visual Studio or some
 other editor, please try to maintain the existing coding style as best as you can.
 
 Once you've got some changes that you'd like to submit upstream to the official HtmlKit repository,
-simply send me a Pull Request and I will try to review your changes in a timely manner.
+simply send me a **Pull Request** and I will try to review your changes in a timely manner.
 
 If you'd like to contribute but don't have any particular features in mind to work on, check out the issue
 tracker and look for something that might pique your interest!
