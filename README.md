@@ -79,6 +79,74 @@ you can simply choose the **Debug** or **Release** build configuration and then 
 
 Note: The **Release** build will generate the xml API documentation, but the **Debug** build will not.
 
+## Using HtmlKit
+
+### Parsing HTML
+
+The primary purpose of HtmlKit is parsing HTML.
+
+```csharp
+using (var reader = new StreamReader (stream)) {
+    var tokenizer = new HtmlTokenizer (reader);
+    HtmlToken token;
+
+    // ReadNextToken() returns `false` when the end of the stream is reached.
+    while (tokenizer.ReadNextToken (out token)) {
+        switch (token.Kind) {
+        case HtmlTokenKind.ScriptData:
+        case HtmlTokenKind.CData:
+        case HtmlTokenKind.Data:
+            // ScriptData, CData, and Data tokens contain text data.
+            var text = (HtmlDataToken) token;
+
+            Console.WriteLine ("{0}: {1}", token.Kind, text.Data);
+            break;
+        case HtmlTokenKind.Tag:
+            // Tag tokens represent tags and their attributes.
+            var tag = (HtmlTagToken) token;
+
+            Console.Write ("<{0}{1}", tag.IsEndTag ? "/" : "", tag.Name);
+
+            foreach (var attribute in tag.Attributes) {
+                if (attribute.Value != null)
+                    Console.Write (" {0}={1}", attribute.Name, Quote (attribute.Value));
+                else
+                    Console.Write (" {0}", attribute.Name);
+            }
+
+            Console.WriteLine (tag.IsEmptyElement ? "/>" : ">");
+            break;
+        case HtmlTokenKind.Comment:
+            var comment = (HtmlCommentToken) token;
+
+            Console.WriteLine ("Comment: {0}", comment.Comment);
+            break;
+        case HtmlTokenKind.DocType:
+            var doctype = (HtmlDocTypeToken) token;
+
+            if (doctype.ForceQuirksMode)
+                Console.Write ("<!-- force quirks mode -->");
+
+            Console.Write ("<!DOCTYPE");
+
+            if (doctype.Name != null)
+                Console.Write (" {0}", doctype.Name.ToUpperInvariant ());
+
+            if (doctype.PublicIdentifier != null) {
+                Console.Write (" PUBLIC \"{0}\"", doctype.PublicIdentifier);
+                if (doctype.SystemIdentifier != null)
+                    Console.Write (" \"{0}\"", doctype.SystemIdentifier);
+            } else if (doctype.SystemIdentifier != null) {
+                Console.Write (" SYSTEM \"{0}\"", doctype.SystemIdentifier);
+            }
+
+            Console.WriteLine (">");
+            break;
+        }
+    }
+}
+```
+
 ## Contributing
 
 The first thing you'll need to do is fork HtmlKit to your own GitHub repository. For instructions on how to
