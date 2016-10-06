@@ -58,7 +58,7 @@ you'll need to issue the following command in your terminal:
 If you are using [TortoiseGit](https://tortoisegit.org) on Windows, you'll need to right-click in the directory
 where you'd like to clone HtmlKit and select **Git Clone...** in the menu. Once you do that, you'll get a dialog
 asking you to specify the repository you'd like to clone. In the textbox labeled **URL:**, enter
-**https://github.com/jstedfast/HtmlKit.git** and then click **OK**. This will clone HtmlKit onto your local machine.
+`https://github.com/jstedfast/HtmlKit.git` and then click **OK**. This will clone HtmlKit onto your local machine.
 
 ## Updating the Source Code
 
@@ -69,10 +69,7 @@ the following command in your terminal within the HtmlKit directory:
     git pull
 
 If you are using [TortoiseGit](https://tortoisegit.org) on Windows, you'll need to right-click on the HtmlKit
-directory and select **Git Sync...** in the menu. Once you do that, you'll need to click the **Pull** and
-**Submodule Update** buttons in the following dialog:
-
-![Update the source code using TortoiseGit](https://github.com/jstedfast/MimeKit/blob/master/Documentation/media/update.png)
+directory and select **Git Sync...** in the menu. Once you do that, you'll need to click the **Pull** button.
 
 ## Building
 
