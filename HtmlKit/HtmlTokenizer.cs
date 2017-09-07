@@ -73,8 +73,8 @@ namespace HtmlKit {
 		/// </summary>
 		/// <remarks>
 		/// <para>Gets or sets whether or not the tokenizer should decode character references.</para>
-		/// <para>Note: Character references in attribute values will still be decoded even if this
-		/// value is set to <c>false</c>.</para>
+		/// <para><alert class="warning">Character references in attribute values will still be decoded
+		/// even if this value is set to <c>false</c>.</alert></para>
 		/// </remarks>
 		/// <value><c>true</c> if character references should be decoded; otherwise, <c>false</c>.</value>
 		public bool DecodeCharacterReferences {
@@ -1801,7 +1801,6 @@ namespace HtmlKit {
 
 			if (data.Length > 0 && data[0] == '<') {
 				// strip the leading '<' but leave the rest
-				var buf = data.ToString ();
 				for (int i = 1; i < data.Length; i++)
 					data[i - 1] = data[i];
 				data.Length--;

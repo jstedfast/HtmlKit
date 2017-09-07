@@ -49,7 +49,7 @@ namespace HtmlKit {
 		public HtmlAttribute (HtmlAttributeId id, string value)
 		{
 			if (id == HtmlAttributeId.Unknown)
-				throw new ArgumentOutOfRangeException ("id");
+				throw new ArgumentOutOfRangeException (nameof (id));
 
 			Name = id.ToAttributeName ();
 			Value = value;
@@ -70,13 +70,13 @@ namespace HtmlKit {
 		public HtmlAttribute (string name, string value)
 		{
 			if (name == null)
-				throw new ArgumentNullException ("name");
+				throw new ArgumentNullException (nameof (name));
 
 			if (name.Length == 0)
-				throw new ArgumentException ("The attribute name cannot be empty.", "name");
+				throw new ArgumentException ("The attribute name cannot be empty.", nameof (name));
 
 			if (!HtmlUtils.IsValidTokenName (name))
-				throw new ArgumentException ("Invalid attribute name.", "name");
+				throw new ArgumentException ("Invalid attribute name.", nameof (name));
 
 			Id = name.ToHtmlAttributeId ();
 			Value = value;
@@ -86,10 +86,10 @@ namespace HtmlKit {
 		internal HtmlAttribute (string name)
 		{
 			if (name == null)
-				throw new ArgumentNullException ("name");
+				throw new ArgumentNullException (nameof (name));
 
 			if (name.Length == 0)
-				throw new ArgumentException ("The attribute name cannot be empty.", "name");
+				throw new ArgumentException ("The attribute name cannot be empty.", nameof (name));
 
 			Id = name.ToHtmlAttributeId ();
 			Name = name;
