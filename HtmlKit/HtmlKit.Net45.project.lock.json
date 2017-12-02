@@ -1,0 +1,43 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.5": {},
+    ".NETFramework,Version=v4.5/win": {},
+    ".NETFramework,Version=v4.5/win-anycpu": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "": [],
+    ".NETFramework,Version=v4.5": []
+  },
+  "packageFolders": {
+    "/Users/fejj/.nuget/packages/": {}
+  },
+  "project": {
+    "restore": {
+      "projectUniqueName": "/Users/fejj/Projects/HtmlKit/HtmlKit/HtmlKit.Net45.csproj",
+      "projectName": "HtmlKit.Net45",
+      "projectPath": "/Users/fejj/Projects/HtmlKit/HtmlKit/HtmlKit.Net45.csproj",
+      "projectJsonPath": "/Users/fejj/Projects/HtmlKit/HtmlKit/HtmlKit.Net45.project.json",
+      "packagesPath": "/Users/fejj/.nuget/packages/",
+      "projectStyle": "ProjectJson",
+      "configFilePaths": [
+        "/Users/fejj/.config/NuGet/NuGet.Config"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      }
+    },
+    "frameworks": {
+      "net45": {}
+    },
+    "runtimes": {
+      "win": {
+        "#import": []
+      },
+      "win-anycpu": {
+        "#import": []
+      }
+    }
+  }
+}
