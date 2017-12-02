@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>UnitTests</RootNamespace>
     <AssemblyName>UnitTests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,11 +29,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -68,13 +68,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HtmlKit\HtmlKit.csproj">
-      <Project>{065C4D91-32E7-442D-8884-CEA2BC3DF4E9}</Project>
-      <Name>HtmlKit</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="TestData\" />
     <Folder Include="TestData\html\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HtmlKit\HtmlKit.csproj">
+      <Project>{EC9375DB-DB92-45C3-AB85-37B78EC4FD2E}</Project>
+      <Name>HtmlKit</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
