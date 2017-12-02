@@ -45,6 +45,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <None Include="TestData\html\badly-quoted-attr.html" />
+    <None Include="TestData\html\badly-quoted-attr.tokens" />
     <None Include="TestData\html\blocked.html" />
     <None Include="TestData\html\blocked.tokens" />
     <None Include="TestData\html\cdata.html" />
