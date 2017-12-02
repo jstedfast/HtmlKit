@@ -31,7 +31,7 @@ test_script:
     	-register:user `
     	-target:.\packages\NUnit.Runners.2.6.4\tools\nunit-console.exe `
     	"-targetargs: ""$elem"" /framework:net-4.5 /noshadow" `
-    	"-filter:+[HtmlKit]* -[UnitTests]* -[CodeGenerator]*" `
+    	"-filter:+[HtmlKit.*]* -[UnitTests]* -[CodeGenerator]*" `
     	-output:opencover.xml `
     }
 
