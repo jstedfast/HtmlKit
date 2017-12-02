@@ -1,5 +1,5 @@
 version: 1.0.1.{build}
-os: Visual Studio 2015
+os: Visual Studio 2017
 configuration: Debug
 platform: Any CPU
 
@@ -14,10 +14,10 @@ environment:
     secure: CtNjB3/AUTKeFrXmEpR71u6zUBqp2z1/bESLf1LRoZvIQhRnuJEqc5GXELWVHKMI
 
 install:
-  - cmd: nuget restore HtmlKit.Net45.sln
+  - cmd: nuget restore HtmlKit.sln
 
 build:
-  project: HtmlKit.Net45.sln
+  project: HtmlKit.sln
   verbosity: minimal
 
 test_script:
