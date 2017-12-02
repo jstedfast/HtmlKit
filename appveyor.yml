@@ -14,10 +14,10 @@ environment:
     secure: CtNjB3/AUTKeFrXmEpR71u6zUBqp2z1/bESLf1LRoZvIQhRnuJEqc5GXELWVHKMI
 
 install:
-  - cmd: nuget restore
+  - cmd: nuget restore HtmlKit.Net45.sln
 
 build:
-  project: HtmlKit.sln
+  project: HtmlKit.Net45.sln
   verbosity: minimal
 
 test_script:
