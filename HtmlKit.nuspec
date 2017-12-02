@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-  <metadata minClientVersion="2.8.6">
+  <metadata minClientVersion="2.12">
     <id>HtmlKit</id>
     <version>1.0.1</version>
     <title>HtmlKit</title>
@@ -15,14 +15,25 @@
     </releaseNotes>
     <copyright>Xamarin Inc.</copyright>
     <language>en-US</language>
-    <tags>html parser</tags>
+    <tags>html parser net45 netstandard netstandard1.0 netstandard1.3</tags>
     <frameworkAssemblies>
     </frameworkAssemblies>
-  <dependencies>
-  </dependencies>
+    <dependencies>
+      <group targetFramework="net45" />
+      <group targetFramework=".NETStandard1.0">
+	<dependency id="NETStandard.Library" version="1.6.1" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+	<dependency id="NETStandard.Library" version="1.6.1" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
-    <file src="HtmlKit\bin\Release\HtmlKit.dll" target="lib\portable-net45+win8+wp8\HtmlKit.dll" />
-    <file src="HtmlKit\bin\Release\HtmlKit.xml" target="lib\portable-net45+win8+wp8\HtmlKit.xml" />
+    <file src="HtmlKit\bin\Release\net45\HtmlKit.dll" target="lib\net45\HtmlKit.dll" />
+    <file src="HtmlKit\bin\Release\net45\HtmlKit.xml" target="lib\net45\HtmlKit.xml" />
+    <file src="HtmlKit\bin\Release\netstandard1.0\HtmlKit.dll" target="lib\netstandard1.0\HtmlKit.dll" />
+    <file src="HtmlKit\bin\Release\netstandard1.0\HtmlKit.xml" target="lib\netstandard1.0\HtmlKit.xml" />
+    <file src="HtmlKit\bin\Release\netstandard1.3\HtmlKit.dll" target="lib\netstandard1.3\HtmlKit.dll" />
+    <file src="HtmlKit\bin\Release\netstandard1.3\HtmlKit.xml" target="lib\netstandard1.3\HtmlKit.xml" />
   </files>
 </package>
