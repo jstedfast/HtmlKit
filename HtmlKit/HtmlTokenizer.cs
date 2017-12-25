@@ -1852,79 +1852,72 @@ namespace HtmlKit {
 			}
 
 			if (count == 2) {
+				// "<!--"
 				TokenizerState = HtmlTokenizerState.CommentStart;
 				name.Length = 0;
 				return null;
 			}
 
-			if (count == 1) {
-				// parse error
-				TokenizerState = HtmlTokenizerState.BogusComment;
-				// trim the leading "<!"
-				for (int i = 0; i < data.Length - 2; i++)
-					data[i] = data[i + 2];
-				data.Length -= 2;
-				bang = true;
-				return null;
-			}
-
-			if (c == 'D' || c == 'd') {
-				// Note: we save the data in case we hit a parse error and have to emit a data token
-				data.Append (c);
-				name.Append (c);
-				count = 1;
-				Read ();
-
-				while (count < 7) {
-					if ((nc = Read ()) == -1) {
-						TokenizerState = HtmlTokenizerState.EndOfFile;
-						return EmitDataToken (false);
-					}
-
-					if (ToLower ((c = (char) nc)) != DocType[count])
-						break;
-
+			if (count == 0) {
+				// Check for "<!DOCTYPE " or "<![CDATA["
+				if (c == 'D' || c == 'd') {
 					// Note: we save the data in case we hit a parse error and have to emit a data token
 					data.Append (c);
 					name.Append (c);
-					count++;
-				}
+					count = 1;
+					Read ();
 
-				if (count == 7) {
-					doctype = CreateDocTypeToken (name.ToString ());
-					TokenizerState = HtmlTokenizerState.DocType;
-					name.Length = 0;
-					return null;
-				}
+					while (count < 7) {
+						if ((nc = Read ()) == -1) {
+							TokenizerState = HtmlTokenizerState.EndOfFile;
+							return EmitDataToken (false);
+						}
 
-				name.Length = 0;
-			} else if (c == '[') {
-				// Note: we save the data in case we hit a parse error and have to emit a data token
-				data.Append (c);
-				count = 1;
-				Read ();
+						if (ToLower ((c = (char) nc)) != DocType[count])
+							break;
 
-				while (count < 7) {
-					if ((nc = Read ()) == -1) {
-						TokenizerState = HtmlTokenizerState.EndOfFile;
-						return EmitDataToken (false);
+						// Note: we save the data in case we hit a parse error and have to emit a data token
+						data.Append (c);
+						name.Append (c);
+						count++;
 					}
 
-					c = (char) nc;
+					if (count == 7) {
+						doctype = CreateDocTypeToken (name.ToString ());
+						TokenizerState = HtmlTokenizerState.DocType;
+						name.Length = 0;
+						return null;
+					}
 
+					name.Length = 0;
+				} else if (c == '[') {
 					// Note: we save the data in case we hit a parse error and have to emit a data token
 					data.Append (c);
+					count = 1;
+					Read ();
 
-					if (c != CData[count])
-						break;
+					while (count < 7) {
+						if ((nc = Read ()) == -1) {
+							TokenizerState = HtmlTokenizerState.EndOfFile;
+							return EmitDataToken (false);
+						}
 
-					count++;
-				}
+						c = (char) nc;
 
-				if (count == 7) {
-					TokenizerState = HtmlTokenizerState.CDataSection;
-					data.Length = 0;
-					return null;
+						// Note: we save the data in case we hit a parse error and have to emit a data token
+						data.Append (c);
+
+						if (c != CData[count])
+							break;
+
+						count++;
+					}
+
+					if (count == 7) {
+						TokenizerState = HtmlTokenizerState.CDataSection;
+						data.Length = 0;
+						return null;
+					}
 				}
 			}
 
