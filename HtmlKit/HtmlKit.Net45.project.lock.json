@@ -20,19 +20,12 @@
       "projectPath": "/Users/fejj/Projects/HtmlKit/HtmlKit/HtmlKit.Net45.csproj",
       "projectJsonPath": "/Users/fejj/Projects/HtmlKit/HtmlKit/HtmlKit.Net45.project.json",
       "packagesPath": "/Users/fejj/.nuget/packages/",
-      "outputPath": "/Users/fejj/Projects/HtmlKit/HtmlKit/obj/",
       "projectStyle": "ProjectJson",
-      "validateRuntimeAssets": true,
       "configFilePaths": [
-        "/Users/fejj/.nuget/NuGet/NuGet.Config"
+        "/Users/fejj/.config/NuGet/NuGet.Config"
       ],
       "sources": {
         "https://api.nuget.org/v3/index.json": {}
-      },
-      "frameworks": {
-        "net45": {
-          "projectReferences": {}
-        }
       }
     },
     "frameworks": {

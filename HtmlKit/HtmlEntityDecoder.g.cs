@@ -6,6 +6,8 @@ namespace HtmlKit {
 
 		bool PushNamedEntity (char c)
 		{
+			int state = states[index - 1];
+
 			switch (c) {
 			case '1':
 				switch (state) {
@@ -8038,12 +8040,14 @@ namespace HtmlKit {
 			default: return false;
 			}
 
-			pushed[index++] = c;
+			states[index] = state;
+			pushed[index] = c;
+			index++;
 
 			return true;
 		}
 
-		string GetNamedEntityValue ()
+		static string GetNamedEntityValue (int state)
 		{
 			switch (state) {
 			case 6: return "\u00C1"; // &Aacute
@@ -10171,8 +10175,29 @@ namespace HtmlKit {
 			case 7724: return "\uD835\uDCCF"; // &zscr
 			case 7726: return "\u200D"; // &zwj
 			case 7728: return "\u200C"; // &zwnj
-			default: return new string (pushed, 0, index);
+			default: return null;
 			}
+		}
+
+		string GetNamedEntityValue ()
+		{
+			int startIndex = index;
+			string decoded = null;
+
+			while (startIndex > 0) {
+				if ((decoded = GetNamedEntityValue (states[startIndex - 1])) != null)
+					break;
+
+				startIndex--;
+			}
+
+			if (decoded == null)
+				decoded = string.Empty;
+
+			if (startIndex < index)
+				decoded += new string (pushed, startIndex, index - startIndex);
+
+			return decoded;
 		}
 	}
 }

@@ -183,6 +183,8 @@ namespace CodeGenerator {
 
 			output.WriteLine ("\t\tbool PushNamedEntity (char c)");
 			output.WriteLine ("\t\t{");
+			output.WriteLine ("\t\t\tint state = states[index - 1];");
+			output.WriteLine ();
 			output.WriteLine ("\t\t\tswitch (c) {");
 			foreach (var outer in OuterSwitchLabels) {
 				output.WriteLine ("\t\t\tcase '{0}':", outer.Key);
@@ -196,7 +198,9 @@ namespace CodeGenerator {
 			output.WriteLine ("\t\t\tdefault: return false;");
 			output.WriteLine ("\t\t\t}"); // end switch (state)
 			output.WriteLine ();
-			output.WriteLine ("\t\t\tpushed[index++] = c;");
+			output.WriteLine ("\t\t\tstates[index] = state;");
+			output.WriteLine ("\t\t\tpushed[index] = c;");
+			output.WriteLine ("\t\t\tindex++;");
 			output.WriteLine ();
 			output.WriteLine ("\t\t\treturn true;");
 			output.WriteLine ("\t\t}");
@@ -204,7 +208,7 @@ namespace CodeGenerator {
 
 		static void GenerateGetNamedEntityValueMethod (TextWriter output)
 		{
-			output.WriteLine ("\t\tstring GetNamedEntityValue ()");
+			output.WriteLine ("\t\tstatic string GetNamedEntityValue (int state)");
 			output.WriteLine ("\t\t{");
 			output.WriteLine ("\t\t\tswitch (state) {");
 			foreach (var kvp in FinalStates) {
@@ -215,8 +219,29 @@ namespace CodeGenerator {
 					output.Write ("\\u{0:X4}", (int) state.Value[i]);
 				output.WriteLine ("\"; // {0}", state.Name);
 			}
-			output.WriteLine ("\t\t\tdefault: return new string (pushed, 0, index);");
+			output.WriteLine ("\t\t\tdefault: return null;");
 			output.WriteLine ("\t\t\t}");
+			output.WriteLine ("\t\t}");
+			output.WriteLine ();
+			output.WriteLine ("\t\tstring GetNamedEntityValue ()");
+			output.WriteLine ("\t\t{");
+			output.WriteLine ("\t\t\tint startIndex = index;");
+			output.WriteLine ("\t\t\tstring decoded = null;");
+			output.WriteLine ();
+			output.WriteLine ("\t\t\twhile (startIndex > 0) {");
+			output.WriteLine ("\t\t\t\tif ((decoded = GetNamedEntityValue (states[startIndex - 1])) != null)");
+			output.WriteLine ("\t\t\t\t\tbreak;");
+			output.WriteLine ();
+			output.WriteLine ("\t\t\t\tstartIndex--;");
+			output.WriteLine ("\t\t\t}");
+			output.WriteLine ();
+			output.WriteLine ("\t\t\tif (decoded == null)");
+			output.WriteLine ("\t\t\t\tdecoded = string.empty;");
+			output.WriteLine ();
+			output.WriteLine ("\t\t\tif (startIndex < index)");
+			output.WriteLine ("\t\t\t\tdecoded += new string (pushed, startIndex, index - startIndex);");
+			output.WriteLine ();
+			output.WriteLine ("\t\t\treturn decoded;");
 			output.WriteLine ("\t\t}");
 		}
 	}

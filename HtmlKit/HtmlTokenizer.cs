@@ -49,6 +49,7 @@ namespace HtmlKit {
 		HtmlTagToken tag;
 		int cdataIndex;
 		bool isEndTag;
+		bool bang;
 		char quote;
 
 		TextReader text;
@@ -224,7 +225,7 @@ namespace HtmlKit {
 		/// Creates an attribute.
 		/// </remarks>
 		/// <returns>The attribute.</returns>
-		/// <param name="name">THe attribute name.</param>
+		/// <param name="name">The attribute name.</param>
 		protected virtual HtmlAttribute CreateAttribute (string name)
 		{
 			return new HtmlAttribute (name);
@@ -291,8 +292,10 @@ namespace HtmlKit {
 		HtmlToken EmitCommentToken (string comment, bool bogus = false)
 		{
 			var token = CreateCommentToken (comment, bogus);
+			token.IsBangComment = bang;
 			data.Length = 0;
 			name.Length = 0;
+			bang = false;
 			return token;
 		}
 
@@ -721,9 +724,17 @@ namespace HtmlKit {
 			data.Append (c);
 
 			switch ((c = (char) nc)) {
-			case '!': TokenizerState = HtmlTokenizerState.MarkupDeclarationOpen; break;
-			case '?': TokenizerState = HtmlTokenizerState.BogusComment; break;
-			case '/': TokenizerState = HtmlTokenizerState.EndTagOpen; break;
+			case '!':
+				TokenizerState = HtmlTokenizerState.MarkupDeclarationOpen;
+				break;
+			case '?':
+				TokenizerState = HtmlTokenizerState.BogusComment;
+				data.Length = 1;
+				data[0] = c;
+				break;
+			case '/':
+				TokenizerState = HtmlTokenizerState.EndTagOpen;
+				break;
 			default:
 				if (IsAsciiLetter (c)) {
 					TokenizerState = HtmlTokenizerState.TagName;
@@ -766,6 +777,8 @@ namespace HtmlKit {
 					name.Append (c);
 				} else {
 					TokenizerState = HtmlTokenizerState.BogusComment;
+					data.Length = 1;
+					data[0] = c;
 				}
 				break;
 			}
@@ -1800,13 +1813,6 @@ namespace HtmlKit {
 			int nc;
 			char c;
 
-			if (data.Length > 0 && data[0] == '<') {
-				// strip the leading '<' but leave the rest
-				for (int i = 1; i < data.Length; i++)
-					data[i - 1] = data[i];
-				data.Length--;
-			}
-
 			do {
 				if ((nc = Read ()) == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -1854,6 +1860,11 @@ namespace HtmlKit {
 			if (count == 1) {
 				// parse error
 				TokenizerState = HtmlTokenizerState.BogusComment;
+				// trim the leading "<!"
+				for (int i = 0; i < data.Length - 2; i++)
+					data[i] = data[i + 2];
+				data.Length -= 2;
+				bang = true;
 				return null;
 			}
 
@@ -1919,6 +1930,12 @@ namespace HtmlKit {
 
 			// parse error
 			TokenizerState = HtmlTokenizerState.BogusComment;
+
+			// trim the leading "<!"
+			for (int i = 0; i < data.Length - 2; i++)
+				data[i] = data[i + 2];
+			data.Length -= 2;
+			bang = true;
 
 			return null;
 		}
