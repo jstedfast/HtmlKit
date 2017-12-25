@@ -48,6 +48,7 @@
     <Compile Include="HtmlEntityDecoderTests.cs" />
     <Compile Include="HtmlWriterTests.cs" />
     <Compile Include="HtmlUtilsTests.cs" />
+    <Compile Include="HtmlTokenTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TestData\html\badly-quoted-attr.html" />
