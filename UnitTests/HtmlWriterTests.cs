@@ -57,6 +57,8 @@ namespace UnitTests {
 				Assert.Throws<ArgumentNullException> (() => html.WriteAttribute (HtmlAttributeId.Alt, null, 0, 0));
 				Assert.Throws<ArgumentOutOfRangeException> (() => html.WriteAttribute (HtmlAttributeId.Alt, new char[0], -1, 0));
 				Assert.Throws<ArgumentOutOfRangeException> (() => html.WriteAttribute (HtmlAttributeId.Alt, new char[0], 0, 1));
+				Assert.Throws<ArgumentException> (() => html.WriteAttribute (HtmlAttributeId.Unknown, "value"));
+				Assert.Throws<ArgumentException> (() => html.WriteAttribute (HtmlAttributeId.Alt, null));
 
 				Assert.Throws<ArgumentException> (() => html.WriteAttributeName (HtmlAttributeId.Unknown));
 				Assert.Throws<ArgumentNullException> (() => html.WriteAttributeName (null));
