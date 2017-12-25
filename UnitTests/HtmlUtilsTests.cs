@@ -218,6 +218,14 @@ namespace UnitTests {
 		[Test]
 		public void TestHtmlNamespaces ()
 		{
+			string nullspace = null;
+
+			Assert.Throws<ArgumentNullException> (() => nullspace.ToHtmlNamespace ());
+
+			Assert.AreEqual (HtmlNamespace.Html, "does not exist".ToHtmlNamespace ());
+
+			Assert.Throws<ArgumentOutOfRangeException> (() => ((HtmlNamespace) 500).ToNamespaceUrl ());
+
 			foreach (HtmlNamespace ns in Enum.GetValues (typeof (HtmlNamespace))) {
 				var value = ns.ToNamespaceUrl ().ToHtmlNamespace ();
 
