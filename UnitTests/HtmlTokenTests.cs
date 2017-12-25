@@ -60,6 +60,7 @@ namespace UnitTests
 			Assert.Throws<ArgumentNullException> (() => new HtmlTagToken (null, attributes, false));
 			Assert.Throws<ArgumentNullException> (() => new HtmlTagToken ("name", null, false));
 			Assert.Throws<ArgumentNullException> (() => new HtmlTagToken (null, false));
+			Assert.Throws<ArgumentNullException> (() => tag.WriteTo (null));
 
 			Assert.Throws<ArgumentNullException> (() => new HtmlScriptDataToken (null));
 			Assert.Throws<ArgumentNullException> (() => script.WriteTo (null));
