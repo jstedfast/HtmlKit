@@ -100,10 +100,13 @@ namespace UnitTests {
 		[Test]
 		public void TestHtmlWriter ()
 		{
-			const string expected = "<html ltr=\"true\"><head/><body><p class=\"paragraph\">" +
-				"special characters in this text should get encoded: &lt;&gt;&#39;&amp;\n" +
+			const string expected = "<html ltr=\"true\"><head/><body>" +
+				"<p class=\"paragraph\" style=\"font: arial; color: red\" align=\"left\">" +
+				"special characters in this text should get encoded: &lt;&gt;&#39;&amp;\n<br/></p>" +
+				"<p class=\"paragraph\" style=\"font: arial; color: red\" align=\"left\">" +
 				"special characters should not get encoded: &lt;&gt;" +
 				"</p></body></html>";
+			var style = "font: arial; color: red";
 			var actual = new StringBuilder ();
 
 			using (var html = new HtmlWriter (new StringWriter (actual))) {
@@ -141,7 +144,36 @@ namespace UnitTests {
 				html.WriteAttributeValue ("paragraph");
 				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
 
+				html.WriteAttributeName ("style");
+				Assert.AreEqual (HtmlWriterState.Attribute, html.WriterState);
+
+				html.WriteAttributeValue (style.ToCharArray (), 0, style.Length);
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				html.WriteAttribute (HtmlAttributeId.Align, "left");
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
 				html.WriteText ("special characters in this text should get encoded: <>'&\n");
+				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
+
+				html.WriteEmptyElementTag ("br");
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				html.WriteEndTag ("p");
+				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
+
+				html.WriteStartTag ("p");
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				html.WriteAttribute (HtmlAttributeId.Class, "paragraph".ToCharArray (), 0, "paragraph".Length);
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				html.WriteAttribute ("style", style.ToCharArray (), 0, style.Length);
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
+				html.WriteAttribute ("align", "left");
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+
 				html.WriteMarkupText ("special characters should not get encoded: &lt;&gt;");
 				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
 
