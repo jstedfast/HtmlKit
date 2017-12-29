@@ -105,7 +105,14 @@ namespace UnitTests {
 				"special characters in this text should get encoded: &lt;&gt;&#39;&amp;\n<br/><br/></p>" +
 				"<p class=\"paragraph\" style=\"font: arial; color: red\" align=\"left\">" +
 				"special characters should not get encoded: &lt;&gt;" +
-				"</p><p></p></body></html>";
+				"</p><p></p>" +
+				"<p class=\"paragraph\" style=\"font: arial; color: red\" align=\"left\">" +
+				"special characters in this text should get encoded: &lt;&gt;&#39;&amp;\n<br/><br/></p>" +
+				"<p class=\"paragraph\" style=\"font: arial; color: red\" align=\"left\">" +
+				"special characters should not get encoded: &lt;&gt;" +
+				"</p></body></html>";
+			var text = "special characters in this text should get encoded: <>'&\n";
+			var markup = "special characters should not get encoded: &lt;&gt;";
 			var style = "font: arial; color: red";
 			var actual = new StringBuilder ();
 
@@ -153,7 +160,7 @@ namespace UnitTests {
 				html.WriteAttribute (HtmlAttributeId.Align, "left");
 				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
 
-				html.WriteText ("special characters in this text should get encoded: <>'&\n");
+				html.WriteText (text);
 				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
 
 				html.WriteEmptyElementTag ("br");
@@ -179,7 +186,7 @@ namespace UnitTests {
 				html.WriteAttribute ("align", "left");
 				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
 
-				html.WriteMarkupText ("special characters should not get encoded: &lt;&gt;");
+				html.WriteMarkupText (markup);
 				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
 
 				html.WriteEndTag (HtmlTagId.P);
@@ -188,8 +195,25 @@ namespace UnitTests {
 				html.WriteStartTag (HtmlTagId.P);
 				html.WriteEndTag (HtmlTagId.P);
 
+				html.WriteStartTag ("p");
+				html.WriteAttribute ("class", "paragraph");
+				html.WriteAttribute ("style", style);
+				html.WriteAttribute ("align", "left");
+				html.WriteText (text.ToCharArray (), 0, text.Length);
+				html.WriteEmptyElementTag ("br");
+				html.WriteEmptyElementTag ("br");
+				html.WriteEndTag ("p");
+
+				html.WriteStartTag ("p");
+				html.WriteAttribute ("class", "paragraph");
+				html.WriteAttribute ("style", style);
+				html.WriteAttribute ("align", "left");
+				html.WriteMarkupText (markup.ToCharArray (), 0, markup.Length);
+				html.WriteEndTag ("p");
+
 				html.WriteEndTag (HtmlTagId.Body);
 				html.WriteEndTag ("html");
+				html.Flush ();
 			}
 
 			Assert.AreEqual (expected, actual.ToString ());
