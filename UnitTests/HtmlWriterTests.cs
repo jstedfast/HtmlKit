@@ -102,10 +102,10 @@ namespace UnitTests {
 		{
 			const string expected = "<html ltr=\"true\"><head/><body>" +
 				"<p class=\"paragraph\" style=\"font: arial; color: red\" align=\"left\">" +
-				"special characters in this text should get encoded: &lt;&gt;&#39;&amp;\n<br/></p>" +
+				"special characters in this text should get encoded: &lt;&gt;&#39;&amp;\n<br/><br/></p>" +
 				"<p class=\"paragraph\" style=\"font: arial; color: red\" align=\"left\">" +
 				"special characters should not get encoded: &lt;&gt;" +
-				"</p></body></html>";
+				"</p><p></p></body></html>";
 			var style = "font: arial; color: red";
 			var actual = new StringBuilder ();
 
@@ -158,9 +158,14 @@ namespace UnitTests {
 
 				html.WriteEmptyElementTag ("br");
 				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
+				html.WriteEmptyElementTag ("br");
+				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
 
 				html.WriteEndTag ("p");
 				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
+
+				Assert.Throws<InvalidOperationException> (() => html.WriteAttributeName ("style"));
+				Assert.Throws<InvalidOperationException> (() => html.WriteAttributeName (HtmlAttributeId.Style));
 
 				html.WriteStartTag ("p");
 				Assert.AreEqual (HtmlWriterState.Tag, html.WriterState);
@@ -177,6 +182,10 @@ namespace UnitTests {
 				html.WriteMarkupText ("special characters should not get encoded: &lt;&gt;");
 				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
 
+				html.WriteEndTag (HtmlTagId.P);
+				Assert.AreEqual (HtmlWriterState.Default, html.WriterState);
+
+				html.WriteStartTag (HtmlTagId.P);
 				html.WriteEndTag (HtmlTagId.P);
 
 				html.WriteEndTag (HtmlTagId.Body);
