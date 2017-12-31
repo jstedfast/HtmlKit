@@ -993,7 +993,18 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestTruncatedAfterAttributeValue ()
+		public void TestTruncatedAfterAttributeValueQuoted ()
+		{
+			const string content = "<name attr=\"value\" ";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("<name attr=\"value\" ", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedAfterAttributeValueUnquoted ()
 		{
 			const string content = "<name attr=value ";
 			var tokenizer = CreateTokenizer (content);
@@ -1024,6 +1035,19 @@ namespace UnitTests {
 			Assert.IsFalse (tokenizer.ReadNextToken (out HtmlToken token));
 			//Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
 			//Assert.AreEqual ("</>", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestInvalidSelfClosingStartTag ()
+		{
+			const string content = "<name/ attr=value>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			var tag = (HtmlTagToken) token;
+			Assert.AreEqual ("name", tag.Name);
+			Assert.AreEqual (1, tag.Attributes.Count);
 		}
 	}
 }
