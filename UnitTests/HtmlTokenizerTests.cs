@@ -599,7 +599,20 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestTruncatedDocTypeNameAfterPublicKeyword ()
+		public void TestTruncatedDocTypeAfterPublicKeyword ()
+		{
+			const string content = "<!DOCTYPE HTML PuBlIc";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("PuBlIc", doctype.PublicKeyword);
+		}
+
+		[Test]
+		public void TestTruncatedDocTypeBeforePublicIdentifier ()
 		{
 			const string content = "<!DOCTYPE HTML PuBlIc ";
 			var tokenizer = CreateTokenizer (content);
@@ -612,9 +625,9 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestTruncatedDocTypeNameBeforePublicIdentifier ()
+		public void TestTruncatedDocTypePublicIdentifierQuoted ()
 		{
-			const string content = "<!DOCTYPE HTML PuBlIc=";
+			const string content = "<!DOCTYPE HTML PuBlIc \"value";
 			var tokenizer = CreateTokenizer (content);
 
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
@@ -622,10 +635,25 @@ namespace UnitTests {
 			var doctype = (HtmlDocTypeToken) token;
 			Assert.IsTrue (doctype.ForceQuirksMode);
 			Assert.AreEqual ("PuBlIc", doctype.PublicKeyword);
+			Assert.AreEqual ("value", doctype.PublicIdentifier);
 		}
 
 		[Test]
-		public void TestDocTypeNamePublicWithoutEquals ()
+		public void TestTruncatedDocTypeAfterPublicIdentifier ()
+		{
+			const string content = "<!DOCTYPE HTML PuBlIc \"value\"";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("PuBlIc", doctype.PublicKeyword);
+			Assert.AreEqual ("value", doctype.PublicIdentifier);
+		}
+
+		[Test]
+		public void TestDocTypePublicWithoutSpace ()
 		{
 			const string content = "<!DOCTYPE HTML PuBlIc\"value\">";
 			var tokenizer = CreateTokenizer (content);
