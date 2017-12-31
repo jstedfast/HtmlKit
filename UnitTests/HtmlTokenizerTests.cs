@@ -483,5 +483,216 @@ namespace UnitTests {
 		//	Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
 		//	Assert.AreEqual (content, ((HtmlDataToken) token).Data);
 		//}
+
+		// The following unit tests are for error conditions
+
+		[Test]
+		public void TestTruncatedDocTypeToken ()
+		{
+			const string content = "<!DOC";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("<!DOC", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestNotQuiteDocTypeBogusComment ()
+		{
+			const string content = "<!DOCS>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("DOCS", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestTruncatedNotQuiteDocTypeBogusComment ()
+		{
+			const string content = "<!DOCS";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("DOCS", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestNotQuiteCDATABogusComment ()
+		{
+			const string content = "<![CDAT[>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("[CDAT[", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestTruncatedNotQuiteCDATABogusComment ()
+		{
+			const string content = "<![CDAT[";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("[CDAT[", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestEmptyComment0 ()
+		{
+			const string content = "<!-->"; // malformed
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual (string.Empty, ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestEmptyComment1 ()
+		{
+			const string content = "<!--->"; // malformed
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual (string.Empty, ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestEmptyComment2 ()
+		{
+			const string content = "<!---->"; // correct
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual (string.Empty, ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestTruncatedEmptyComment0 ()
+		{
+			const string content = "<!--";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual (string.Empty, ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestTruncatedEmptyComment1 ()
+		{
+			const string content = "<!---";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual (string.Empty, ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestTruncatedEmptyComment2 ()
+		{
+			const string content = "<!----";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual (string.Empty, ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestDashComment ()
+		{
+			const string content = "<!---comment-->";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("-comment", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestDashDashComment ()
+		{
+			const string content = "<!----comment-->";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("--comment", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestCommentDash ()
+		{
+			const string content = "<!--comment--->";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("comment-", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestCommentDashDash ()
+		{
+			const string content = "<!--comment---->";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("comment--", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestCommentDashComment ()
+		{
+			const string content = "<!--comment-comment-->";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("comment-comment", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestCommentDashDashComment ()
+		{
+			const string content = "<!--comment--comment-->";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("comment--comment", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestCommentEndBang ()
+		{
+			const string content = "<!--comment--!>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("comment", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestTruncatedCommentEndBang ()
+		{
+			const string content = "<!--comment--!";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("comment", ((HtmlCommentToken) token).Comment);
+		}
 	}
 }

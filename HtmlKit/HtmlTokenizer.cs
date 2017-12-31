@@ -1873,12 +1873,15 @@ namespace HtmlKit {
 							return EmitDataToken (false);
 						}
 
-						if (ToLower ((c = (char) nc)) != DocType[count])
-							break;
+						c = (char) nc;
 
 						// Note: we save the data in case we hit a parse error and have to emit a data token
 						data.Append (c);
 						name.Append (c);
+
+						if (ToLower (c) != DocType[count])
+							break;
+
 						count++;
 					}
 
@@ -2083,6 +2086,7 @@ namespace HtmlKit {
 					break;
 				default:
 					TokenizerState = HtmlTokenizerState.Comment;
+					name.Append ("--");
 					name.Append (c == '\0' ? '\uFFFD' : c);
 					return null;
 				}
