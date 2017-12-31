@@ -2177,13 +2177,9 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.Data;
 					doctype.ForceQuirksMode = true;
 					return EmitDocType ();
-				case '\0':
-					TokenizerState = HtmlTokenizerState.DocTypeName;
-					name.Append ('\uFFFD');
-					return null;
 				default:
 					TokenizerState = HtmlTokenizerState.DocTypeName;
-					name.Append (c);
+					name.Append (c == '\0' ? '\uFFFD' : c);
 					return null;
 				}
 			} while (true);

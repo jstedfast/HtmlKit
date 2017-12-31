@@ -520,20 +520,9 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestDocTypeHtm ()
+		public void TestDocTypeNoName ()
 		{
-			const string content = "<!DOCTYPE HTM>";
-			var tokenizer = CreateTokenizer (content);
-
-			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
-			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
-			Assert.IsFalse (((HtmlDocTypeToken) token).ForceQuirksMode);
-		}
-
-		[Test]
-		public void TestTruncatedDocTypeHtm ()
-		{
-			const string content = "<!DOCTYPE HTM";
+			const string content = "<!DOCTYPE  >";
 			var tokenizer = CreateTokenizer (content);
 
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
@@ -542,18 +531,7 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestDocTypeHtml ()
-		{
-			const string content = "<!DOCTYPE HTML>";
-			var tokenizer = CreateTokenizer (content);
-
-			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
-			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
-			Assert.IsFalse (((HtmlDocTypeToken) token).ForceQuirksMode);
-		}
-
-		[Test]
-		public void TestTruncatedDocTypeHtml ()
+		public void TestTruncatedDocTypeName ()
 		{
 			const string content = "<!DOCTYPE HTML";
 			var tokenizer = CreateTokenizer (content);
@@ -564,7 +542,29 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestDocTypeHtmlSpace ()
+		public void TestDocTypeWithName ()
+		{
+			const string content = "<!DOCTYPE HTML>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsFalse (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestTruncatedAfterDocTypeName ()
+		{
+			const string content = "<!DOCTYPE HTML ";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsTrue (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestDocTypeNameSpace ()
 		{
 			const string content = "<!DOCTYPE HTML >";
 			var tokenizer = CreateTokenizer (content);
@@ -572,6 +572,84 @@ namespace UnitTests {
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
 			Assert.IsFalse (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestDocTypeNameSpaceBogus ()
+		{
+			const string content = "<!DOCTYPE HTML BOGUS>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsFalse (doctype.ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestDocTypeNamePublicBogus ()
+		{
+			const string content = "<!DOCTYPE HTML PUBLICBOGUS>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestTruncatedDocTypeNameAfterPublicKeyword ()
+		{
+			const string content = "<!DOCTYPE HTML PuBlIc ";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("PuBlIc", doctype.PublicKeyword);
+		}
+
+		[Test]
+		public void TestTruncatedDocTypeNameBeforePublicIdentifier ()
+		{
+			const string content = "<!DOCTYPE HTML PuBlIc=";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("PuBlIc", doctype.PublicKeyword);
+		}
+
+		[Test]
+		public void TestDocTypeNamePublicWithoutEquals ()
+		{
+			const string content = "<!DOCTYPE HTML PuBlIc\"value\">";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsFalse (doctype.ForceQuirksMode);
+			Assert.AreEqual ("PuBlIc", doctype.PublicKeyword);
+			Assert.AreEqual ("value", doctype.PublicIdentifier);
+		}
+
+		[Test]
+		public void TestDocTypeNamePublicClose ()
+		{
+			const string content = "<!DOCTYPE HTML PuBlIc>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("PuBlIc", doctype.PublicKeyword);
+			Assert.AreEqual (null, doctype.PublicIdentifier);
 		}
 
 		[Test]
