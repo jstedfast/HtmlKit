@@ -487,6 +487,83 @@ namespace UnitTests {
 		// The following unit tests are for error conditions
 
 		[Test]
+		public void TestTruncatedDocType ()
+		{
+			const string content = "<!DOCTYPE";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsTrue (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestTruncatedDocTypeSpace ()
+		{
+			const string content = "<!DOCTYPE ";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsTrue (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestDocTypeHtm ()
+		{
+			const string content = "<!DOCTYPE HTM>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsFalse (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestTruncatedDocTypeHtm ()
+		{
+			const string content = "<!DOCTYPE HTM";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsTrue (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestDocTypeHtml ()
+		{
+			const string content = "<!DOCTYPE HTML>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsFalse (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestTruncatedDocTypeHtml ()
+		{
+			const string content = "<!DOCTYPE HTML";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsTrue (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestDocTypeHtmlSpace ()
+		{
+			const string content = "<!DOCTYPE HTML >";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			Assert.IsFalse (((HtmlDocTypeToken) token).ForceQuirksMode);
+		}
+
+		[Test]
 		public void TestTruncatedDocTypeToken ()
 		{
 			const string content = "<!DOC";
@@ -693,6 +770,28 @@ namespace UnitTests {
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
 			Assert.AreEqual ("comment", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestCommentDashDashBang ()
+		{
+			const string content = "<!--comment--!-->";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("comment--!", ((HtmlCommentToken) token).Comment);
+		}
+
+		[Test]
+		public void TestCommentDashDashBangComment ()
+		{
+			const string content = "<!--comment--!comment-->";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Comment, token.Kind);
+			Assert.AreEqual ("comment--!comment", ((HtmlCommentToken) token).Comment);
 		}
 	}
 }
