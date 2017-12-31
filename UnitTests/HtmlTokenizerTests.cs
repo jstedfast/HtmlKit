@@ -874,12 +874,12 @@ namespace UnitTests {
 		[Test]
 		public void TestTruncatedAfterAttributeName ()
 		{
-			const string content = "<name attr ";
+			const string content = "<name attr  ";
 			var tokenizer = CreateTokenizer (content);
 
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
-			Assert.AreEqual ("<name attr ", ((HtmlDataToken) token).Data);
+			Assert.AreEqual ("<name attr  ", ((HtmlDataToken) token).Data);
 		}
 
 		[Test]
@@ -927,14 +927,25 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestTruncatedBeforeAttributeValue ()
+		public void TestTruncatedBeforeAttributeValue1 ()
 		{
-			const string content = "<name attr=";
+			const string content = "<name attr =";
 			var tokenizer = CreateTokenizer (content);
 
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
-			Assert.AreEqual ("<name attr=", ((HtmlDataToken) token).Data);
+			Assert.AreEqual ("<name attr =", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedBeforeAttributeValue2 ()
+		{
+			const string content = "<name attr = ";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("<name attr = ", ((HtmlDataToken) token).Data);
 		}
 
 		[Test]
@@ -957,6 +968,28 @@ namespace UnitTests {
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
 			Assert.AreEqual ("<name attr=value", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedCharacterReferenceInAttributeValue1 ()
+		{
+			const string content = "<name attr=&";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("<name attr=&", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedCharacterReferenceInAttributeValue2 ()
+		{
+			const string content = "<name attr=&am";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("<name attr=&am", ((HtmlDataToken) token).Data);
 		}
 
 		[Test]
