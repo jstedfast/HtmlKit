@@ -1004,6 +1004,17 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestTruncatedAttributeValueQuotedWithAbortedCharacterReference ()
+		{
+			const string content = "<name attr=\"one & two";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("<name attr=\"one & two", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
 		public void TestTruncatedAttributeValueUnquoted ()
 		{
 			const string content = "<name attr=value";
