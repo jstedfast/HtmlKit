@@ -1073,26 +1073,32 @@ namespace UnitTests {
 			Assert.AreEqual ("<name attr=\"value\"", ((HtmlDataToken) token).Data);
 		}
 
-		//[Test]
-		//public void TestTruncatedAfterAttributeValueQuoted ()
-		//{
-		//	const string content = "<name attr=\"value\"  ";
-		//	var tokenizer = CreateTokenizer (content);
+		[Test]
+		public void TestAttrbuteNameAfterAttributeValueQuoted ()
+		{
+			const string content = "<name attr1=\"value\"attr2=value>";
+			var tokenizer = CreateTokenizer (content);
 
-		//	Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
-		//	Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
-		//	Assert.AreEqual ("<name attr=\"value\"  ", ((HtmlDataToken) token).Data);
-		//}
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			var tag = (HtmlTagToken) token;
+			Assert.AreEqual ("name", tag.Name);
+			Assert.AreEqual (2, tag.Attributes.Count);
+			Assert.AreEqual ("attr1", tag.Attributes[0].Name);
+			Assert.AreEqual ("value", tag.Attributes[0].Value);
+			Assert.AreEqual ("attr2", tag.Attributes[1].Name);
+			Assert.AreEqual ("value", tag.Attributes[1].Value);
+		}
 
 		[Test]
 		public void TestTruncatedSelfClosingTagAfterAttributeValueQuoted ()
 		{
-			const string content = "<name attr=\"value\"  /";
+			const string content = "<name attr=\"value\"/";
 			var tokenizer = CreateTokenizer (content);
 
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
-			Assert.AreEqual ("<name attr=\"value\"  /", ((HtmlDataToken) token).Data);
+			Assert.AreEqual ("<name attr=\"value\"/", ((HtmlDataToken) token).Data);
 		}
 
 		[Test]
