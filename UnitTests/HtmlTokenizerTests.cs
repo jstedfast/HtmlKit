@@ -599,9 +599,9 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestDocTypeNamePublicBogus ()
+		public void TestDocTypeNamePublicX ()
 		{
-			const string content = "<!DOCTYPE HTML PUBLICBOGUS>";
+			const string content = "<!DOCTYPE HTML PUBLICX>";
 			var tokenizer = CreateTokenizer (content);
 
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
@@ -832,6 +832,45 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestTruncatedDocTypeBeforeSystemIdentifier ()
+		{
+			const string content = "<!DOCTYPE HTML SySTeM ";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("SySTeM", doctype.SystemKeyword);
+		}
+
+		[Test]
+		public void TestDocTypeBeforeSystemIdentifier ()
+		{
+			const string content = "<!DOCTYPE HTML SySTeM  >";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("SySTeM", doctype.SystemKeyword);
+		}
+
+		[Test]
+		public void TestDocTypeBeforeSystemIdentifierX ()
+		{
+			const string content = "<!DOCTYPE HTML SySTeM  x>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("SySTeM", doctype.SystemKeyword);
+		}
+
+		[Test]
 		public void TestTruncatedDocTypeSystemIdentifier ()
 		{
 			const string content = "<!DOCTYPE HTML SySTeM \"value";
@@ -871,6 +910,58 @@ namespace UnitTests {
 			Assert.IsFalse (doctype.ForceQuirksMode);
 			Assert.AreEqual ("SySTeM", doctype.SystemKeyword);
 			Assert.AreEqual ("value", doctype.SystemIdentifier);
+		}
+
+		[Test]
+		public void TestTruncatedDocTypeAfterSystemIdentifier ()
+		{
+			const string content = "<!DOCTYPE HTML SySTeM \"value\" ";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("SySTeM", doctype.SystemKeyword);
+			Assert.AreEqual ("value", doctype.SystemIdentifier);
+		}
+
+		[Test]
+		public void TestTruncatedBogusDocType ()
+		{
+			const string content = "<!DOCTYPE HTML SySTeM \"value\" x";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("SySTeM", doctype.SystemKeyword);
+			Assert.AreEqual ("value", doctype.SystemIdentifier);
+		}
+
+		[Test]
+		public void TestDocTypeNameSystemX ()
+		{
+			const string content = "<!DOCTYPE HTML SYSTEMX>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestDocTypeNameSystem ()
+		{
+			const string content = "<!DOCTYPE HTML SYSTEM>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.IsTrue (doctype.ForceQuirksMode);
 		}
 
 		[Test]
