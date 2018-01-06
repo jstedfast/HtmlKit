@@ -11,20 +11,23 @@
     ".NETFramework,Version=v4.5": []
   },
   "packageFolders": {
-    "/Users/fejj/.nuget/packages/": {}
+    "C:\\Users\\jeffs.DESKTOP-509767B\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "/Users/fejj/Projects/HtmlKit/HtmlKit/HtmlKit.Net45.csproj",
+      "projectUniqueName": "C:\\Users\\jeffs.DESKTOP-509767B\\Documents\\Projects\\HtmlKit\\HtmlKit\\HtmlKit.Net45.csproj",
       "projectName": "HtmlKit.Net45",
-      "projectPath": "/Users/fejj/Projects/HtmlKit/HtmlKit/HtmlKit.Net45.csproj",
-      "projectJsonPath": "/Users/fejj/Projects/HtmlKit/HtmlKit/HtmlKit.Net45.project.json",
-      "packagesPath": "/Users/fejj/.nuget/packages/",
+      "projectPath": "C:\\Users\\jeffs.DESKTOP-509767B\\Documents\\Projects\\HtmlKit\\HtmlKit\\HtmlKit.Net45.csproj",
+      "projectJsonPath": "C:\\Users\\jeffs.DESKTOP-509767B\\Documents\\Projects\\HtmlKit\\HtmlKit\\HtmlKit.Net45.project.json",
+      "packagesPath": "C:\\Users\\jeffs.DESKTOP-509767B\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\jeffs.DESKTOP-509767B\\Documents\\Projects\\HtmlKit\\HtmlKit\\obj\\",
       "projectStyle": "ProjectJson",
       "configFilePaths": [
-        "/Users/fejj/.config/NuGet/NuGet.Config"
+        "C:\\Users\\jeffs.DESKTOP-509767B\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       }
     },
