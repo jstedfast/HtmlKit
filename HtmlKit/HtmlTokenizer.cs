@@ -36,6 +36,7 @@ namespace HtmlKit {
 	/// </remarks>
 	public class HtmlTokenizer
 	{
+		// Specification: https://dev.w3.org/html5/spec-LC/tokenization.html
 		const string DocType = "doctype";
 		const string CData = "[CDATA[";
 

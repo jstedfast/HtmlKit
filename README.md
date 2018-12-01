@@ -6,6 +6,9 @@
 
 HtmlKit is a cross-platform .NET framework for parsing HTML.
 
+HtmlKit implements the HTML5 tokenizing state machine described in
+[W3C's HTML5 Tokenization Specification](https://dev.w3.org/html5/spec-LC/tokenization.html).
+
 ## Goals
 
 I haven't fully figured that out yet.
