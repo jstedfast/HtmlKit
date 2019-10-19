@@ -18,6 +18,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -27,6 +28,7 @@
     <DocumentationFile>bin\Release\net45\HtmlKit.xml</DocumentationFile>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -39,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CharBuffer.cs" />
     <Compile Include="HtmlAttribute.cs" />
     <Compile Include="HtmlAttributeCollection.cs" />
     <Compile Include="HtmlAttributeId.cs" />
@@ -56,6 +59,7 @@
     <Compile Include="HtmlWriter.cs" />
     <Compile Include="HtmlWriterState.cs" />
     <Compile Include="ICharArray.cs" />
+    <Compile Include="OptimizedOrdinalComparer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

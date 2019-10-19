@@ -740,7 +740,7 @@ namespace HtmlKit {
 		{
 			var values = (HtmlTagId[]) Enum.GetValues (typeof (HtmlTagId));
 
-			TagNameToId = new Dictionary<string, HtmlTagId> (values.Length - 1, StringComparer.OrdinalIgnoreCase);
+			TagNameToId = new Dictionary<string, HtmlTagId> (values.Length - 1, OptimizedOrdinalIgnoreCaseComparer.Comparer);
 
 			for (int i = 0; i < values.Length - 1; i++)
 				TagNameToId.Add (values[i].ToHtmlTagName (), values[i]);

@@ -601,7 +601,7 @@ namespace HtmlKit {
 		{
 			var values = (HtmlAttributeId[]) Enum.GetValues (typeof (HtmlAttributeId));
 
-			AttributeNameToId = new Dictionary<string, HtmlAttributeId> (values.Length - 1, StringComparer.OrdinalIgnoreCase);
+			AttributeNameToId = new Dictionary<string, HtmlAttributeId> (values.Length - 1, OptimizedOrdinalIgnoreCaseComparer.Comparer);
 
 			for (int i = 1; i < values.Length; i++)
 				AttributeNameToId.Add (values[i].ToAttributeName (), values[i]);

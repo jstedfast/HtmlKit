@@ -25,7 +25,7 @@
 //
 
 using System.IO;
-using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace HtmlKit {
 	/// <summary>
@@ -41,9 +41,10 @@ namespace HtmlKit {
 		const string CData = "[CDATA[";
 
 		readonly HtmlEntityDecoder entity = new HtmlEntityDecoder ();
-		readonly StringBuilder data = new StringBuilder ();
-		readonly StringBuilder name = new StringBuilder ();
+		readonly CharBuffer data = new CharBuffer (2048);
+		readonly CharBuffer name = new CharBuffer (32);
 		readonly char[] cdata = new char[3];
+		readonly TextReader text;
 		HtmlDocTypeToken doctype;
 		HtmlAttribute attribute;
 		string activeTagName;
@@ -52,8 +53,6 @@ namespace HtmlKit {
 		bool isEndTag;
 		bool bang;
 		char quote;
-
-		TextReader text;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HtmlTokenizer"/> class.
@@ -232,19 +231,26 @@ namespace HtmlKit {
 			return new HtmlAttribute (name);
 		}
 
-		static bool IsAlphaNumeric (char c)
+		[MethodImpl (MethodImplOptions.AggressiveInlining)]
+		static bool IsAlphaNumeric (int c)
 		{
-			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
+			return ((uint) (c - 'A') <= 'Z' - 'A') || ((uint) (c - 'a') <= 'z' - 'a') || ((uint) (c - '0') <= '9' - '0');
 		}
 
-		static bool IsAsciiLetter (char c)
+		[MethodImpl (MethodImplOptions.AggressiveInlining)]
+		static bool IsAsciiLetter (int c)
 		{
-			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+			return ((uint) (c - 'A') <= 'Z' - 'A') || ((uint) (c - 'a') <= 'z' - 'a');
 		}
 
-		static char ToLower (char c)
+		[MethodImpl (MethodImplOptions.AggressiveInlining)]
+		static char ToLower (int c)
 		{
-			return (c >= 'A' && c <= 'Z') ? (char) (c + 0x20) : c;
+			// check if the char is within the uppercase range
+			if ((uint) (c - 'A') <= 'Z' - 'A')
+				return (char) (c + 0x20);
+
+			return (char) c;
 		}
 
 		int Peek ()
@@ -300,7 +306,7 @@ namespace HtmlKit {
 			return token;
 		}
 
-		HtmlToken EmitCommentToken (StringBuilder comment, bool bogus = false)
+		HtmlToken EmitCommentToken (CharBuffer comment, bool bogus = false)
 		{
 			return EmitCommentToken (comment.ToString (), bogus);
 		}

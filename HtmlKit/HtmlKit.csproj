@@ -25,10 +25,12 @@
     <AssemblyOriginatorKeyFile>htmlkit.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CharBuffer.cs" />
     <Compile Include="HtmlAttribute.cs" />
     <Compile Include="HtmlAttributeCollection.cs" />
     <Compile Include="HtmlAttributeId.cs" />
@@ -46,6 +48,7 @@
     <Compile Include="HtmlWriter.cs" />
     <Compile Include="HtmlWriterState.cs" />
     <Compile Include="ICharArray.cs" />
+    <Compile Include="OptimizedOrdinalComparer.cs" />
   </ItemGroup>
 
 </Project>
