@@ -2,12 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata minClientVersion="2.12">
     <id>HtmlKit</id>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <title>HtmlKit</title>
     <authors>Jeffrey Stedfast</authors>
     <owners>Jeffrey Stedfast</owners>
-    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <license type="expression">MIT</license>
     <projectUrl>http://github.com/jstedfast/HtmlKit</projectUrl>
+    <repository type="git" url="https://github.com/jstedfast/HtmlKit" />
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>HtmlKit is a cross-platform .NET framework for parsing HTML.</description>
     <summary>HtmlKit is a cross-platform .NET framework for parsing HTML.</summary>
@@ -20,18 +21,10 @@
     </frameworkAssemblies>
     <dependencies>
       <group targetFramework="net45" />
-      <group targetFramework=".NETStandard1.0">
-	<dependency id="NETStandard.Library" version="1.6.1" />
-      </group>
-      <group targetFramework=".NETStandard1.3">
-	<dependency id="NETStandard.Library" version="1.6.1" />
-      </group>
-      <group targetFramework=".NETStandard1.6">
-	<dependency id="NETStandard.Library" version="1.6.1" />
-      </group>
-      <group targetFramework=".NETStandard2.0">
-	<dependency id="NETStandard.Library" version="1.6.1" />
-      </group>
+      <group targetFramework=".NETStandard1.0" />
+      <group targetFramework=".NETStandard1.3" />
+      <group targetFramework=".NETStandard1.6" />
+      <group targetFramework=".NETStandard2.0" />
     </dependencies>
   </metadata>
   <files>
