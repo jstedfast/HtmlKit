@@ -667,9 +667,6 @@ namespace HtmlKit {
 
 					output.Write (entity.GetValue ());
 					entity.Reset ();
-
-					if (index < endIndex && data[index] == ';')
-						index++;
 				} else {
 					output.Write (data[index++]);
 				}

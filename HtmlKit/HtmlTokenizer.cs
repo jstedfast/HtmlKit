@@ -431,6 +431,9 @@ namespace HtmlKit {
 			while (entity.Push (c)) {
 				Read ();
 
+				if (c == ';')
+					break;
+
 				if ((nc = Peek ()) == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					data.Append (entity.GetPushedInput ());
@@ -446,11 +449,6 @@ namespace HtmlKit {
 
 			data.Append (entity.GetValue ());
 			entity.Reset ();
-
-			if (c == ';') {
-				// consume the ';'
-				Read ();
-			}
 
 			return null;
 		}
@@ -1673,7 +1671,6 @@ namespace HtmlKit {
 		{
 			char additionalAllowedCharacter = quote == '\0' ? '>' : quote;
 			int nc = Peek ();
-			bool consume;
 			char c;
 
 			if (nc == -1) {
@@ -1689,13 +1686,11 @@ namespace HtmlKit {
 			case '\t': case '\r': case '\n': case '\f': case ' ': case '<': case '&':
 				// no character is consumed, emit '&'
 				name.Append ('&');
-				consume = false;
 				break;
 			default:
 				if (c == additionalAllowedCharacter) {
 					// this is not a character reference, nothing is consumed
 					name.Append ('&');
-					consume = false;
 					break;
 				}
 
@@ -1703,6 +1698,9 @@ namespace HtmlKit {
 
 				while (entity.Push (c)) {
 					Read ();
+
+					if (c == ';')
+						break;
 
 					if ((nc = Peek ()) == -1) {
 						TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -1727,7 +1725,6 @@ namespace HtmlKit {
 				data.Length--;
 				data.Append (pushed);
 				name.Append (value);
-				consume = c == ';';
 				entity.Reset ();
 				break;
 			}
@@ -1736,9 +1733,6 @@ namespace HtmlKit {
 				TokenizerState = HtmlTokenizerState.AttributeValueUnquoted;
 			else
 				TokenizerState = HtmlTokenizerState.AttributeValueQuoted;
-
-			if (consume)
-				Read ();
 
 			return null;
 		}

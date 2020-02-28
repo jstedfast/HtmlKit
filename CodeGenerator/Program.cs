@@ -90,8 +90,8 @@ namespace CodeGenerator {
 
 					name = (string) json.Value;
 
-					// trim leading '&' and trailing ';'
-					name = name.TrimStart ('&').TrimEnd (';');
+					// trim leading '&'
+					name = name.Substring (1);
 
 					if (!json.Read () || json.TokenType != JsonToken.StartObject)
 						break;
@@ -236,7 +236,7 @@ namespace CodeGenerator {
 			output.WriteLine ("\t\t\t}");
 			output.WriteLine ();
 			output.WriteLine ("\t\t\tif (decoded == null)");
-			output.WriteLine ("\t\t\t\tdecoded = string.empty;");
+			output.WriteLine ("\t\t\t\tdecoded = string.Empty;");
 			output.WriteLine ();
 			output.WriteLine ("\t\t\tif (startIndex < index)");
 			output.WriteLine ("\t\t\t\tdecoded += new string (pushed, startIndex, index - startIndex);");
