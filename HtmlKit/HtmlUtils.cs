@@ -110,7 +110,7 @@ namespace HtmlKit {
 					}
 
 					if (c > 255 && char.IsSurrogate (c)) {
-						if (index + 1 < endIndex && char.IsSurrogatePair (c, value[index])) {
+						if (index < endIndex && char.IsSurrogatePair (c, value[index])) {
 							unichar = char.ConvertToUtf32 (c, value[index]);
 							index++;
 						} else {
@@ -414,7 +414,7 @@ namespace HtmlKit {
 					}
 
 					if (c > 255 && char.IsSurrogate (c)) {
-						if (index + 1 < endIndex && char.IsSurrogatePair (c, data[index])) {
+						if (index < endIndex && char.IsSurrogatePair (c, data[index])) {
 							unichar = char.ConvertToUtf32 (c, data[index]);
 							index++;
 						} else {
