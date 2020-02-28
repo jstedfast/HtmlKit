@@ -171,7 +171,7 @@ namespace HtmlKit {
 				throw new ArgumentOutOfRangeException (nameof (count));
 
 			if (quote != '"' && quote != '\'')
-				throw new ArgumentException ("quote");
+				throw new ArgumentException ("The quote character must either be '\"' or '\''.", nameof (quote));
 
 			HtmlAttributeEncode (output, new CharArray (value), startIndex, count, quote);
 		}
@@ -209,7 +209,7 @@ namespace HtmlKit {
 				throw new ArgumentOutOfRangeException (nameof (count));
 
 			if (quote != '"' && quote != '\'')
-				throw new ArgumentException ("quote");
+				throw new ArgumentException ("The quote character must either be '\"' or '\''.", nameof (quote));
 
 			var encoded = new StringBuilder ();
 
@@ -257,7 +257,7 @@ namespace HtmlKit {
 				throw new ArgumentOutOfRangeException (nameof (count));
 
 			if (quote != '"' && quote != '\'')
-				throw new ArgumentException ("quote");
+				throw new ArgumentException ("The quote character must either be '\"' or '\''.", nameof (quote));
 
 			HtmlAttributeEncode (output, new CharString (value), startIndex, count, quote);
 		}
@@ -288,7 +288,7 @@ namespace HtmlKit {
 				throw new ArgumentNullException (nameof (value));
 
 			if (quote != '"' && quote != '\'')
-				throw new ArgumentException ("quote");
+				throw new ArgumentException ("The quote character must either be '\"' or '\''.", nameof (quote));
 
 			HtmlAttributeEncode (output, new CharString (value), 0, value.Length, quote);
 		}
@@ -326,7 +326,7 @@ namespace HtmlKit {
 				throw new ArgumentOutOfRangeException (nameof (count));
 
 			if (quote != '"' && quote != '\'')
-				throw new ArgumentException ("quote");
+				throw new ArgumentException ("The quote character must either be '\"' or '\''.", nameof (quote));
 
 			var encoded = new StringBuilder ();
 
@@ -357,7 +357,7 @@ namespace HtmlKit {
 				throw new ArgumentNullException (nameof (value));
 
 			if (quote != '"' && quote != '\'')
-				throw new ArgumentException ("quote");
+				throw new ArgumentException ("The quote character must either be '\"' or '\''.", nameof (quote));
 
 			var encoded = new StringBuilder ();
 
