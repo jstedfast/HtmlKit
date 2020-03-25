@@ -129,7 +129,7 @@ namespace HtmlKit {
 		/// <para>Combined with <see cref="LineNumber"/>, a value of <c>1,1</c> indicates
 		/// the start of the document.</para>
 		/// </remarks>
-		/// <value>The current line number.</value>
+		/// <value>The column position of the current line.</value>
 		public int LinePosition {
 			get; private set;
 		}
