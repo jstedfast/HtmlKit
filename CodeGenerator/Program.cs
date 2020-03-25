@@ -251,9 +251,6 @@ namespace CodeGenerator {
 			output.WriteLine ("\t\t{");
 			output.WriteLine ("\t\t\tint min = 0, max = transitions.Length;");
 			output.WriteLine ();
-			output.WriteLine ("\t\t\tif (max == 0)");
-			output.WriteLine ("\t\t\t\treturn -1;");
-			output.WriteLine ();
 			output.WriteLine ("\t\t\tdo {");
 			output.WriteLine ("\t\t\t\tint i = min + ((max - min) / 2);");
 			output.WriteLine ();
