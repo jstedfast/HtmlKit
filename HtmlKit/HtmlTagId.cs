@@ -649,9 +649,9 @@ namespace HtmlKit {
 		TH,
 
 		/// <summary>
-		/// The HTML &lt;thread&gt; tag.
+		/// The HTML &lt;thead&gt; tag.
 		/// </summary>
-		Thread,
+		THead,
 
 		/// <summary>
 		/// The HTML &lt;time&gt; tag.
