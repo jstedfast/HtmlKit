@@ -1,9 +1,9 @@
 ﻿//
 // HtmlEntityDecoderTests.cs
 //
-// Author: Jeffrey Stedfast <jeff@xamarin.com>
+// Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2015-2020 Xamarin Inc. (www.xamarin.com)
+// Copyright (c) 2015-2022 Jeffrey Stedfast <jestedfa@microsoft.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,12 @@
 // THE SOFTWARE.
 //
 
-using System;
 using System.IO;
 
 using NUnit.Framework;
 
 using Newtonsoft.Json;
+
 using HtmlKit;
 
 namespace UnitTests {
@@ -39,7 +39,7 @@ namespace UnitTests {
 		[Test]
 		public void TestDecodeNamedEntities ()
 		{
-			var path = Path.Combine ("..", "..", "TestData", "html", "HtmlEntities.json");
+			var path = Path.Combine (TestHelper.ProjectDir, "TestData", "html", "HtmlEntities.json");
 			var decoder = new HtmlEntityDecoder ();
 
 			using (var json = new JsonTextReader (new StreamReader (path))) {

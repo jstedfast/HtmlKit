@@ -30,7 +30,7 @@ test_script:
     	.\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe `
     	-register:user `
     	-target:.\packages\NUnit.Runners.2.6.4\tools\nunit-console.exe `
-    	"-targetargs: ""$elem"" /framework:net-4.5 /noshadow" `
+    	"-targetargs: ""$elem"" /framework:net-4.8 /noshadow" `
     	"-filter:+[HtmlKit.*]* -[UnitTests]* -[CodeGenerator]*" `
     	-output:opencover.xml `
     }

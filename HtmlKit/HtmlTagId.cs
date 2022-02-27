@@ -1,9 +1,9 @@
 ﻿//
 // HtmlTagId.cs
 //
-// Author: Jeffrey Stedfast <jeff@xamarin.com>
+// Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2015-2020 Xamarin Inc. (www.xamarin.com)
+// Copyright (c) 2015-2022 Jeffrey Stedfast <jestedfa@microsoft.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,6 @@
 //
 
 using System;
-using System.Linq;
-using System.Reflection;
 using System.Collections.Generic;
 
 namespace HtmlKit {
@@ -760,14 +758,8 @@ namespace HtmlKit {
 				return "!";
 
 			var name = value.ToString ();
-
-#if NETSTANDARD1_0 || NETSTANDARD1_3 || NETSTANDARD1_6
-			var field = typeof (HtmlTagId).GetTypeInfo ().GetDeclaredField (name);
-			var attrs = field.GetCustomAttributes (typeof (HtmlTagNameAttribute), false).ToArray ();
-#else
 			var field = typeof (HtmlTagId).GetField (name);
 			var attrs = field.GetCustomAttributes (typeof (HtmlTagNameAttribute), false);
-#endif
 
 			if (attrs != null && attrs.Length == 1)
 				return ((HtmlTagNameAttribute) attrs[0]).Name;
@@ -785,15 +777,13 @@ namespace HtmlKit {
 		/// <param name="name">The tag name.</param>
 		internal static HtmlTagId ToHtmlTagId (this string name)
 		{
-			HtmlTagId value;
-
 			if (string.IsNullOrEmpty (name))
 				return HtmlTagId.Unknown;
 
 			if (name[0] == '!')
 				return HtmlTagId.Comment;
 
-			if (!TagNameToId.TryGetValue (name, out value))
+			if (!TagNameToId.TryGetValue (name, out HtmlTagId value))
 				return HtmlTagId.Unknown;
 
 			return value;

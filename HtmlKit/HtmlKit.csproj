@@ -5,7 +5,7 @@
     <AssemblyTitle>HtmlKit</AssemblyTitle>
     <VersionPrefix>1.0.3</VersionPrefix>
     <Authors>Jeffrey Stedfast</Authors>
-    <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net452;net461;net47;net48;net5.0;net6.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AssemblyName>HtmlKit</AssemblyName>
@@ -28,6 +28,28 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' And $(TargetFramework.StartsWith('net4')) ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard2.')) ">
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CharBuffer.cs" />
@@ -47,7 +69,6 @@
     <Compile Include="HtmlUtils.cs" />
     <Compile Include="HtmlWriter.cs" />
     <Compile Include="HtmlWriterState.cs" />
-    <Compile Include="ICharArray.cs" />
     <Compile Include="OptimizedOrdinalComparer.cs" />
   </ItemGroup>
 

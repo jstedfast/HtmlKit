@@ -1,9 +1,9 @@
 ﻿//
 // HtmlUtilsTests.cs
 //
-// Author: Jeffrey Stedfast <jeff@xamarin.com>
+// Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2015-2020 Xamarin Inc. (www.xamarin.com)
+// Copyright (c) 2015-2022 Jeffrey Stedfast <jestedfa@microsoft.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 using NUnit.Framework;
 
@@ -42,12 +43,19 @@ namespace UnitTests {
 			const string text = "text";
 
 			// HtmlAttributeEncode
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (null));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode ((string) null));
 			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (text, 'x'));
 
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode ((ReadOnlySpan<char>) null));
+			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (text.AsSpan (), 'x'));
+
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (null, text));
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (writer, null));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (writer, (string) null));
 			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (writer, text, 'x'));
+
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (null, text.AsSpan ()));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (writer, (ReadOnlySpan<char>) null));
+			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (writer, text.AsSpan (), 'x'));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode ((string) null, 0, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlAttributeEncode (text, -1, 0));
@@ -65,17 +73,21 @@ namespace UnitTests {
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlAttributeEncode (writer, text, 0, text.Length + 1));
 			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (writer, text, 0, text.Length, 'x'));
 
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (null, text.ToCharArray(), 0, text.Length));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (null, text.ToCharArray (), 0, text.Length));
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (writer, (char[]) null, 0, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlAttributeEncode (writer, text.ToCharArray (), -1, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlAttributeEncode (writer, text.ToCharArray (), 0, text.Length + 1));
 			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (writer, text.ToCharArray (), 0, text.Length, 'x'));
 
 			// HtmlEncode
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (null));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode ((string) null));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode ((ReadOnlySpan<char>) null));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (null, text));
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (writer, null));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (writer, (string) null));
+
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (null, text.AsSpan ()));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (writer, (ReadOnlySpan<char>) null));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode ((string) null, 0, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlEncode (text, -1, 0));
@@ -90,7 +102,7 @@ namespace UnitTests {
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlEncode (writer, text, -1, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlEncode (writer, text, 0, text.Length + 1));
 
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (null, text.ToCharArray(), 0, text.Length));
+			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (null, text.ToCharArray (), 0, text.Length));
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (writer, (char[]) null, 0, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlEncode (writer, text.ToCharArray (), -1, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlEncode (writer, text.ToCharArray (), 0, text.Length + 1));
@@ -143,7 +155,7 @@ namespace UnitTests {
 			}
 		}
 
-		static void AssertHtmlEncode (string text, string expected)
+		static void AssertHtmlEncode (string text, string expected, bool testDecode)
 		{
 			string encoded, decoded;
 
@@ -174,22 +186,24 @@ namespace UnitTests {
 				Assert.AreEqual (expected, encoded, "HtmlEncode(TextWriter,char[],int,int)");
 			}
 
-			decoded = HtmlUtils.HtmlDecode (encoded);
-			Assert.AreEqual (text, decoded, "HtmlDecode(string)");
+			if (testDecode) {
+				decoded = HtmlUtils.HtmlDecode (encoded);
+				Assert.AreEqual (text, decoded, "HtmlDecode(string)");
 
-			decoded = HtmlUtils.HtmlDecode (encoded, 0, encoded.Length);
-			Assert.AreEqual (text, decoded, "HtmlDecode(string,int,int)");
+				decoded = HtmlUtils.HtmlDecode (encoded, 0, encoded.Length);
+				Assert.AreEqual (text, decoded, "HtmlDecode(string,int,int)");
 
-			using (var writer = new StringWriter ()) {
-				HtmlUtils.HtmlDecode (writer, encoded);
-				decoded = writer.ToString ();
-				Assert.AreEqual (text, decoded, "HtmlDecode(TextWriter,string)");
-			}
+				using (var writer = new StringWriter ()) {
+					HtmlUtils.HtmlDecode (writer, encoded);
+					decoded = writer.ToString ();
+					Assert.AreEqual (text, decoded, "HtmlDecode(TextWriter,string)");
+				}
 
-			using (var writer = new StringWriter ()) {
-				HtmlUtils.HtmlDecode (writer, encoded, 0, encoded.Length);
-				decoded = writer.ToString ();
-				Assert.AreEqual (text, decoded, "HtmlDecode(TextWriter,string,int,int)");
+				using (var writer = new StringWriter ()) {
+					HtmlUtils.HtmlDecode (writer, encoded, 0, encoded.Length);
+					decoded = writer.ToString ();
+					Assert.AreEqual (text, decoded, "HtmlDecode(TextWriter,string,int,int)");
+				}
 			}
 		}
 
@@ -201,7 +215,19 @@ namespace UnitTests {
 			const string text = "if (showJapaneseText && x <= 1)\ttext = '狂ったこの世で狂うなら気は確かだ。';";
 
 			AssertHtmlAttributeEncode (text, attributeValue);
-			AssertHtmlEncode (text, encoded);
+			AssertHtmlEncode (text, encoded, true);
+		}
+
+		[Test]
+		public void TestEncodeSurrogatePairs ()
+		{
+			const string attributeValue = "\"This emoji (&#128561;) contains a surrogate pair. And this next one is truncated: &#55357;\"";
+			const string encoded = "This emoji (&#128561;) contains a surrogate pair. And this next one is truncated: &#55357;";
+			var emoji = Encoding.UTF8.GetString (Convert.FromBase64String ("8J+YsQ=="));
+			var text = $"This emoji ({emoji}) contains a surrogate pair. And this next one is truncated: {emoji[0]}";
+
+			AssertHtmlAttributeEncode (text, attributeValue);
+			AssertHtmlEncode (text, encoded, false);
 		}
 
 		[Test]

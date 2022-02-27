@@ -1,9 +1,9 @@
 ﻿//
 // HtmlAttributeId.cs
 //
-// Author: Jeffrey Stedfast <jeff@xamarin.com>
+// Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2015-2020 Xamarin Inc. (www.xamarin.com)
+// Copyright (c) 2015-2022 Jeffrey Stedfast <jestedfa@microsoft.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,6 @@
 //
 
 using System;
-using System.Linq;
-using System.Reflection;
 using System.Collections.Generic;
 
 namespace HtmlKit {
@@ -618,14 +616,8 @@ namespace HtmlKit {
 		public static string ToAttributeName (this HtmlAttributeId value)
 		{
 			var name = value.ToString ();
-
-#if NETSTANDARD1_0 || NETSTANDARD1_3 || NETSTANDARD1_6
-			var field = typeof (HtmlAttributeId).GetTypeInfo ().GetDeclaredField (name);
-			var attrs = field.GetCustomAttributes (typeof (HtmlAttributeNameAttribute), false).ToArray ();
-#else
 			var field = typeof (HtmlAttributeId).GetField (name);
 			var attrs = field.GetCustomAttributes (typeof (HtmlAttributeNameAttribute), false);
-#endif
 
 			if (attrs != null && attrs.Length == 1)
 				return ((HtmlAttributeNameAttribute) attrs[0]).Name;
@@ -643,9 +635,7 @@ namespace HtmlKit {
 		/// <param name="name">The attribute name.</param>
 		internal static HtmlAttributeId ToHtmlAttributeId (this string name)
 		{
-			HtmlAttributeId value;
-
-			if (!AttributeNameToId.TryGetValue (name, out value))
+			if (!AttributeNameToId.TryGetValue (name, out HtmlAttributeId value))
 				return HtmlAttributeId.Unknown;
 
 			return value;

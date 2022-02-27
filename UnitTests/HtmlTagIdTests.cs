@@ -1,5 +1,5 @@
 ﻿//
-// HtmlTokenKind.cs
+// HtmlTagIdTests.cs
 //
 // Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
@@ -24,42 +24,39 @@
 // THE SOFTWARE.
 //
 
-namespace HtmlKit {
-	/// <summary>
-	/// The kinds of tokens that the <see cref="HtmlTokenizer"/> can emit.
-	/// </summary>
-	/// <remarks>
-	/// The kinds of tokens that the <see cref="HtmlTokenizer"/> can emit.
-	/// </remarks>
-	public enum HtmlTokenKind {
-		/// <summary>
-		/// A token consisting of <c>[CDATA[</c>.
-		/// </summary>
-		CData,
+using HtmlKit;
 
-		/// <summary>
-		/// An HTML comment token.
-		/// </summary>
-		Comment,
+using NUnit.Framework;
 
-		/// <summary>
-		/// A token consisting of character data.
-		/// </summary>
-		Data,
+namespace UnitTests {
+	[TestFixture]
+	public class HtmlTagIdTests
+	{
+		[Test]
+		public void TestToHtmlTagId ()
+		{
+			Assert.AreEqual (HtmlTagId.Unknown, "".ToHtmlTagId (), "string.Empty");
+			Assert.AreEqual (HtmlTagId.Comment, "!".ToHtmlTagId (), "!");
+			Assert.AreEqual (HtmlTagId.Comment, "!blah".ToHtmlTagId (), "!blah");
+			Assert.AreEqual (HtmlTagId.A, "a".ToHtmlTagId (), "a");
+			Assert.AreEqual (HtmlTagId.A, "A".ToHtmlTagId (), "A");
+			Assert.AreEqual (HtmlTagId.Font, "font".ToHtmlTagId (), "font");
+			Assert.AreEqual (HtmlTagId.Font, "FONT".ToHtmlTagId (), "FONT");
+			Assert.AreEqual (HtmlTagId.Font, "FoNt".ToHtmlTagId (), "FoNt");
+		}
 
-		/// <summary>
-		/// An HTML DOCTYPE token.
-		/// </summary>
-		DocType,
+		[Test]
+		public void TestIsFormattingElement ()
+		{
+			var formattingElements = new[] { "a", "b", "big", "code", "em", "font", "i", "nobr", "s", "small", "strike", "strong", "tt", "u" };
 
-		/// <summary>
-		/// A token consisting of script data.
-		/// </summary>
-		ScriptData,
+			foreach (var element in formattingElements) {
+				var tag = element.ToHtmlTagId ();
 
-		/// <summary>
-		/// An HTML tag token.
-		/// </summary>
-		Tag,
+				Assert.IsTrue (tag.IsFormattingElement (), element);
+			}
+
+			Assert.IsFalse ("body".ToHtmlTagId ().IsFormattingElement (), "body");
+		}
 	}
 }

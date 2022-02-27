@@ -1,9 +1,9 @@
 ﻿//
 // HtmlTokenizer.cs
 //
-// Author: Jeffrey Stedfast <jeff@xamarin.com>
+// Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2015-2020 Xamarin Inc. (www.xamarin.com)
+// Copyright (c) 2015-2022 Jeffrey Stedfast <jestedfa@microsoft.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ namespace HtmlKit {
 		char quote;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlTokenizer"/> class.
+		/// Initialize a new instance of the <see cref="HtmlTokenizer"/> class.
 		/// </summary>
 		/// <remarks>
 		/// Creates a new <see cref="HtmlTokenizer"/>.
@@ -107,7 +107,7 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Gets the current line number.
+		/// Get the current line number.
 		/// </summary>
 		/// <remarks>
 		/// <para>This property is most commonly used for error reporting, but can be called
@@ -121,7 +121,7 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Gets the current line position.
+		/// Get the current line position.
 		/// </summary>
 		/// <remarks>
 		/// <para>This property is most commonly used for error reporting, but can be called
@@ -2718,13 +2718,13 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Reads the next token.
+		/// Read the next token.
 		/// </summary>
 		/// <remarks>
 		/// Reads the next token.
 		/// </remarks>
 		/// <returns><c>true</c> if the next token was read; otherwise, <c>false</c>.</returns>
-		/// <param name="token">THe token that was read.</param>
+		/// <param name="token">The token that was read.</param>
 		public bool ReadNextToken (out HtmlToken token)
 		{
 			do {

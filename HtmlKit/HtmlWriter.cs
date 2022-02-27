@@ -1,9 +1,9 @@
 ﻿//
 // HtmlWriter.cs
 //
-// Author: Jeffrey Stedfast <jeff@xamarin.com>
+// Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2015-2020 Xamarin Inc. (www.xamarin.com)
+// Copyright (c) 2015-2022 Jeffrey Stedfast <jestedfa@microsoft.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ namespace HtmlKit {
 		bool empty;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlKit.HtmlWriter"/> class.
+		/// Initialize a new instance of the <see cref="HtmlWriter"/> class.
 		/// </summary>
 		/// <remarks>
 		/// Creates a new <see cref="HtmlWriter"/>.
@@ -65,7 +65,7 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlKit.HtmlWriter"/> class.
+		/// Initialize a new instance of the <see cref="HtmlWriter"/> class.
 		/// </summary>
 		/// <remarks>
 		/// Creates a new <see cref="HtmlWriter"/>.
@@ -83,12 +83,12 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Releas unmanaged resources and perform other cleanup operations before the
-		/// <see cref="HtmlKit.HtmlWriter"/> is reclaimed by garbage collection.
+		/// Release unmanaged resources and perform other cleanup operations before the
+		/// <see cref="HtmlWriter"/> is reclaimed by garbage collection.
 		/// </summary>
 		/// <remarks>
 		/// Releases unmanaged resources and performs other cleanup operations before the
-		/// <see cref="HtmlKit.HtmlWriter"/> is reclaimed by garbage collection.
+		/// <see cref="HtmlWriter"/> is reclaimed by garbage collection.
 		/// </remarks>
 		~HtmlWriter ()
 		{
@@ -133,7 +133,7 @@ namespace HtmlKit {
 				throw new ArgumentException ("The attribute name cannot be empty.", nameof (name));
 
 			if (!HtmlUtils.IsValidTokenName (name))
-				throw new ArgumentException ("Invalid attribute name.", nameof (name));
+				throw new ArgumentException ($"Invalid attribute name: {name}", nameof (name));
 		}
 
 		static void ValidateTagName (string name)
@@ -145,7 +145,7 @@ namespace HtmlKit {
 				throw new ArgumentException ("The tag name cannot be empty.", nameof (name));
 
 			if (!HtmlUtils.IsValidTokenName (name))
-				throw new ArgumentException ("Invalid tag name.", nameof (name));
+				throw new ArgumentException ($"Invalid tag name: {name}", nameof (name));
 		}
 
 		void EncodeAttributeName (string name)
@@ -869,7 +869,7 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Releases the unmanaged resources used by the <see cref="HtmlWriter"/> and
+		/// Release the unmanaged resources used by the <see cref="HtmlWriter"/> and
 		/// optionally releases the managed resources.
 		/// </summary>
 		/// <remarks>
@@ -885,12 +885,12 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Releases all resource used by the <see cref="HtmlKit.HtmlWriter"/> object.
+		/// Release all resource used by the <see cref="HtmlWriter"/> object.
 		/// </summary>
-		/// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="HtmlKit.HtmlWriter"/>. The
-		/// <see cref="Dispose()"/> method leaves the <see cref="HtmlKit.HtmlWriter"/> in an unusable state. After calling
-		/// <see cref="Dispose()"/>, you must release all references to the <see cref="HtmlKit.HtmlWriter"/> so the garbage
-		/// collector can reclaim the memory that the <see cref="HtmlKit.HtmlWriter"/> was occupying.</remarks>
+		/// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="HtmlWriter"/>. The
+		/// <see cref="Dispose()"/> method leaves the <see cref="HtmlWriter"/> in an unusable state. After calling
+		/// <see cref="Dispose()"/>, you must release all references to the <see cref="HtmlWriter"/> so the garbage
+		/// collector can reclaim the memory that the <see cref="HtmlWriter"/> was occupying.</remarks>
 		public void Dispose ()
 		{
 			Dispose (true);

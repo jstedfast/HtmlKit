@@ -1,9 +1,9 @@
 ﻿//
-// ICharArray.cs
+// TestHelper.cs
 //
-// Author: Jeffrey Stedfast <jeff@xamarin.com>
+// Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2015-2020 Xamarin Inc. (www.xamarin.com)
+// Copyright (c) 2015-2022 Jeffrey Stedfast <jestedfa@microsoft.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,54 +24,33 @@
 // THE SOFTWARE.
 //
 
+using System;
 using System.IO;
 
-namespace HtmlKit {
-	interface ICharArray
+namespace UnitTests {
+	static class TestHelper
 	{
-		char this[int index] { get; }
+		public static readonly string ProjectDir;
 
-		void Write (TextWriter output, int startIndex, int count);
-	}
-
-	class CharArray : ICharArray
-	{
-		readonly char[] array;
-
-		public CharArray (char[] value)
+		static TestHelper ()
 		{
-			array = value;
-		}
+			var codeBase = typeof (TestHelper).Assembly.CodeBase;
+			if (codeBase.StartsWith ("file://", StringComparison.OrdinalIgnoreCase))
+				codeBase = codeBase.Substring ("file://".Length);
 
-		public char this[int index] {
-			get { return array[index]; }
-		}
+			if (Path.DirectorySeparatorChar == '\\') {
+				if (codeBase[0] == '/')
+					codeBase = codeBase.Substring (1);
 
-		public void Write (TextWriter output, int startIndex, int count)
-		{
-			output.Write (array, startIndex, count);
-		}
-	}
+				codeBase = codeBase.Replace ('/', '\\');
+			}
+			
+			var dir = Path.GetDirectoryName (codeBase);
 
-	class CharString : ICharArray
-	{
-		readonly string array;
+			while (Path.GetFileName (dir) != "UnitTests")
+				dir = Path.GetFullPath (Path.Combine (dir, ".."));
 
-		public CharString (string value)
-		{
-			array = value;
-		}
-
-		public char this[int index] {
-			get { return array[index]; }
-		}
-
-		public void Write (TextWriter output, int startIndex, int count)
-		{
-			int endIndex = startIndex + count;
-
-			for (int i = startIndex; i < endIndex; i++)
-				output.Write (array[i]);
+			ProjectDir = Path.GetFullPath (dir);
 		}
 	}
 }
