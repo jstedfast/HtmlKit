@@ -1,6 +1,6 @@
 # HtmlKit
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/cqtm6o7swyh4wri4/branch/master?svg=true)](https://ci.appveyor.com/project/jstedfast/htmlkit/branch/master)[![Coverity Scan Build Status](https://scan.coverity.com/projects/5621/badge.svg)](https://scan.coverity.com/projects/5621)[![Coverage Status](https://coveralls.io/repos/jstedfast/HtmlKit/badge.svg?branch=HEAD)](https://coveralls.io/r/jstedfast/HtmlKit?branch=HEAD)
+[![Build Status](https://github.com/jstedfast/HtmlKit/actions/workflows/main.yml/badge.svg?event=push)](https://github.com/jstedfast/HtmlKit/actions/workflows/main.yml)[![Coverity Scan Build Status](https://scan.coverity.com/projects/5621/badge.svg)](https://scan.coverity.com/projects/5621)[![Coverage Status](https://coveralls.io/repos/jstedfast/HtmlKit/badge.svg?branch=HEAD)](https://coveralls.io/r/jstedfast/HtmlKit?branch=HEAD)
 
 ## What is HtmlKit?
 
@@ -22,7 +22,7 @@ Maybe someday I'll implement a DOM. Who knows.
 
 ## License Information
 
-HtmlKit is Copyright (C) 2015-2018 Xamarin Inc. and is licensed under the MIT license:
+HtmlKit is Copyright (C) 2015-2022 Jeffrey Stedfast and is licensed under the MIT license:
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -76,9 +76,11 @@ directory and select **Git Sync...** in the menu. Once you do that, you'll need 
 
 ## Building
 
-In the top-level HtmlKit directory, you will find an **HtmlKit.sln** file. You can open this file in either
-[Xamarin Studio](https://www.xamarin.com/download) or [Visual Studio 2015](https://beta.visualstudio.com/vs/community/),
-you can simply choose the **Debug** or **Release** build configuration and then build.
+Once you've opened **HtmlKit.sln** solution file in [Visual Studio](https://www.visualstudio.com/downloads/),
+you can choose the **Debug** or **Release** build configuration and then build.
+
+Both Visual Studio 2022 and Visual Studio 2019 should be able to build HtmlKit without any issues, but older versions such as
+Visual Studio 2015 and 2017 will likely require modifications to the projects in order to build correctly.
 
 Note: The **Release** build will generate the xml API documentation, but the **Debug** build will not.
 
@@ -155,21 +157,28 @@ using (var reader = new StreamReader (stream)) {
 The first thing you'll need to do is fork HtmlKit to your own GitHub repository. For instructions on how to
 do that, see the section titled **Getting the Source Code**.
 
-If you use [Xamarin Studio](http://xamarin.com/studio) or [MonoDevelop](http://monodevelop.com), all of the
-solution files are configured with the coding style used by HtmlKit. If you use Visual Studio or some
-other editor, please try to maintain the existing coding style as best as you can.
+If you use [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/) or [MonoDevelop](http://monodevelop.com),
+all of the solution files are configured with the coding style used by HtmlKit. If you use Visual Studio on Windows or
+some other editor, please try to maintain the existing coding style as best as you can.
 
 Once you've got some changes that you'd like to submit upstream to the official HtmlKit repository,
-simply send me a **Pull Request** and I will try to review your changes in a timely manner.
+send me a **Pull Request** and I will try to review your changes in a timely manner.
 
 If you'd like to contribute but don't have any particular features in mind to work on, check out the issue
 tracker and look for something that might pique your interest!
 
 ## Reporting Bugs
 
-Have a bug or a feature request? [Please open a new issue](https://github.com/jstedfast/HtmlKit/issues).
+Have a bug or a feature request? Please open a new
+[bug report](https://github.com/jstedfast/HtmlKit/issues/new?template=bug_report.md)
+or
+[feature request](https://github.com/jstedfast/HtmlKit/issues/new?template=feature_request.md).
 
-Before opening a new issue, please search for existing issues to avoid submitting duplicates.
+Before opening a new issue, please search through any [existing issues](https://github.com/jstedfast/HtmlKit/issues)
+to avoid submitting duplicates.
+
+If you are getting an exception from somewhere within HtmlKit, don't just provide the `Exception.Message`
+string. Please include the `Exception.StackTrace` as well. The `Message`, by itself, is often useless.
 
 ## Documentation
 
