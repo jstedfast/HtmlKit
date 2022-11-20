@@ -5,7 +5,7 @@
     <AssemblyTitle>HtmlKit</AssemblyTitle>
     <VersionPrefix>1.0.3</VersionPrefix>
     <Authors>Jeffrey Stedfast</Authors>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net452;net461;net47;net48;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net48;net6.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AssemblyName>HtmlKit</AssemblyName>

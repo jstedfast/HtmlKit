@@ -58,6 +58,8 @@ namespace UnitTests {
 
 		static void VerifyHtmlTokenizerOutput (string path)
 		{
+			System.Text.Encoding.RegisterProvider (System.Text.CodePagesEncodingProvider.Instance);
+
 			var outpath = Path.ChangeExtension (path, ".out.html");
 			var tokens = Path.ChangeExtension (path, ".tokens");
 			var expectedOutput = File.Exists (outpath) ? File.ReadAllText (outpath) : string.Empty;

@@ -34,7 +34,7 @@ namespace UnitTests {
 
 		static TestHelper ()
 		{
-			var codeBase = typeof (TestHelper).Assembly.CodeBase;
+			var codeBase = typeof (TestHelper).Assembly.Location;
 			if (codeBase.StartsWith ("file://", StringComparison.OrdinalIgnoreCase))
 				codeBase = codeBase.Substring ("file://".Length);
 
