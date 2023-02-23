@@ -12433,7 +12433,7 @@ namespace HtmlKit {
 				startIndex--;
 			}
 
-			if (decoded == null)
+			if (decoded is null)
 				decoded = string.Empty;
 
 			if (startIndex < index)

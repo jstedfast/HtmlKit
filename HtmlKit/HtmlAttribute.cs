@@ -69,7 +69,7 @@ namespace HtmlKit {
 		/// </exception>
 		public HtmlAttribute (string name, string value)
 		{
-			if (name == null)
+			if (name is null)
 				throw new ArgumentNullException (nameof (name));
 
 			if (name.Length == 0)
@@ -85,7 +85,7 @@ namespace HtmlKit {
 
 		internal HtmlAttribute (string name)
 		{
-			if (name == null)
+			if (name is null)
 				throw new ArgumentNullException (nameof (name));
 
 			if (name.Length == 0)

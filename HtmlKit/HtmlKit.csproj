@@ -4,6 +4,7 @@
     <Description>HtmlKit is a cross-platform .NET framework for parsing HTML.</Description>
     <AssemblyTitle>HtmlKit</AssemblyTitle>
     <VersionPrefix>1.0.3</VersionPrefix>
+    <LangVersion>10</LangVersion>
     <Authors>Jeffrey Stedfast</Authors>
     <_LegacyFrameworks>net462;net47</_LegacyFrameworks>
     <_LegacyFrameworks Condition=" Exists('C:\Windows') ">$(_LegacyFrameworks);net48</_LegacyFrameworks>
@@ -24,10 +25,12 @@
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <RootNamespace>HtmlKit</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyOriginatorKeyFile>htmlkit.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
+    <NoWarn>1701;1702;CA1835;IDE0016;IDE0056;IDE0057;IDE0063;IDE0066;IDE0090</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
