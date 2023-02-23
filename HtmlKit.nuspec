@@ -16,49 +16,40 @@
     </releaseNotes>
     <copyright>Jeffrey Stedfast</copyright>
     <language>en-US</language>
-    <tags>html parser net452 net461 net47 net48 net5.0 net6.0 netstandard netstandard2.0 netstandard2.1</tags>
+    <tags>html parser net462 net47 net48 net6.0 netstandard netstandard2.0 netstandard2.1</tags>
     <frameworkAssemblies>
     </frameworkAssemblies>
     <dependencies>
-      <group targetFramework="net452">
+      <group targetFramework="net462">
         <dependency id="System.Buffers" version="4.5.1" />
-        <dependency id="System.Memory" version="4.5.4" />
-      </group>
-      <group targetFramework="net461">
-        <dependency id="System.Buffers" version="4.5.1" />
-        <dependency id="System.Memory" version="4.5.4" />
+        <dependency id="System.Memory" version="4.5.5" />
       </group>
       <group targetFramework="net47">
         <dependency id="System.Buffers" version="4.5.1" />
-        <dependency id="System.Memory" version="4.5.4" />
+        <dependency id="System.Memory" version="4.5.5" />
       </group>
       <group targetFramework="net48">
         <dependency id="System.Buffers" version="4.5.1" />
-        <dependency id="System.Memory" version="4.5.4" />
+        <dependency id="System.Memory" version="4.5.5" />
       </group>
-      <group targetFramework="net5.0" />
       <group targetFramework="net6.0" />
       <group targetFramework="netstandard2.0">
         <dependency id="System.Buffers" version="4.5.1" />
-        <dependency id="System.Memory" version="4.5.4" />
+        <dependency id="System.Memory" version="4.5.5" />
       </group>
       <group targetFramework="netstandard2.1">
         <dependency id="System.Buffers" version="4.5.1" />
-        <dependency id="System.Memory" version="4.5.4" />
+        <dependency id="System.Memory" version="4.5.5" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="HtmlKit\bin\Release\net452\HtmlKit.dll" target="lib\net452\HtmlKit.dll" />
-    <file src="HtmlKit\bin\Release\net452\HtmlKit.xml" target="lib\net452\HtmlKit.xml" />
-    <file src="HtmlKit\bin\Release\net461\HtmlKit.dll" target="lib\net461\HtmlKit.dll" />
-    <file src="HtmlKit\bin\Release\net461\HtmlKit.xml" target="lib\net461\HtmlKit.xml" />
+    <file src="HtmlKit\bin\Release\net462\HtmlKit.dll" target="lib\net462\HtmlKit.dll" />
+    <file src="HtmlKit\bin\Release\net462\HtmlKit.xml" target="lib\net462\HtmlKit.xml" />
     <file src="HtmlKit\bin\Release\net47\HtmlKit.dll" target="lib\net47\HtmlKit.dll" />
     <file src="HtmlKit\bin\Release\net47\HtmlKit.xml" target="lib\net47\HtmlKit.xml" />
     <file src="HtmlKit\bin\Release\net48\HtmlKit.dll" target="lib\net48\HtmlKit.dll" />
     <file src="HtmlKit\bin\Release\net48\HtmlKit.xml" target="lib\net48\HtmlKit.xml" />
-    <file src="HtmlKit\bin\Release\net5.0\HtmlKit.dll" target="lib\net5.0\HtmlKit.dll" />
-    <file src="HtmlKit\bin\Release\net5.0\HtmlKit.xml" target="lib\net5.0\HtmlKit.xml" />
     <file src="HtmlKit\bin\Release\net6.0\HtmlKit.dll" target="lib\net6.0\HtmlKit.dll" />
     <file src="HtmlKit\bin\Release\net6.0\HtmlKit.xml" target="lib\net6.0\HtmlKit.xml" />
     <file src="HtmlKit\bin\Release\netstandard2.0\HtmlKit.dll" target="lib\netstandard2.0\HtmlKit.dll" />

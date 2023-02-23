@@ -5,7 +5,9 @@
     <AssemblyTitle>HtmlKit</AssemblyTitle>
     <VersionPrefix>1.0.3</VersionPrefix>
     <Authors>Jeffrey Stedfast</Authors>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net452;net461;net47;net48;net5.0;net6.0</TargetFrameworks>
+    <_LegacyFrameworks>net462;net47</_LegacyFrameworks>
+    <_LegacyFrameworks Condition=" Exists('C:\Windows') ">$(_LegacyFrameworks);net48</_LegacyFrameworks>
+    <TargetFrameworks>$(_LegacyFrameworks);netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AssemblyName>HtmlKit</AssemblyName>
@@ -40,14 +42,9 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
 
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard2.')) ">
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) ">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Memory" Version="4.5.4" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Memory" Version="4.5.4" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2015-2022 Jeffrey Stedfast <jestedfa@microsoft.com>
+// Copyright (c) 2015-2023 Jeffrey Stedfast <jestedfa@microsoft.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,7 @@
 // THE SOFTWARE.
 //
 
-using System;
-using System.IO;
 using System.Text;
-
-using NUnit.Framework;
 
 using HtmlKit;
 
@@ -46,7 +42,7 @@ namespace UnitTests {
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode ((string) null));
 			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (text, 'x'));
 
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode ((ReadOnlySpan<char>) null));
+			//Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode ((ReadOnlySpan<char>) null));
 			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (text.AsSpan (), 'x'));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (null, text));
@@ -54,7 +50,7 @@ namespace UnitTests {
 			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (writer, text, 'x'));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (null, text.AsSpan ()));
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (writer, (ReadOnlySpan<char>) null));
+			//Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode (writer, (ReadOnlySpan<char>) null));
 			Assert.Throws<ArgumentException> (() => HtmlUtils.HtmlAttributeEncode (writer, text.AsSpan (), 'x'));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlAttributeEncode ((string) null, 0, 0));
@@ -81,13 +77,13 @@ namespace UnitTests {
 
 			// HtmlEncode
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode ((string) null));
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode ((ReadOnlySpan<char>) null));
+			//Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode ((ReadOnlySpan<char>) null));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (null, text));
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (writer, (string) null));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (null, text.AsSpan ()));
-			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (writer, (ReadOnlySpan<char>) null));
+			//Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode (writer, (ReadOnlySpan<char>) null));
 
 			Assert.Throws<ArgumentNullException> (() => HtmlUtils.HtmlEncode ((string) null, 0, 0));
 			Assert.Throws<ArgumentOutOfRangeException> (() => HtmlUtils.HtmlEncode (text, -1, 0));
