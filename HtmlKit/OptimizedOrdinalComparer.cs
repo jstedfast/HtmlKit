@@ -28,8 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace HtmlKit
-{
+namespace HtmlKit {
 	/// <summary>
 	/// An optimized version of StringComparer.OrdinalIgnoreCase.
 	/// </summary>
