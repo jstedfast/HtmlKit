@@ -55,7 +55,7 @@ namespace UnitTests {
 			Assert.Throws<ArgumentNullException> (() => cdata.WriteTo (null));
 
 			Assert.Throws<ArgumentNullException> (() => new HtmlDataToken (null));
-			Assert.Throws<ArgumentOutOfRangeException> (() => new BrokenHtmlDataToken ("THis is some character data."));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new BrokenHtmlDataToken ("This is some character data."));
 			Assert.Throws<ArgumentNullException> (() => data.WriteTo (null));
 
 			Assert.Throws<ArgumentNullException> (() => doc.WriteTo (null));
@@ -82,9 +82,40 @@ namespace UnitTests {
 		}
 
 		[Test]
-		public void TestHtmlDataTOkenCtor ()
+		public void TestHtmlDocTypePublicIdentifier ()
 		{
-			
+			var doctype = new HtmlDocTypeToken ();
+
+			doctype.PublicIdentifier = "public-identifier";
+			Assert.AreEqual ("public-identifier", doctype.PublicIdentifier, "PublicIdentifier");
+			Assert.AreEqual ("PUBLIC", doctype.PublicKeyword, "PublicKeyword");
+			Assert.IsNull (doctype.SystemKeyword, "SystemKeyword");
+
+			doctype.PublicIdentifier = null;
+			Assert.IsNull (doctype.PublicIdentifier, "PublicIdentifier");
+			Assert.AreEqual ("PUBLIC", doctype.PublicKeyword, "PublicKeyword");
+			Assert.IsNull (doctype.SystemKeyword, "SystemKeyword");
+
+			doctype.PublicIdentifier = "public-identifier";
+			doctype.SystemIdentifier = "system-identifier";
+			doctype.PublicIdentifier = null;
+			Assert.IsNull (doctype.PublicIdentifier, "PublicIdentifier");
+			Assert.AreEqual ("PUBLIC", doctype.PublicKeyword, "PublicKeyword");
+			Assert.AreEqual ("SYSTEM", doctype.SystemKeyword, "SystemKeyword");
+		}
+
+		[Test]
+		public void TestHtmlDocTypeSystemIdentifier ()
+		{
+			var doctype = new HtmlDocTypeToken ();
+
+			doctype.SystemIdentifier = "system-identifier";
+			Assert.AreEqual ("system-identifier", doctype.SystemIdentifier, "SystemIdentifier");
+			Assert.AreEqual ("SYSTEM", doctype.SystemKeyword, "SystemKeyword");
+
+			doctype.SystemIdentifier = null;
+			Assert.IsNull (doctype.SystemIdentifier, "SystemIdentifier");
+			Assert.IsNull (doctype.SystemKeyword, "SystemKeyword");
 		}
 	}
 }
