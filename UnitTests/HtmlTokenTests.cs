@@ -30,6 +30,13 @@ namespace UnitTests {
 	[TestFixture]
 	public class HtmlTokenTests
 	{
+		class BrokenHtmlDataToken : HtmlDataToken
+		{
+			public BrokenHtmlDataToken (string data) : base (HtmlTokenKind.Comment, data)
+			{
+			}
+		}
+
 		[Test]
 		public void TestArgumentExceptions ()
 		{
@@ -48,6 +55,7 @@ namespace UnitTests {
 			Assert.Throws<ArgumentNullException> (() => cdata.WriteTo (null));
 
 			Assert.Throws<ArgumentNullException> (() => new HtmlDataToken (null));
+			Assert.Throws<ArgumentOutOfRangeException> (() => new BrokenHtmlDataToken ("THis is some character data."));
 			Assert.Throws<ArgumentNullException> (() => data.WriteTo (null));
 
 			Assert.Throws<ArgumentNullException> (() => doc.WriteTo (null));
@@ -59,6 +67,24 @@ namespace UnitTests {
 
 			Assert.Throws<ArgumentNullException> (() => new HtmlScriptDataToken (null));
 			Assert.Throws<ArgumentNullException> (() => script.WriteTo (null));
+		}
+
+		[Test]
+		public void TestHtmlTagTokenCtor ()
+		{
+			var attrs = new HtmlAttribute[] { new HtmlAttribute ("src", "image.png"), new HtmlAttribute ("alt", "[image]") };
+			var token = new HtmlTagToken ("img", attrs, true);
+
+			Assert.AreEqual (HtmlTagId.Image, token.Id);
+			Assert.IsTrue (token.IsEmptyElement);
+			Assert.IsFalse (token.IsEndTag);
+			Assert.AreEqual (2, token.Attributes.Count);
+		}
+
+		[Test]
+		public void TestHtmlDataTOkenCtor ()
+		{
+			
 		}
 	}
 }
