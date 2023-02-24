@@ -68,7 +68,7 @@ namespace UnitTests {
 				Assert.IsTrue (tag.IsEmptyElement (), element);
 			}
 
-			Assert.IsFalse ("body".ToHtmlTagId ().IsFormattingElement (), "body");
+			Assert.IsFalse ("body".ToHtmlTagId ().IsEmptyElement (), "body");
 		}
 	}
 }
