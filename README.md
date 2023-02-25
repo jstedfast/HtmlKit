@@ -1,6 +1,6 @@
 # HtmlKit
 
-[![Build Status](https://github.com/jstedfast/HtmlKit/actions/workflows/main.yml/badge.svg?event=push)](https://github.com/jstedfast/HtmlKit/actions/workflows/main.yml)[![Coverity Scan Build Status](https://scan.coverity.com/projects/5621/badge.svg)](https://scan.coverity.com/projects/5621)[![Coverage Status](https://coveralls.io/repos/jstedfast/HtmlKit/badge.svg?branch=HEAD)](https://coveralls.io/r/jstedfast/HtmlKit?branch=HEAD)
+[![Build Status](https://github.com/jstedfast/HtmlKit/actions/workflows/main.yml/badge.svg?event=push)](https://github.com/jstedfast/HtmlKit/actions/workflows/main.yml)[![Coverity Scan Build Status](https://scan.coverity.com/projects/5621/badge.svg)](https://scan.coverity.com/projects/5621)[![Coverage Status](https://coveralls.io/repos/github/jstedfast/HtmlKit/badge.svg?branch=master)](https://coveralls.io/github/jstedfast/HtmlKit?branch=master)
 
 ## What is HtmlKit?
 
