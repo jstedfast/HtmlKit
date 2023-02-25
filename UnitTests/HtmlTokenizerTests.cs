@@ -560,6 +560,19 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestDocTypeNameParseError ()
+		{
+			const string content = "<!DOCTYPE HTML\0>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.AreEqual ("HTML\uFFFD", doctype.Name);
+			Assert.IsFalse (doctype.ForceQuirksMode);
+		}
+
+		[Test]
 		public void TestDocTypeNameSpace ()
 		{
 			const string content = "<!DOCTYPE HTML >";
@@ -567,7 +580,9 @@ namespace UnitTests {
 
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
-			Assert.IsFalse (((HtmlDocTypeToken) token).ForceQuirksMode);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.AreEqual ("HTML\uFFFD", doctype.Name);
+			Assert.IsFalse (doctype.ForceQuirksMode);
 		}
 
 		[Test]
@@ -579,6 +594,20 @@ namespace UnitTests {
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
 			var doctype = (HtmlDocTypeToken) token;
+			Assert.AreEqual ("HTML", doctype.Name);
+			Assert.IsFalse (doctype.ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestAfterDocTypeNameBogusDocType ()
+		{
+			const string content = "<!DOCTYPE HTML PUBLISH>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.AreEqual ("HTML", doctype.Name);
 			Assert.IsFalse (doctype.ForceQuirksMode);
 		}
 
@@ -591,6 +620,7 @@ namespace UnitTests {
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
 			var doctype = (HtmlDocTypeToken) token;
+			Assert.AreEqual ("HTML", doctype.Name);
 			Assert.IsFalse (doctype.ForceQuirksMode);
 		}
 
@@ -603,7 +633,38 @@ namespace UnitTests {
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
 			var doctype = (HtmlDocTypeToken) token;
-			Assert.IsTrue (doctype.ForceQuirksMode);
+			Assert.AreEqual ("HTML", doctype.Name);
+			Assert.IsFalse (doctype.ForceQuirksMode);
+		}
+
+		[Test]
+		public void TestDocTypePublicIdentifierQuotedParseError ()
+		{
+			const string content = "<!DOCTYPE HTML PUBLIC \"public-identifier\0\">";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.AreEqual ("HTML", doctype.Name);
+			Assert.IsFalse (doctype.ForceQuirksMode);
+			Assert.AreEqual ("PUBLIC", doctype.PublicKeyword);
+			Assert.AreEqual ("public-identifier\uFFFD", doctype.PublicIdentifier);
+		}
+
+		[Test]
+		public void TestDocTypeSystemIdentifierQuotedParseError ()
+		{
+			const string content = "<!DOCTYPE HTML SYSTEM \"system-identifier\0\">";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
+			var doctype = (HtmlDocTypeToken) token;
+			Assert.AreEqual ("HTML", doctype.Name);
+			Assert.IsFalse (doctype.ForceQuirksMode);
+			Assert.AreEqual ("SYSTEM", doctype.SystemKeyword);
+			Assert.AreEqual ("system-identifier\uFFFD", doctype.SystemIdentifier);
 		}
 
 		[Test]
@@ -615,6 +676,7 @@ namespace UnitTests {
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
 			var doctype = (HtmlDocTypeToken) token;
+			Assert.AreEqual ("HTML", doctype.Name);
 			Assert.IsTrue (doctype.ForceQuirksMode);
 			Assert.AreEqual ("PuBlIc", doctype.PublicKeyword);
 		}
@@ -3000,6 +3062,64 @@ namespace UnitTests {
 			Assert.AreEqual (HtmlAttributeId.Src, tag.Attributes[0].Id);
 			Assert.AreEqual ("\"", tag.Attributes[1].Name);
 			Assert.AreEqual (HtmlAttributeId.Unknown, tag.Attributes[1].Id);
+			Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
+			Assert.IsFalse (tokenizer.ReadNextToken (out token));
+		}
+
+		[Test]
+		public void TestBeforeAttributeValueParseError ()
+		{
+			const string content = "<img src= =>";
+			var tokenizer = CreateTokenizer (content);
+			HtmlTagToken tag;
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			tag = (HtmlTagToken) token;
+			Assert.AreEqual (HtmlTagId.Image, tag.Id);
+			Assert.AreEqual (1, tag.Attributes.Count);
+			Assert.AreEqual ("src", tag.Attributes[0].Name);
+			Assert.AreEqual (HtmlAttributeId.Src, tag.Attributes[0].Id);
+			Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
+			Assert.IsFalse (tokenizer.ReadNextToken (out token));
+		}
+
+		[Test]
+		public void TestBeforeAttributeValueGreaterThan ()
+		{
+			const string content = "<img src= >";
+			var tokenizer = CreateTokenizer (content);
+			HtmlTagToken tag;
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			tag = (HtmlTagToken) token;
+			Assert.AreEqual (HtmlTagId.Image, tag.Id);
+			Assert.AreEqual (1, tag.Attributes.Count);
+			Assert.AreEqual ("src", tag.Attributes[0].Name);
+			Assert.AreEqual (HtmlAttributeId.Src, tag.Attributes[0].Id);
+			Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
+			Assert.IsFalse (tokenizer.ReadNextToken (out token));
+		}
+
+		[Test]
+		public void TestAttributeValueUnquotedParseError ()
+		{
+			const string content = "<img src=ab=c>";
+			var tokenizer = CreateTokenizer (content);
+			HtmlTagToken tag;
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			tag = (HtmlTagToken) token;
+			Assert.AreEqual (HtmlTagId.Image, tag.Id);
+			Assert.AreEqual (1, tag.Attributes.Count);
+			Assert.AreEqual ("src", tag.Attributes[0].Name);
+			Assert.AreEqual (HtmlAttributeId.Src, tag.Attributes[0].Id);
+			Assert.AreEqual ("ab=c", tag.Attributes[0].Value);
 			Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
 			Assert.IsFalse (tokenizer.ReadNextToken (out token));
 		}
