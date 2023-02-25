@@ -581,7 +581,7 @@ namespace UnitTests {
 			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
 			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
 			var doctype = (HtmlDocTypeToken) token;
-			Assert.AreEqual ("HTML\uFFFD", doctype.Name);
+			Assert.AreEqual ("HTML", doctype.Name);
 			Assert.IsFalse (doctype.ForceQuirksMode);
 		}
 
@@ -634,7 +634,7 @@ namespace UnitTests {
 			Assert.AreEqual (HtmlTokenKind.DocType, token.Kind);
 			var doctype = (HtmlDocTypeToken) token;
 			Assert.AreEqual ("HTML", doctype.Name);
-			Assert.IsFalse (doctype.ForceQuirksMode);
+			Assert.IsTrue (doctype.ForceQuirksMode);
 		}
 
 		[Test]
