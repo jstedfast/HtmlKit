@@ -2461,6 +2461,105 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestTruncatedScriptDataDoubleEscapedDashDashDash ()
+		{
+			const string content = "<script><!---<script>---";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<!---", ((HtmlScriptDataToken) token).Data);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<script>---", ((HtmlScriptDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<!---", ((HtmlScriptDataToken) token).Data);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<script>---", ((HtmlScriptDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedScriptDataDoubleEscapedDashDashGreaterThan ()
+		{
+			const string content = "<script><!---<script>-->";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<!---", ((HtmlScriptDataToken) token).Data);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<script>-->", ((HtmlScriptDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<!---", ((HtmlScriptDataToken) token).Data);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<script>-->", ((HtmlScriptDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedScriptDataDoubleEscapedDashDashLetter ()
+		{
+			const string content = "<script><!---<script>--a";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<!---", ((HtmlScriptDataToken) token).Data);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<script>--a", ((HtmlScriptDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<!---", ((HtmlScriptDataToken) token).Data);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("<script>--a", ((HtmlScriptDataToken) token).Data);
+		}
+
+		[Test]
 		public void TestTruncatedScriptDataEndTagOpen ()
 		{
 			const string content = "<script></";
