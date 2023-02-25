@@ -360,15 +360,10 @@ namespace HtmlKit {
 			return token;
 		}
 
-		HtmlToken EmitScriptDataToken (bool truncated)
+		HtmlToken EmitScriptDataToken ()
 		{
 			if (data.Length == 0)
 				return null;
-
-			if (truncated && IgnoreTruncatedTags) {
-				data.Length = 0;
-				return null;
-			}
 
 			var token = CreateScriptDataToken (data.ToString ());
 			data.Length = 0;
@@ -713,7 +708,7 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptData);
 
-			return EmitScriptDataToken (false);
+			return EmitScriptDataToken ();
 		}
 
 		// 8.2.4.7 PLAINTEXT state
@@ -929,7 +924,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitScriptDataToken (true);
+				return EmitScriptDataToken ();
 			}
 
 			c = (char) nc;
@@ -957,7 +952,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitScriptDataToken (true);
+					return EmitScriptDataToken ();
 				}
 
 				c = (char) nc;
@@ -1048,7 +1043,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitScriptDataToken (true);
+					return EmitScriptDataToken ();
 				}
 
 				c = (char) nc;
@@ -1060,7 +1055,7 @@ namespace HtmlKit {
 					break;
 				case '<':
 					TokenizerState = HtmlTokenizerState.ScriptDataEscapedLessThan;
-					token = EmitScriptDataToken (false);
+					token = EmitScriptDataToken ();
 					data.Append ('<');
 					break;
 				default:
@@ -1081,7 +1076,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitScriptDataToken (true);
+				return EmitScriptDataToken ();
 			}
 
 			switch ((c = (char) nc)) {
@@ -1092,7 +1087,7 @@ namespace HtmlKit {
 				break;
 			case '<':
 				TokenizerState = HtmlTokenizerState.ScriptDataEscapedLessThan;
-				token = EmitScriptDataToken (false);
+				token = EmitScriptDataToken ();
 				data.Append ('<');
 				Read ();
 				break;
@@ -1116,7 +1111,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitScriptDataToken (true);
+					return EmitScriptDataToken ();
 				}
 
 				c = (char) nc;
@@ -1127,7 +1122,7 @@ namespace HtmlKit {
 					break;
 				case '<':
 					TokenizerState = HtmlTokenizerState.ScriptDataEscapedLessThan;
-					token = EmitScriptDataToken (false);
+					token = EmitScriptDataToken ();
 					data.Append ('<');
 					break;
 				case '>':
@@ -1175,7 +1170,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitScriptDataToken (true);
+				return EmitScriptDataToken ();
 			}
 
 			c = (char) nc;
@@ -1203,7 +1198,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitScriptDataToken (true);
+					return EmitScriptDataToken ();
 				}
 
 				c = (char) nc;
@@ -1262,7 +1257,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitScriptDataToken (true);
+					return EmitScriptDataToken ();
 				}
 
 				c = (char) nc;
@@ -1298,7 +1293,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitScriptDataToken (true);
+					return EmitScriptDataToken ();
 				}
 
 				c = (char) nc;
@@ -1329,7 +1324,7 @@ namespace HtmlKit {
 
 			if (nc == -1) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitScriptDataToken (true);
+				return EmitScriptDataToken ();
 			}
 
 			switch ((c = (char) nc)) {
@@ -1359,7 +1354,7 @@ namespace HtmlKit {
 
 				if (nc == -1) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitScriptDataToken (true);
+					return EmitScriptDataToken ();
 				}
 
 				c = (char) nc;
