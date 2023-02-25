@@ -170,5 +170,20 @@ namespace UnitTests {
 			TestPushInvalidNumericEntity ("&#x7FFFFFFF0");
 			TestPushInvalidNumericEntity ($"&#{int.MaxValue / 10}{(int.MaxValue % 10) + 1}");
 		}
+
+		[Test]
+		public void TestIncompleteNumericEntity ()
+		{
+			var decoder = new HtmlEntityDecoder ();
+
+			Assert.IsTrue (decoder.Push ('&'));
+			Assert.IsTrue (decoder.Push ('#'));
+			Assert.IsTrue (decoder.Push ('x'));
+			Assert.IsTrue (decoder.Push ('9'));
+			Assert.IsTrue (decoder.Push ('5'));
+
+			var value = decoder.GetValue ();
+			Assert.AreEqual ("&#x95", value);
+		}
 	}
 }
