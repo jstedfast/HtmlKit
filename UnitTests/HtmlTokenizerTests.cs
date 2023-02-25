@@ -1703,6 +1703,33 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestTruncatedRawTextEndTagOpenNonAsciiLetter ()
+		{
+			const string content = "<style></ ";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</ ", ((HtmlDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</ ", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
 		public void TestTruncatedRawTextEndTagName ()
 		{
 			const string content = "<style></s";
@@ -1725,6 +1752,114 @@ namespace UnitTests {
 			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
 			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
 			Assert.IsFalse (tokenizer.ReadNextToken (out token));
+		}
+
+		[Test]
+		public void TestTruncatedRawTextEndTagNameNotActiveTagSpace ()
+		{
+			const string content = "<style></bold ";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</bold ", ((HtmlDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</bold ", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedRawTextEndTagNameNotActiveTagSolidus ()
+		{
+			const string content = "<style></bold/";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</bold/", ((HtmlDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</bold/", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedRawTextEndTagNameNotActiveTagGreaterThan ()
+		{
+			const string content = "<style></bold>";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</bold>", ((HtmlDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</bold>", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedRawTextEndTagNameNotActiveTagNonAsciiLetter ()
+		{
+			const string content = "<style></bold-";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</bold-", ((HtmlDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Style, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("</bold-", ((HtmlDataToken) token).Data);
 		}
 
 		[Test]
@@ -2183,6 +2318,114 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestTruncatedScriptDataEndTagNameNotActiveTagSpace ()
+		{
+			const string content = "<script></style ";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("</style ", ((HtmlScriptDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("</style ", ((HtmlScriptDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedScriptDataEndTagNameNotActiveTagSolidus ()
+		{
+			const string content = "<script></style/";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("</style/", ((HtmlScriptDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("</style/", ((HtmlScriptDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedScriptDataEndTagNameNotActiveTagGreaterThan ()
+		{
+			const string content = "<script></style>";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("</style>", ((HtmlScriptDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("</style>", ((HtmlScriptDataToken) token).Data);
+		}
+
+		[Test]
+		public void TestTruncatedScriptDataEndTagNameNotActiveTagNonAsciiLetter ()
+		{
+			const string content = "<script></style-";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("</style-", ((HtmlScriptDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Script, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.ScriptData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.ScriptData, token.Kind);
+			Assert.AreEqual ("</style-", ((HtmlScriptDataToken) token).Data);
+		}
+
+		[Test]
 		public void TestIncompleteEndTag ()
 		{
 			const string content = "</>";
@@ -2205,6 +2448,20 @@ namespace UnitTests {
 			var tag = (HtmlTagToken) token;
 			Assert.AreEqual ("name", tag.Name);
 			Assert.AreEqual (1, tag.Attributes.Count);
+		}
+
+		[Test]
+		public void TestNoScript ()
+		{
+			const string content = "<noscript>";
+			var tokenizer = CreateTokenizer (content);
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out HtmlToken token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			var tag = (HtmlTagToken) token;
+			Assert.AreEqual ("noscript", tag.Name);
+			Assert.AreEqual (HtmlTagId.NoScript, tag.Id);
+			Assert.AreEqual (HtmlTokenizerState.RawText, tokenizer.TokenizerState);
 		}
 	}
 }
