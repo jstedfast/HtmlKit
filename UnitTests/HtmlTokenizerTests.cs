@@ -2946,6 +2946,65 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestBeforeAttributeNameParseError ()
+		{
+			const string content = "<img \"image.png\">";
+			var tokenizer = CreateTokenizer (content);
+			HtmlTagToken tag;
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			tag = (HtmlTagToken) token;
+			Assert.AreEqual (HtmlTagId.Image, tag.Id);
+			Assert.AreEqual (1, tag.Attributes.Count);
+			Assert.AreEqual ("\"image.png\"", tag.Attributes[0].Name);
+			Assert.AreEqual (HtmlAttributeId.Unknown, tag.Attributes[0].Id);
+			Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
+			Assert.IsFalse (tokenizer.ReadNextToken (out token));
+		}
+
+		[Test]
+		public void TestAfterAttributeNameGreaterThan ()
+		{
+			const string content = "<img src >";
+			var tokenizer = CreateTokenizer (content);
+			HtmlTagToken tag;
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			tag = (HtmlTagToken) token;
+			Assert.AreEqual (HtmlTagId.Image, tag.Id);
+			Assert.AreEqual (1, tag.Attributes.Count);
+			Assert.AreEqual ("src", tag.Attributes[0].Name);
+			Assert.AreEqual (HtmlAttributeId.Src, tag.Attributes[0].Id);
+			Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
+			Assert.IsFalse (tokenizer.ReadNextToken (out token));
+		}
+
+		[Test]
+		public void TestAfterAttributeNameParseError ()
+		{
+			const string content = "<img src \">";
+			var tokenizer = CreateTokenizer (content);
+			HtmlTagToken tag;
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			tag = (HtmlTagToken) token;
+			Assert.AreEqual (HtmlTagId.Image, tag.Id);
+			Assert.AreEqual (2, tag.Attributes.Count);
+			Assert.AreEqual ("src", tag.Attributes[0].Name);
+			Assert.AreEqual (HtmlAttributeId.Src, tag.Attributes[0].Id);
+			Assert.AreEqual ("\"", tag.Attributes[1].Name);
+			Assert.AreEqual (HtmlAttributeId.Unknown, tag.Attributes[1].Id);
+			Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
+			Assert.IsFalse (tokenizer.ReadNextToken (out token));
+		}
+
+		[Test]
 		public void TestIncompleteEndTag ()
 		{
 			const string content = "</>";
