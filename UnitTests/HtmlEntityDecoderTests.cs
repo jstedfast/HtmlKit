@@ -168,6 +168,7 @@ namespace UnitTests {
 			TestPushInvalidNumericEntity ("&#xg");
 			TestPushInvalidNumericEntity ("&#xFFFFFFFF");
 			TestPushInvalidNumericEntity ("&#x7FFFFFFF0");
+			TestPushInvalidNumericEntity ($"&#{int.MaxValue / 10}{(int.MaxValue % 10) + 1}");
 		}
 	}
 }
