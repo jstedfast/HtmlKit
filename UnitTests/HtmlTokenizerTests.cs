@@ -1094,6 +1094,25 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestTruncatedCDATASection ()
+		{
+			const string content = "<![CDATA[this is some cdata]]";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.CData, token.Kind);
+			Assert.AreEqual ("this is some cdata]]", ((HtmlDataToken) token).Data);
+
+			tokenizer = CreateTokenizer (content);
+			tokenizer.IgnoreTruncatedTags = true;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.CData, token.Kind);
+			Assert.AreEqual ("this is some cdata]]", ((HtmlDataToken) token).Data);
+		}
+
+		[Test]
 		public void TestTruncatedComment ()
 		{
 			const string content = "<!--comment";
