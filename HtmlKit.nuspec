@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata minClientVersion="2.12">
     <id>HtmlKit</id>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
     <title>HtmlKit</title>
     <authors>Jeffrey Stedfast</authors>
     <owners>Jeffrey Stedfast</owners>
@@ -13,10 +13,19 @@
     <description>HtmlKit is a cross-platform .NET framework for parsing HTML.</description>
     <summary>HtmlKit is a cross-platform .NET framework for parsing HTML.</summary>
     <releaseNotes>
+* Dropped support for net45 and netstandard1.x.
+* Added support for net462, net47, net48, net6.0, net7.0 and netstandard2.1.
+* Fixed HtmlEntityDecoder standards compliance.
+* Improved performance of HtmlEntityDecoder.
+* Added more methods to HtmlAttributeCollection to make it easier to use.
+* Renamed HtmlTagId.Thread to HtmlTagId.THead (which is what it should have been all along).
+* Add an HtmlTokenizer.IgnoreTruncatedTags propeerty.
+* Fixed bugs in HtmlTokenizer.
+* Added HtmlUtils methods that take ReadOnlySpan&lt;char&gt; arguments instead of char[] or string.
     </releaseNotes>
     <copyright>Jeffrey Stedfast</copyright>
     <language>en-US</language>
-    <tags>html parser net462 net47 net48 net6.0 netstandard netstandard2.0 netstandard2.1</tags>
+    <tags>html parser net462 net47 net48 net6.0 net7.0, netstandard netstandard2.0 netstandard2.1</tags>
     <frameworkAssemblies>
     </frameworkAssemblies>
     <dependencies>
@@ -33,6 +42,7 @@
         <dependency id="System.Memory" version="4.5.5" />
       </group>
       <group targetFramework="net6.0" />
+      <group targetFramework="net7.0" />
       <group targetFramework="netstandard2.0">
         <dependency id="System.Buffers" version="4.5.1" />
         <dependency id="System.Memory" version="4.5.5" />

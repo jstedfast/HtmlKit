@@ -90,7 +90,7 @@ Write-Host "Updating $projectFile..."
 Update-Project -ProjectFile $projectFile -Version $Version
 
 $fileName = $ProjectName + ".nuspec"
-$nuspec = Join-Path "nuget" $fileName
+$nuspec = $fileName
 $nuspec = Resolve-Path $nuspec
 Write-Host "Updating $nuspec..."
 Update-NuGetPackageVersion -NuSpecFile $nuspec -Version $Version
