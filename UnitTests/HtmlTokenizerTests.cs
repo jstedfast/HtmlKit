@@ -480,6 +480,50 @@ namespace UnitTests {
 		//	Assert.AreEqual (content, ((HtmlDataToken) token).Data);
 		//}
 
+		[Test]
+		public void TestDataCharacterReferencesNotDecoded ()
+		{
+			const string content = "<b>check &CounterClockwiseContourIntegral; is not decoded</b>";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			tokenizer.DecodeCharacterReferences = false;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.B, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("check &CounterClockwiseContourIntegral; is not decoded", ((HtmlDataToken) token).Data);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.B, ((HtmlTagToken) token).Id);
+			Assert.IsTrue (((HtmlTagToken) token).IsEndTag);
+		}
+
+		[Test]
+		public void TestRcDataCharacterReferencesNotDecoded ()
+		{
+			const string content = "<title>check &CounterClockwiseContourIntegral; is not decoded</title>";
+			var tokenizer = CreateTokenizer (content);
+			HtmlToken token;
+
+			tokenizer.DecodeCharacterReferences = false;
+
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Title, ((HtmlTagToken) token).Id);
+			Assert.AreEqual (HtmlTokenizerState.RcData, tokenizer.TokenizerState);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Data, token.Kind);
+			Assert.AreEqual ("check &CounterClockwiseContourIntegral; is not decoded", ((HtmlDataToken) token).Data);
+			Assert.IsTrue (tokenizer.ReadNextToken (out token));
+			Assert.AreEqual (HtmlTokenKind.Tag, token.Kind);
+			Assert.AreEqual (HtmlTagId.Title, ((HtmlTagToken) token).Id);
+			Assert.IsTrue (((HtmlTagToken) token).IsEndTag);
+		}
+
 		// The following unit tests are for error conditions
 
 		[Test]
