@@ -386,7 +386,6 @@ namespace HtmlKit {
 
 			Attributes = new HtmlAttributeCollection (attributes);
 			IsEmptyElement = isEmptyElement;
-			Id = name.ToHtmlTagId ();
 			Name = name;
 		}
 
@@ -407,7 +406,6 @@ namespace HtmlKit {
 				throw new ArgumentNullException (nameof (name));
 
 			Attributes = new HtmlAttributeCollection ();
-			Id = name.ToHtmlTagId ();
 			IsEndTag = isEndTag;
 			Name = name;
 		}
@@ -423,6 +421,8 @@ namespace HtmlKit {
 			get; private set;
 		}
 
+		private HtmlTagId id = (HtmlTagId) (-1);
+
 		/// <summary>
 		/// Get the HTML tag identifier.
 		/// </summary>
@@ -431,7 +431,13 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <value>The HTML tag identifier.</value>
 		public HtmlTagId Id {
-			get; private set;
+			get {
+				if (id < 0) {
+					id = Name.ToHtmlTagId ();
+				}
+
+				return id;
+			}
 		}
 
 		/// <summary>

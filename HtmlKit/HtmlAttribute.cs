@@ -53,7 +53,7 @@ namespace HtmlKit {
 
 			Name = id.ToAttributeName ();
 			Value = value;
-			Id = id;
+			this.id = id;
 		}
 
 		/// <summary>
@@ -78,7 +78,6 @@ namespace HtmlKit {
 			if (!HtmlUtils.IsValidTokenName (name))
 				throw new ArgumentException ("Invalid attribute name.", nameof (name));
 
-			Id = name.ToHtmlAttributeId ();
 			Value = value;
 			Name = name;
 		}
@@ -91,9 +90,10 @@ namespace HtmlKit {
 			if (name.Length == 0)
 				throw new ArgumentException ("The attribute name cannot be empty.", nameof (name));
 
-			Id = name.ToHtmlAttributeId ();
 			Name = name;
 		}
+
+		private HtmlAttributeId id = (HtmlAttributeId) (-1);
 
 		/// <summary>
 		/// Get the HTML attribute identifier.
@@ -103,7 +103,13 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <value>The attribute identifier.</value>
 		public HtmlAttributeId Id {
-			get; private set;
+			get {
+				if (id < 0) {
+					id = Name.ToHtmlAttributeId ();
+				}
+
+				return id;
+			}
 		}
 
 		/// <summary>
