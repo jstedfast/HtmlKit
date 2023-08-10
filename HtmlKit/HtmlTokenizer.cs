@@ -295,7 +295,7 @@ namespace HtmlKit {
 				return false;
 
 			for (int i = 0; i < name.Length; i++) {
-				if (ToLower (name[i]) != value[i])
+				if (ToLower (name[i]) != ToLower (value[i]))
 					return false;
 			}
 
@@ -377,11 +377,11 @@ namespace HtmlKit {
 				switch (tag.Id) {
 				case HtmlTagId.Style: case HtmlTagId.Xmp: case HtmlTagId.IFrame: case HtmlTagId.NoEmbed: case HtmlTagId.NoFrames:
 					TokenizerState = HtmlTokenizerState.RawText;
-					activeTagName = tag.Name.ToLowerInvariant ();
+					activeTagName = tag.Name;
 					break;
 				case HtmlTagId.Title: case HtmlTagId.TextArea:
 					TokenizerState = HtmlTokenizerState.RcData;
-					activeTagName = tag.Name.ToLowerInvariant ();
+					activeTagName = tag.Name;
 					break;
 				case HtmlTagId.PlainText:
 					TokenizerState = HtmlTokenizerState.PlainText;
@@ -392,7 +392,7 @@ namespace HtmlKit {
 				case HtmlTagId.NoScript:
 					// TODO: only switch into the RawText state if scripting is enabled
 					TokenizerState = HtmlTokenizerState.RawText;
-					activeTagName = tag.Name.ToLowerInvariant ();
+					activeTagName = tag.Name;
 					break;
 				case HtmlTagId.Html:
 					TokenizerState = HtmlTokenizerState.Data;
