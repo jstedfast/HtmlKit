@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeGenerator", "CodeGenera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{983A05E3-0188-4642-8315-EAAF8C17690F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{E4A2E65D-5E01-4390-9152-FA3101047D69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{983A05E3-0188-4642-8315-EAAF8C17690F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{983A05E3-0188-4642-8315-EAAF8C17690F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{983A05E3-0188-4642-8315-EAAF8C17690F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4A2E65D-5E01-4390-9152-FA3101047D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4A2E65D-5E01-4390-9152-FA3101047D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4A2E65D-5E01-4390-9152-FA3101047D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4A2E65D-5E01-4390-9152-FA3101047D69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
