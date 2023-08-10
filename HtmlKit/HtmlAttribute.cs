@@ -35,6 +35,8 @@ namespace HtmlKit {
 	/// </remarks>
 	public class HtmlAttribute
 	{
+		HtmlAttributeId id = (HtmlAttributeId) (-1);
+
 		/// <summary>
 		/// Initialize a new instance of the <see cref="HtmlAttribute"/> class.
 		/// </summary>
@@ -53,7 +55,7 @@ namespace HtmlKit {
 
 			Name = id.ToAttributeName ();
 			Value = value;
-			Id = id;
+			this.id = id;
 		}
 
 		/// <summary>
@@ -78,7 +80,6 @@ namespace HtmlKit {
 			if (!HtmlUtils.IsValidTokenName (name))
 				throw new ArgumentException ("Invalid attribute name.", nameof (name));
 
-			Id = name.ToHtmlAttributeId ();
 			Value = value;
 			Name = name;
 		}
@@ -91,7 +92,6 @@ namespace HtmlKit {
 			if (name.Length == 0)
 				throw new ArgumentException ("The attribute name cannot be empty.", nameof (name));
 
-			Id = name.ToHtmlAttributeId ();
 			Name = name;
 		}
 
@@ -103,7 +103,12 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <value>The attribute identifier.</value>
 		public HtmlAttributeId Id {
-			get; private set;
+			get {
+				if (id == (HtmlAttributeId) (-1))
+					id = Name.ToHtmlAttributeId ();
+
+				return id;
+			}
 		}
 
 		/// <summary>

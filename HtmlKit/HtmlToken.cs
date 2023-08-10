@@ -362,6 +362,8 @@ namespace HtmlKit {
 	/// </remarks>
 	public class HtmlTagToken : HtmlToken
 	{
+		HtmlTagId id = (HtmlTagId) (-1);
+
 		/// <summary>
 		/// Initialize a new instance of the <see cref="HtmlTagToken"/> class.
 		/// </summary>
@@ -386,7 +388,6 @@ namespace HtmlKit {
 
 			Attributes = new HtmlAttributeCollection (attributes);
 			IsEmptyElement = isEmptyElement;
-			Id = name.ToHtmlTagId ();
 			Name = name;
 		}
 
@@ -407,7 +408,6 @@ namespace HtmlKit {
 				throw new ArgumentNullException (nameof (name));
 
 			Attributes = new HtmlAttributeCollection ();
-			Id = name.ToHtmlTagId ();
 			IsEndTag = isEndTag;
 			Name = name;
 		}
@@ -431,7 +431,12 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <value>The HTML tag identifier.</value>
 		public HtmlTagId Id {
-			get; private set;
+			get {
+				if (id == (HtmlTagId) (-1))
+					id = Name.ToHtmlTagId ();
+
+				return id;
+			}
 		}
 
 		/// <summary>
