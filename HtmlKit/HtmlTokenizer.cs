@@ -273,15 +273,12 @@ namespace HtmlKit {
 
 		int Read ()
 		{
-			int c;
-
-			if ((c = text.Read ()) == -1)
-				return -1;
+			int c = text.Read ();
 
 			if (c == '\n') {
 				LinePosition = 1;
 				LineNumber++;
-			} else {
+			} else if (c != -1) {
 				LinePosition++;
 			}
 
