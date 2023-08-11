@@ -118,8 +118,30 @@ namespace Benchmarks
 
 			var reader = XmlReader.Create (stream, settings);
 
-			while (reader.Read ())
-				;
+			while (reader.Read ()) {
+				switch (reader.NodeType) {
+				case XmlNodeType.Attribute:
+					var attrName = reader.Name;
+					var value = reader.Value;
+					break;
+				case XmlNodeType.Element:
+				case XmlNodeType.EndElement:
+					var tagName = reader.Name;
+					break;
+				case XmlNodeType.EntityReference:
+					var entityReference = reader.Value;
+					break;
+				case XmlNodeType.CDATA:
+				case XmlNodeType.Text:
+				case XmlNodeType.Whitespace:
+				case XmlNodeType.SignificantWhitespace:
+					var text = reader.ReadContentAsString ();
+					break;
+				case XmlNodeType.DocumentType:
+					var lang = reader.XmlLang;
+					break;
+				}
+			}
 		}
 
 		[Benchmark]
