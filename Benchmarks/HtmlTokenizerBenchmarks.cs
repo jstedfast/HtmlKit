@@ -92,8 +92,9 @@ namespace Benchmarks
 			var tokenizer = new ASHtmlTokenizer (source, AngleSharp.Html.HtmlEntityProvider.Resolver);
 			ASHtmlToken token;
 
-			while ((token = tokenizer.Get ()) != null && token.Type != ASHtmlTokenType.EndOfFile)
-				;
+			do {
+				token = tokenizer.Get ();
+			} while (token.Type != ASHtmlTokenType.EndOfFile);
 		}
 
 		[Benchmark]
