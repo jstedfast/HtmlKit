@@ -39,7 +39,7 @@ namespace UnitTests {
 
 			var quoted = new StringBuilder (text.Length + 2, (text.Length * 2) + 2);
 
-			quoted.Append ("\"");
+			quoted.Append ('\"');
 			for (int i = 0; i < text.Length; i++) {
 				if (text[i] == '\\' || text[i] == '"')
 					quoted.Append ('\\');
@@ -47,7 +47,7 @@ namespace UnitTests {
 					continue;
 				quoted.Append (text[i]);
 			}
-			quoted.Append ("\"");
+			quoted.Append ('\"');
 
 			return quoted.ToString ();
 		}
