@@ -59,6 +59,22 @@ namespace Benchmarks
 			HtmlKit_TokenizeFile ("xamarin3.xhtml");
 		}
 
+		static void HtmlKit_TokenizeStream (string fileName)
+		{
+			var path = Path.Combine (HtmlDataDir, fileName);
+			using var stream = File.OpenRead (path);
+			var tokenizer = new HtmlTokenizer (stream);
+
+			while (tokenizer.ReadNextToken (out var token))
+				;
+		}
+
+		[Benchmark]
+		public void HtmlKit_Xamarin3Stream ()
+		{
+			HtmlKit_TokenizeStream ("xamarin3.xhtml");
+		}
+
 		#endregion HtmlKit
 
 		#region HtmlPerformanceKit
@@ -73,7 +89,7 @@ namespace Benchmarks
 				;
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public void HtmlPerformanceKit_Xamarin3 ()
 		{
 			HtmlPerformanceKit_TokenizeFile ("xamarin3.xhtml");
@@ -97,7 +113,7 @@ namespace Benchmarks
 			} while (token.Type != ASHtmlTokenType.EndOfFile);
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public void AngleSharp_Xamarin3 ()
 		{
 			AngleSharp_TokenizeFile ("xamarin3.xhtml");
@@ -144,7 +160,7 @@ namespace Benchmarks
 			}
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public void XmlReader_Xamarin3 ()
 		{
 			XmlReader_TokenizeFile ("xamarin3.xhtml");

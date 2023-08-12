@@ -24,6 +24,7 @@
 // THE SOFTWARE.
 //
 
+using System;
 using System.Text;
 
 using HtmlKit;
@@ -32,6 +33,17 @@ namespace UnitTests {
 	[TestFixture]
 	public class HtmlTokenizerTests
 	{
+		[Test]
+		public void TestArgumentExceptions ()
+		{
+			Assert.Throws<ArgumentNullException> (() => new HtmlTokenizer ((TextReader) null));
+
+			Assert.Throws<ArgumentNullException> (() => new HtmlTokenizer ((Stream) null));
+			Assert.Throws<ArgumentNullException> (() => new HtmlTokenizer ((Stream) null, Encoding.UTF8));
+
+			Assert.Throws<ArgumentNullException> (() => new HtmlTokenizer (Stream.Null, null));
+		}
+
 		static string Quote (string text)
 		{
 			if (text == null)
@@ -52,18 +64,31 @@ namespace UnitTests {
 			return quoted.ToString ();
 		}
 
-		static void VerifyHtmlTokenizerOutput (string path)
+		static void VerifyHtmlTokenizerOutput (string path, bool useTextReader)
 		{
 			var outpath = Path.ChangeExtension (path, ".out.html");
 			var tokens = Path.ChangeExtension (path, ".tokens");
 			var expectedOutput = File.Exists (outpath) ? File.ReadAllText (outpath) : string.Empty;
 			var expected = File.Exists (tokens) ? File.ReadAllText (tokens).Replace ("\r\n", "\n") : string.Empty;
+			var encoding = Encoding.GetEncoding (1252);
 			var output = new StringBuilder ();
 			var actual = new StringBuilder ();
+			TextReader reader = null;
+			Stream stream = null;
 
-			using (var textReader = new StreamReader (path, Encoding.GetEncoding (1252))) {
-				var tokenizer = new HtmlTokenizer (textReader);
+			if (useTextReader)
+				reader = new StreamReader (path, encoding);
+			else
+				stream = File.OpenRead (path);
+
+			try {
+				HtmlTokenizer tokenizer;
 				HtmlToken token;
+
+				if (useTextReader)
+					tokenizer = new HtmlTokenizer (reader);
+				else
+					tokenizer = new HtmlTokenizer (stream, encoding);
 
 				Assert.AreEqual (HtmlTokenizerState.Data, tokenizer.TokenizerState);
 
@@ -139,6 +164,9 @@ namespace UnitTests {
 				}
 
 				Assert.AreEqual (HtmlTokenizerState.EndOfFile, tokenizer.TokenizerState);
+			} finally {
+				reader?.Dispose ();
+				stream?.Dispose ();
 			}
 
 			if (!File.Exists (tokens))
@@ -151,58 +179,67 @@ namespace UnitTests {
 			Assert.AreEqual (expectedOutput, output.ToString (), "The output stream does not match the expected output.");
 		}
 
-		[Test]
-		public void TestGoogleSignInAttemptBlocked ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestGoogleSignInAttemptBlocked (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "blocked.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "blocked.html"), useTextReader);
 		}
 
-		[Test]
-		public void TestXamarin3SampleHtml ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestXamarin3SampleHtml (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "xamarin3.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "xamarin3.html"), useTextReader);
 		}
 
-		[Test]
-		public void TestPapercut ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestPapercut (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "papercut.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "papercut.html"), useTextReader);
 		}
 
-		[Test]
-		public void TestPapercut44 ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestPapercut44 (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "papercut-4.4.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "papercut-4.4.html"), useTextReader);
 		}
 
-		[Test]
-		public void TestScriptData ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestScriptData (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "script-data.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "script-data.html"), useTextReader);
 		}
 
-		[Test]
-		public void TestCData ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestCData (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "cdata.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "cdata.html"), useTextReader);
 		}
 
-		[Test]
-		public void TestTokenizer ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestTokenizer (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "test.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "test.html"), useTextReader);
 		}
 
-		[Test]
-		public void TestPlainText ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestPlainText (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "plaintext.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "plaintext.html"), useTextReader);
 		}
 
-		[Test]
-		public void TestBadlyQuotedAttribute ()
+		[TestCase (true)]
+		[TestCase (false)]
+		public void TestBadlyQuotedAttribute (bool useTextReader)
 		{
-			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "badly-quoted-attr.html"));
+			VerifyHtmlTokenizerOutput (Path.Combine (TestHelper.ProjectDir, "TestData", "html", "badly-quoted-attr.html"), useTextReader);
 		}
 
 		// Note: The following tests are borrowed from AngleSharp

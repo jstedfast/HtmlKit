@@ -24,7 +24,9 @@
 // THE SOFTWARE.
 //
 
+using System;
 using System.IO;
+using System.Text;
 using System.Runtime.CompilerServices;
 
 namespace HtmlKit {
@@ -40,22 +42,105 @@ namespace HtmlKit {
 		const string DocType = "doctype";
 		const string CData = "[CDATA[";
 
+		const int MinimumBufferSize = 1024;
+
 		readonly HtmlEntityDecoder entity = new HtmlEntityDecoder ();
 		readonly CharBuffer data = new CharBuffer (2048);
 		readonly CharBuffer name = new CharBuffer (32);
-		readonly char[] buffer = new char[2048];
-		readonly char[] cdata = new char[3];
-		readonly TextReader text;
+
+		readonly TextReader textReader;
+		readonly Stream stream;
+		Encoding encoding;
+		Decoder decoder;
+
+		readonly byte[] input;
+		int inputEnd;
+
+		char[] buffer;
 		int bufferIndex, bufferEnd;
+
+		readonly char[] cdata = new char[3];
+		int cdataIndex;
+
 		HtmlDocTypeToken doctype;
 		HtmlAttribute attribute;
 		string activeTagName;
 		HtmlTagToken tag;
-		int cdataIndex;
+		char quote;
+
+		bool detectEncodingFromByteOrderMarks;
 		bool isEndTag;
 		bool bang;
 		bool eof;
-		char quote;
+
+		HtmlTokenizer ()
+		{
+			DecodeCharacterReferences = true;
+			LinePosition = 1;
+			LineNumber = 1;
+		}
+
+		/// <summary>
+		/// Initialize a new instance of the <see cref="HtmlTokenizer"/> class.
+		/// </summary>
+		/// <remarks>
+		/// <para>Creates a new <see cref="HtmlTokenizer"/>.</para>
+		/// <para>This constructor will attempt to auto-detect the appropriate encoding to use by examining the first four bytes of the stream
+		/// and, if a unicode byte-order-mark is detected, use the appropriate unicode encoding. If no byte order mark is detected, then it will
+		/// default to UTF-8.</para>
+		/// </remarks>
+		/// <param name="stream">The input stream.</param>
+		public HtmlTokenizer (Stream stream) : this (stream, Encoding.UTF8)
+		{
+		}
+
+		/// <summary>
+		/// Initialize a new instance of the <see cref="HtmlTokenizer"/> class.
+		/// </summary>
+		/// <remarks>
+		/// <para>Creates a new <see cref="HtmlTokenizer"/>.</para>
+		/// <para>This constructor will attempt to auto-detect the appropriate encoding to use by examining the first four bytes of the stream
+		/// and, if a unicode byte-order-mark is detected, use the appropriate unicode encoding. If no byte order mark is detected, then it will
+		/// default to the user-supplied encoding.</para>
+		/// </remarks>
+		/// <param name="stream">The input stream.</param>
+		/// <param name="encoding">The charset encoding of the stream.</param>
+		public HtmlTokenizer (Stream stream, Encoding encoding) : this (stream, encoding, true)
+		{
+		}
+
+		/// <summary>
+		/// Initialize a new instance of the <see cref="HtmlTokenizer"/> class.
+		/// </summary>
+		/// <remarks>
+		/// <para>Creates a new <see cref="HtmlTokenizer"/>.</para>
+		/// <para>This constructor allows you to change the encoding the first time you read from the <see cref="HtmlTokenizer"/>. The
+		/// <paramref name="detectEncodingFromByteOrderMarks"/> parameter detects the encoding by looking at the first four bytes of the stream.
+		/// It will automatically recognize UTF-8, little-endian UTF-16, big-endian UTF-16, little-endian UTF-32, and big-endian UTF-32 text if
+		/// the stream starts with the appropriate byte order marks. Otherwise, the user-provided encoding is used.</para>
+		/// </remarks>
+		/// <param name="stream">The input stream.</param>
+		/// <param name="encoding">The charset encoding of the stream.</param>
+		/// <param name="detectEncodingFromByteOrderMarks"><c>true</c> if byte order marks should be detected and used to override the <paramref name="encoding"/>; otherwise, <c>false</c>.</param>
+		/// <param name="bufferSize">The minimum buffer size to use for reading.</param>
+		public HtmlTokenizer (Stream stream, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize = 4096) : this ()
+		{
+			if (stream == null)
+				throw new ArgumentNullException (nameof (stream));
+
+			if (encoding == null)
+				throw new ArgumentNullException (nameof (encoding));
+
+			input = new byte[Math.Max (MinimumBufferSize, bufferSize)];
+			if (!detectEncodingFromByteOrderMarks) {
+				buffer = new char[encoding.GetMaxCharCount (input.Length)];
+				decoder = encoding.GetDecoder ();
+			}
+
+			this.detectEncodingFromByteOrderMarks = detectEncodingFromByteOrderMarks;
+			this.encoding = encoding;
+			this.stream = stream;
+		}
 
 		/// <summary>
 		/// Initialize a new instance of the <see cref="HtmlTokenizer"/> class.
@@ -64,12 +149,13 @@ namespace HtmlKit {
 		/// Creates a new <see cref="HtmlTokenizer"/>.
 		/// </remarks>
 		/// <param name="reader">The <see cref="TextReader"/>.</param>
-		public HtmlTokenizer (TextReader reader)
+		public HtmlTokenizer (TextReader reader) : this ()
 		{
-			DecodeCharacterReferences = true;
-			LinePosition = 1;
-			LineNumber = 1;
-			text = reader;
+			if (reader == null)
+				throw new ArgumentNullException (nameof (reader));
+
+			buffer = new char[2048];
+			textReader = reader;
 		}
 
 		/// <summary>
@@ -276,12 +362,90 @@ namespace HtmlKit {
 			LineNumber++;
 		}
 
+		int DetectEncodingFromByteOrderMarks ()
+		{
+			detectEncodingFromByteOrderMarks = false;
+
+			do {
+				int nread = stream.Read (input, inputEnd, input.Length - inputEnd);
+
+				if (nread == 0)
+					break;
+
+				inputEnd += nread;
+			} while (inputEnd < 4);
+
+			int first2Bytes = inputEnd >= 2 ? input[0] << 8 | input[1] : 0;
+			int next2Bytes = inputEnd >= 4 ? (input[2] << 8 |input[3]) : 0;
+			const int UTF32BE = 12001;
+
+			switch (first2Bytes) {
+			case 0x0000:
+				if (next2Bytes == 0xFEFF)
+					encoding = Encoding.GetEncoding (UTF32BE);
+				break;
+			case 0xFEFF:
+				encoding = Encoding.BigEndianUnicode;
+				break;
+			case 0xFFFE:
+				if (next2Bytes == 0x0000)
+					encoding = Encoding.UTF32;
+				else
+					encoding = Encoding.Unicode;
+				break;
+			case 0xEFBB:
+				if ((next2Bytes & 0xFF00) == 0xBF00)
+					encoding = new UTF8Encoding (true, true);
+				break;
+			}
+
+			decoder = encoding.GetDecoder ();
+			buffer = new char[encoding.GetMaxCharCount (input.Length)];
+
+			var preamble = encoding.GetPreamble ();
+			bool detected = true;
+
+			for (int i = 0; i < preamble.Length; i++) {
+				if (input[i] != preamble[i]) {
+					detected = false;
+					break;
+				}
+			}
+
+			return detected ? preamble.Length : 0;
+		}
+
 		[MethodImpl (MethodImplOptions.AggressiveInlining)]
 		void FillBuffer ()
 		{
 			if (bufferIndex == bufferEnd && !eof) {
-				bufferEnd = text.Read (buffer, 0, buffer.Length);
-				bufferIndex = 0;
+				if (stream != null) {
+					int inputIndex;
+
+					if (detectEncodingFromByteOrderMarks)
+						inputIndex = DetectEncodingFromByteOrderMarks ();
+					else
+						inputIndex = 0;
+
+					bufferIndex = 0;
+					bufferEnd = 0;
+
+					do {
+						if (inputIndex == inputEnd) {
+							inputEnd = stream.Read (input, 0, input.Length);
+							inputIndex = 0;
+						}
+
+						bufferEnd = decoder.GetChars (input, inputIndex, inputEnd - inputIndex, buffer, 0, inputEnd == 0);
+						inputIndex = inputEnd;
+					} while (bufferEnd == 0 && inputEnd > 0);
+
+					inputEnd = 0;
+				} else {
+					bufferEnd = textReader.Read (buffer, 0, buffer.Length);
+					bufferIndex = 0;
+				}
+
 				eof = bufferEnd == 0;
 			}
 		}
