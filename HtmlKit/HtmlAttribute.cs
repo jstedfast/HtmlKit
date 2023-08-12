@@ -86,12 +86,6 @@ namespace HtmlKit {
 
 		internal HtmlAttribute (string name)
 		{
-			if (name is null)
-				throw new ArgumentNullException (nameof (name));
-
-			if (name.Length == 0)
-				throw new ArgumentException ("The attribute name cannot be empty.", nameof (name));
-
 			Name = name;
 		}
 
