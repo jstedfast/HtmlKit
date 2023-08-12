@@ -295,7 +295,6 @@ namespace HtmlKit {
 
 		int Read ()
 		{
-			//int c = text.Read ();
 			FillBuffer ();
 
 			if (bufferIndex >= bufferEnd)
@@ -312,7 +311,6 @@ namespace HtmlKit {
 			return c;
 		}
 
-		// Note: value must be lowercase
 		bool NameIs (string value)
 		{
 			if (name.Length != value.Length)
