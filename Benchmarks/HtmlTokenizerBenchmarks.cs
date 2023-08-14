@@ -43,7 +43,7 @@ namespace Benchmarks
 
 		#region HtmlKit
 
-		static void HtmlKit_TokenizeFile (string fileName)
+		static void HtmlKit_TokenizeTextReader (string fileName)
 		{
 			var path = Path.Combine (HtmlDataDir, fileName);
 			using var reader = new StreamReader (path);
@@ -54,9 +54,9 @@ namespace Benchmarks
 		}
 
 		[Benchmark]
-		public void HtmlKit_Xamarin3 ()
+		public void HtmlKit_TextReader_Xamarin3 ()
 		{
-			HtmlKit_TokenizeFile ("xamarin3.xhtml");
+			HtmlKit_TokenizeTextReader ("xamarin3.xhtml");
 		}
 
 		static void HtmlKit_TokenizeStream (string fileName)
@@ -70,7 +70,7 @@ namespace Benchmarks
 		}
 
 		[Benchmark]
-		public void HtmlKit_Xamarin3Stream ()
+		public void HtmlKit_Stream_Xamarin3 ()
 		{
 			HtmlKit_TokenizeStream ("xamarin3.xhtml");
 		}
@@ -85,11 +85,35 @@ namespace Benchmarks
 			using var reader = new StreamReader (path);
 			var tokenizer = new HtmlPerformanceKit.HtmlReader (reader);
 
-			while (tokenizer.Read ())
-				;
+			while (tokenizer.Read ()) {
+				switch (tokenizer.TokenKind) {
+				case HtmlPerformanceKit.HtmlTokenKind.Doctype:
+					for (int i = 0; i < tokenizer.AttributeCount; i++) {
+						var attrName = tokenizer.GetAttributeName (i);
+						var attrValue = tokenizer.GetAttribute (i);
+					}
+					break;
+				case HtmlPerformanceKit.HtmlTokenKind.Tag:
+					var tagName = tokenizer.Name;
+					for (int i = 0; i < tokenizer.AttributeCount; i++) {
+						var attrName = tokenizer.GetAttributeName (i);
+						var attrValue = tokenizer.GetAttribute (i);
+					}
+					break;
+				case HtmlPerformanceKit.HtmlTokenKind.EndTag:
+					var endTagName = tokenizer.Name;
+					break;
+				case HtmlPerformanceKit.HtmlTokenKind.Comment:
+					var comment = tokenizer.Text;
+					break;
+				case HtmlPerformanceKit.HtmlTokenKind.Text:
+					var text = tokenizer.Text;
+					break;
+				}
+			}
 		}
 
-		//[Benchmark]
+		[Benchmark]
 		public void HtmlPerformanceKit_Xamarin3 ()
 		{
 			HtmlPerformanceKit_TokenizeFile ("xamarin3.xhtml");
@@ -113,7 +137,7 @@ namespace Benchmarks
 			} while (token.Type != ASHtmlTokenType.EndOfFile);
 		}
 
-		//[Benchmark]
+		[Benchmark]
 		public void AngleSharp_Xamarin3 ()
 		{
 			AngleSharp_TokenizeFile ("xamarin3.xhtml");
@@ -138,7 +162,7 @@ namespace Benchmarks
 				switch (reader.NodeType) {
 				case XmlNodeType.Attribute:
 					var attrName = reader.Name;
-					var value = reader.Value;
+					var attrValue = reader.Value;
 					break;
 				case XmlNodeType.Element:
 				case XmlNodeType.EndElement:
@@ -160,7 +184,7 @@ namespace Benchmarks
 			}
 		}
 
-		//[Benchmark]
+		[Benchmark]
 		public void XmlReader_Xamarin3 ()
 		{
 			XmlReader_TokenizeFile ("xamarin3.xhtml");
