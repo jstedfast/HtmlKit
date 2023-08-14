@@ -69,6 +69,7 @@ namespace HtmlKit {
 		char quote;
 
 		bool detectEncodingFromByteOrderMarks;
+		bool detectByteOrderMark;
 		bool isEndTag;
 		bool bang;
 		bool eof;
@@ -138,6 +139,7 @@ namespace HtmlKit {
 			}
 
 			this.detectEncodingFromByteOrderMarks = detectEncodingFromByteOrderMarks;
+			this.detectByteOrderMark = !detectEncodingFromByteOrderMarks;
 			this.encoding = encoding;
 			this.stream = stream;
 		}
@@ -355,6 +357,45 @@ namespace HtmlKit {
 			return (char) c;
 		}
 
+		int SkipByteOrderMark (ReadOnlySpan<byte> preamble)
+		{
+			bool detected = true;
+
+			for (int i = 0; i < preamble.Length; i++) {
+				if (input[i] != preamble[i]) {
+					detected = false;
+					break;
+				}
+			}
+
+			return detected ? preamble.Length : 0;
+		}
+
+		int DetectByteOrderMark ()
+		{
+#if NET6_0_OR_GREATER
+			var preamble = encoding.Preamble;
+#else
+			var preamble = encoding.GetPreamble ();
+#endif
+
+			detectByteOrderMark = false;
+
+			if (preamble.Length == 0)
+				return 0;
+
+			do {
+				int nread = stream.Read (input, inputEnd, input.Length - inputEnd);
+
+				if (nread == 0)
+					break;
+
+				inputEnd += nread;
+			} while (inputEnd < preamble.Length);
+
+			return SkipByteOrderMark (preamble);
+		}
+
 		int DetectEncodingFromByteOrderMarks ()
 		{
 			detectEncodingFromByteOrderMarks = false;
@@ -395,17 +436,13 @@ namespace HtmlKit {
 			decoder = encoding.GetDecoder ();
 			buffer = new char[encoding.GetMaxCharCount (input.Length)];
 
+#if NET6_0_OR_GREATER
+			var preamble = encoding.Preamble;
+#else
 			var preamble = encoding.GetPreamble ();
-			bool detected = true;
+#endif
 
-			for (int i = 0; i < preamble.Length; i++) {
-				if (input[i] != preamble[i]) {
-					detected = false;
-					break;
-				}
-			}
-
-			return detected ? preamble.Length : 0;
+			return SkipByteOrderMark (preamble);
 		}
 
 		[MethodImpl (MethodImplOptions.AggressiveInlining)]
@@ -417,6 +454,8 @@ namespace HtmlKit {
 
 					if (detectEncodingFromByteOrderMarks)
 						inputIndex = DetectEncodingFromByteOrderMarks ();
+					else if (detectByteOrderMark)
+						inputIndex = DetectByteOrderMark ();
 					else
 						inputIndex = 0;
 
