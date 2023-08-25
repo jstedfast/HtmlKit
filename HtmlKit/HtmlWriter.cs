@@ -515,7 +515,7 @@ namespace HtmlKit {
 
 			FlushWriterState ();
 
-			html.Write (string.Format ("<{0}", id.ToHtmlTagName ()));
+			html.Write ($"<{id.ToHtmlTagName ()}");
 			WriterState = HtmlWriterState.Tag;
 			empty = true;
 		}
@@ -543,7 +543,7 @@ namespace HtmlKit {
 
 			FlushWriterState ();
 
-			html.Write (string.Format ("<{0}", name));
+			html.Write ($"<{name}");
 			WriterState = HtmlWriterState.Tag;
 			empty = true;
 		}
@@ -570,7 +570,7 @@ namespace HtmlKit {
 
 			FlushWriterState ();
 
-			html.Write (string.Format ("</{0}>", id.ToHtmlTagName ()));
+			html.Write ($"</{id.ToHtmlTagName ()}>");
 		}
 
 		/// <summary>
@@ -596,7 +596,7 @@ namespace HtmlKit {
 
 			FlushWriterState ();
 
-			html.Write (string.Format ("</{0}>", name));
+			html.Write ($"</{name}>");
 		}
 
 		/// <summary>
@@ -678,7 +678,7 @@ namespace HtmlKit {
 
 			FlushWriterState ();
 
-			html.Write (string.Format ("<{0}", id.ToHtmlTagName ()));
+			html.Write ($"<{id.ToHtmlTagName ()}");
 			WriterState = HtmlWriterState.Tag;
 		}
 
@@ -705,7 +705,7 @@ namespace HtmlKit {
 
 			FlushWriterState ();
 
-			html.Write (string.Format ("<{0}", name));
+			html.Write ($"<{name}");
 			WriterState = HtmlWriterState.Tag;
 		}
 
