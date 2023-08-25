@@ -1150,7 +1150,7 @@ namespace HtmlKit {
 				data.Append (c);
 
 				switch (c) {
-				case '\t': case '\r': case '\n':  case '\f': case ' ':
+				case '\t': case '\r': case '\n': case '\f': case ' ':
 					if (NameIs ("script")) {
 						TokenizerState = HtmlTokenizerState.BeforeAttributeName;
 						break;
