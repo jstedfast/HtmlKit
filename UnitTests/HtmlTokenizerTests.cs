@@ -81,7 +81,7 @@ namespace UnitTests {
 		static void VerifyHtmlTokenizerOutput (string path, Encoding encoding = null, bool useTextReader = true, bool trimCharsetSuffix = false, bool detectEncodingFromByteOrderMarks = true)
 		{
 			GetOutputAndTokenPaths (path, trimCharsetSuffix, out var outpath, out var tokens);
-			var expectedOutput = File.Exists (outpath) ? File.ReadAllText (outpath) : string.Empty;
+			var expectedOutput = File.Exists (outpath) ? File.ReadAllText (outpath).Replace ("\r\n", "\n") : string.Empty;
 			var expected = File.Exists (tokens) ? File.ReadAllText (tokens).Replace ("\r\n", "\n") : string.Empty;
 			var output = new StringBuilder ();
 			var actual = new StringBuilder ();
@@ -107,7 +107,7 @@ namespace UnitTests {
 				Assert.That (tokenizer.TokenizerState, Is.EqualTo (HtmlTokenizerState.Data));
 
 				while (tokenizer.ReadNextToken (out token)) {
-					output.Append (token);
+					output.Append (token.ToString ().Replace ("\r\n", "\n"));
 
 					actual.AppendFormat ("{0}: ", token.Kind);
 
