@@ -493,7 +493,7 @@ namespace UnitTests {
 			Assert.That (token.Kind, Is.EqualTo (HtmlTokenKind.DocType));
 
 			var d = (HtmlDocTypeToken) token;
-			Assert.IsNotNull (d.Name);
+			Assert.That (d.Name, Is.Not.Null);
 			Assert.That (d.Name, Is.EqualTo ("root_element"));
 			Assert.That (d.SystemIdentifier, Is.EqualTo ("DTD_location"));
 		}
