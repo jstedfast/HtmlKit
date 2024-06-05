@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.1.2" />
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
-    <PackageReference Include="HtmlPerformanceKit" Version="0.7.0" />
+    <PackageReference Include="HtmlPerformanceKit" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
