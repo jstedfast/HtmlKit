@@ -1,6 +1,6 @@
 ## License Information
 
-HtmlKit is Copyright (C) 2015-2023 Jeffrey Stedfast and is licensed under the MIT license:
+HtmlKit is Copyright (C) 2015-2024 Jeffrey Stedfast and is licensed under the MIT license:
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
