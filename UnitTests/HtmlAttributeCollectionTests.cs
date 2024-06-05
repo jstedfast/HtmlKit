@@ -48,7 +48,7 @@ namespace UnitTests {
 		[Test]
 		public void TestEmpty ()
 		{
-			Assert.AreEqual (0, HtmlAttributeCollection.Empty.Count);
+			Assert.That (HtmlAttributeCollection.Empty.Count, Is.EqualTo (0));
 		}
 
 		[Test]
@@ -72,13 +72,13 @@ namespace UnitTests {
 			var items = new HtmlAttribute[] { new HtmlAttribute (HtmlAttributeId.Alt, "This is some alt text."), new HtmlAttribute (HtmlAttributeId.Text, "And this is the text.") };
 			var collection = new HtmlAttributeCollection (items);
 
-			Assert.AreEqual (0, collection.IndexOf (HtmlAttributeId.Alt), "HtmlAttributeId.Alt");
-			Assert.AreEqual (1, collection.IndexOf (HtmlAttributeId.Text), "HtmlAttributeId.Text");
-			Assert.AreEqual (-1, collection.IndexOf (HtmlAttributeId.Background), "HtmlAttributeId.Background");
+			Assert.That (collection.IndexOf (HtmlAttributeId.Alt), Is.EqualTo (0), "HtmlAttributeId.Alt");
+			Assert.That (collection.IndexOf (HtmlAttributeId.Text), Is.EqualTo (1), "HtmlAttributeId.Text");
+			Assert.That (collection.IndexOf (HtmlAttributeId.Background), Is.EqualTo (-1), "HtmlAttributeId.Background");
 
-			Assert.AreEqual (0, collection.IndexOf ("alt"), "alt");
-			Assert.AreEqual (1, collection.IndexOf ("text"), "text");
-			Assert.AreEqual (-1, collection.IndexOf ("background"), "background");
+			Assert.That (collection.IndexOf ("alt"), Is.EqualTo (0), "alt");
+			Assert.That (collection.IndexOf ("text"), Is.EqualTo (1), "text");
+			Assert.That (collection.IndexOf ("background"), Is.EqualTo (-1), "background");
 		}
 
 		[Test]
@@ -89,16 +89,16 @@ namespace UnitTests {
 			HtmlAttribute attr;
 
 			Assert.IsTrue (collection.TryGetValue (HtmlAttributeId.Alt, out attr), "HtmlAttributeId.Alt");
-			Assert.AreEqual ("This is some alt text.", attr.Value, "HtmlAttributeId.Alt Value");
+			Assert.That (attr.Value, Is.EqualTo ("This is some alt text."), "HtmlAttributeId.Alt Value");
 			Assert.IsTrue (collection.TryGetValue (HtmlAttributeId.Text, out attr), "HtmlAttributeId.Text");
-			Assert.AreEqual ("And this is the text.", attr.Value, "HtmlAttributeId.Text Value");
+			Assert.That (attr.Value, Is.EqualTo ("And this is the text."), "HtmlAttributeId.Text Value");
 			Assert.IsFalse (collection.TryGetValue (HtmlAttributeId.Background, out attr), "HtmlAttributeId.Background");
 			Assert.IsNull (attr, "HtmlAttributeId.Background is not null");
 
 			Assert.IsTrue (collection.TryGetValue ("alt", out attr), "alt");
-			Assert.AreEqual ("This is some alt text.", attr.Value, "alt Value");
+			Assert.That (attr.Value, Is.EqualTo ("This is some alt text."), "alt Value");
 			Assert.IsTrue (collection.TryGetValue ("text", out attr), "text");
-			Assert.AreEqual ("And this is the text.", attr.Value, "text Value");
+			Assert.That (attr.Value, Is.EqualTo ("And this is the text."), "text Value");
 			Assert.IsFalse (collection.TryGetValue ("background", out attr), "background");
 			Assert.IsNull (attr, "background is not null");
 		}
@@ -111,13 +111,13 @@ namespace UnitTests {
 			int index = 0;
 
 			foreach (var attr in collection) {
-				Assert.AreEqual (items[index], attr, "GetEnumerator<HtmlAttribute>() index = {0}", index);
+				Assert.That (attr, Is.EqualTo (items[index]), $"GetEnumerator<HtmlAttribute>() index = {index}");
 				index++;
 			}
 
 			index = 0;
 			foreach (HtmlAttribute item in ((IEnumerable) collection)) {
-				Assert.AreEqual (items[index], item, "GetEnumerator<HtmlAttribute>() index = {0}", index);
+				Assert.That (item, Is.EqualTo (items[index]), $"GetEnumerator<HtmlAttribute>() index = {index}");
 				index++;
 			}
 		}

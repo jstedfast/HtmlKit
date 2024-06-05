@@ -75,10 +75,10 @@ namespace UnitTests {
 			var attrs = new HtmlAttribute[] { new HtmlAttribute ("src", "image.png"), new HtmlAttribute ("alt", "[image]") };
 			var token = new HtmlTagToken ("img", attrs, true);
 
-			Assert.AreEqual (HtmlTagId.Image, token.Id);
+			Assert.That (token.Id, Is.EqualTo (HtmlTagId.Image));
 			Assert.IsTrue (token.IsEmptyElement);
 			Assert.IsFalse (token.IsEndTag);
-			Assert.AreEqual (2, token.Attributes.Count);
+			Assert.That (token.Attributes.Count, Is.EqualTo (2));
 		}
 
 		[Test]
@@ -87,21 +87,21 @@ namespace UnitTests {
 			var doctype = new HtmlDocTypeToken ();
 
 			doctype.PublicIdentifier = "public-identifier";
-			Assert.AreEqual ("public-identifier", doctype.PublicIdentifier, "PublicIdentifier");
-			Assert.AreEqual ("PUBLIC", doctype.PublicKeyword, "PublicKeyword");
+			Assert.That (doctype.PublicIdentifier, Is.EqualTo ("public-identifier"), "PublicIdentifier");
+			Assert.That (doctype.PublicKeyword, Is.EqualTo ("PUBLIC"), "PublicKeyword");
 			Assert.IsNull (doctype.SystemKeyword, "SystemKeyword");
 
 			doctype.PublicIdentifier = null;
 			Assert.IsNull (doctype.PublicIdentifier, "PublicIdentifier");
-			Assert.AreEqual ("PUBLIC", doctype.PublicKeyword, "PublicKeyword");
+			Assert.That (doctype.PublicKeyword, Is.EqualTo ("PUBLIC"), "PublicKeyword");
 			Assert.IsNull (doctype.SystemKeyword, "SystemKeyword");
 
 			doctype.PublicIdentifier = "public-identifier";
 			doctype.SystemIdentifier = "system-identifier";
 			doctype.PublicIdentifier = null;
 			Assert.IsNull (doctype.PublicIdentifier, "PublicIdentifier");
-			Assert.AreEqual ("PUBLIC", doctype.PublicKeyword, "PublicKeyword");
-			Assert.AreEqual ("SYSTEM", doctype.SystemKeyword, "SystemKeyword");
+			Assert.That (doctype.PublicKeyword, Is.EqualTo ("PUBLIC"), "PublicKeyword");
+			Assert.That (doctype.SystemKeyword, Is.EqualTo ("SYSTEM"), "SystemKeyword");
 		}
 
 		[Test]
@@ -110,8 +110,8 @@ namespace UnitTests {
 			var doctype = new HtmlDocTypeToken ();
 
 			doctype.SystemIdentifier = "system-identifier";
-			Assert.AreEqual ("system-identifier", doctype.SystemIdentifier, "SystemIdentifier");
-			Assert.AreEqual ("SYSTEM", doctype.SystemKeyword, "SystemKeyword");
+			Assert.That (doctype.SystemIdentifier, Is.EqualTo ("system-identifier"), "SystemIdentifier");
+			Assert.That (doctype.SystemKeyword, Is.EqualTo ("SYSTEM"), "SystemKeyword");
 
 			doctype.SystemIdentifier = null;
 			Assert.IsNull (doctype.SystemIdentifier, "SystemIdentifier");

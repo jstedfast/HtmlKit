@@ -86,7 +86,7 @@ namespace UnitTests {
 					for (int i = 0; i < name.Length; i++)
 						Assert.IsTrue (decoder.Push (name[i]), "Failed to push char #{0} of \"{1}\".", i, name);
 
-					Assert.AreEqual (value, decoder.GetValue (), "Decoded entity did not match for \"{0}\".", name);
+					Assert.That (decoder.GetValue (), Is.EqualTo (value), $"Decoded entity did not match for \"{name}\".");
 
 					decoder.Reset ();
 				}
@@ -100,7 +100,7 @@ namespace UnitTests {
 			for (int i = 0; i < text.Length; i++)
 				Assert.IsTrue (decoder.Push (text[i]), "Failed to push char #{0} of \"{1}\".", i, text);
 
-			Assert.AreEqual (expected, decoder.GetValue (), "Decoded entity did not match for \"{0}\".", text);
+			Assert.That (decoder.GetValue (), Is.EqualTo (expected), $"Decoded entity did not match for \"{text}\".");
 		}
 
 		[Test]
@@ -183,7 +183,7 @@ namespace UnitTests {
 			Assert.IsTrue (decoder.Push ('5'));
 
 			var value = decoder.GetValue ();
-			Assert.AreEqual ("&#x95", value);
+			Assert.That (value, Is.EqualTo ("&#x95"));
 		}
 	}
 }
