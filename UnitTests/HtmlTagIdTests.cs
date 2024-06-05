@@ -67,10 +67,10 @@ namespace UnitTests {
 			foreach (var element in formattingElements) {
 				var tag = element.ToHtmlTagId ();
 
-				Assert.IsTrue (tag.IsFormattingElement (), element);
+				Assert.That (tag.IsFormattingElement (), Is.True, element);
 			}
 
-			Assert.IsFalse ("body".ToHtmlTagId ().IsFormattingElement (), "body");
+			Assert.That ("body".ToHtmlTagId ().IsFormattingElement (), Is.False, "body");
 		}
 
 		[Test]
@@ -81,10 +81,10 @@ namespace UnitTests {
 			foreach (var element in emptyElements) {
 				var tag = element.ToHtmlTagId ();
 
-				Assert.IsTrue (tag.IsEmptyElement (), element);
+				Assert.That (tag.IsEmptyElement (), Is.True, element);
 			}
 
-			Assert.IsFalse ("body".ToHtmlTagId ().IsEmptyElement (), "body");
+			Assert.That ("body".ToHtmlTagId ().IsEmptyElement (), Is.False, "body");
 		}
 	}
 }

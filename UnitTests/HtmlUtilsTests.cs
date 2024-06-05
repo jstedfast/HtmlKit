@@ -269,7 +269,7 @@ namespace UnitTests {
 		[Test]
 		public void TestIsValidTokenName ()
 		{
-			Assert.IsFalse (HtmlUtils.IsValidTokenName (string.Empty), "string.Empty");
+			Assert.That (HtmlUtils.IsValidTokenName (string.Empty), Is.False, "string.Empty");
 		}
 	}
 }

@@ -57,13 +57,13 @@ namespace UnitTests {
 			var items = new HtmlAttribute[] { new HtmlAttribute (HtmlAttributeId.Alt, "This is some alt text."), new HtmlAttribute (HtmlAttributeId.Text, "And this is the text.") };
 			var collection = new HtmlAttributeCollection (items);
 
-			Assert.IsTrue (collection.Contains (HtmlAttributeId.Alt), "HtmlAttributeId.Alt");
-			Assert.IsTrue (collection.Contains (HtmlAttributeId.Text), "HtmlAttributeId.Text");
-			Assert.IsFalse (collection.Contains (HtmlAttributeId.Background), "HtmlAttributeId.Background");
+			Assert.That (collection.Contains (HtmlAttributeId.Alt), Is.True, "HtmlAttributeId.Alt");
+			Assert.That (collection.Contains (HtmlAttributeId.Text), Is.True, "HtmlAttributeId.Text");
+			Assert.That (collection.Contains (HtmlAttributeId.Background), Is.False, "HtmlAttributeId.Background");
 
-			Assert.IsTrue (collection.Contains ("alt"), "alt");
-			Assert.IsTrue (collection.Contains ("text"), "text");
-			Assert.IsFalse (collection.Contains ("background"), "background");
+			Assert.That (collection.Contains ("alt"), Is.True, "alt");
+			Assert.That (collection.Contains ("text"), Is.True, "text");
+			Assert.That (collection.Contains ("background"), Is.False, "background");
 		}
 
 		[Test]
@@ -88,19 +88,19 @@ namespace UnitTests {
 			var collection = new HtmlAttributeCollection (items);
 			HtmlAttribute attr;
 
-			Assert.IsTrue (collection.TryGetValue (HtmlAttributeId.Alt, out attr), "HtmlAttributeId.Alt");
+			Assert.That (collection.TryGetValue (HtmlAttributeId.Alt, out attr), Is.True, "HtmlAttributeId.Alt");
 			Assert.That (attr.Value, Is.EqualTo ("This is some alt text."), "HtmlAttributeId.Alt Value");
-			Assert.IsTrue (collection.TryGetValue (HtmlAttributeId.Text, out attr), "HtmlAttributeId.Text");
+			Assert.That (collection.TryGetValue (HtmlAttributeId.Text, out attr), Is.True, "HtmlAttributeId.Text");
 			Assert.That (attr.Value, Is.EqualTo ("And this is the text."), "HtmlAttributeId.Text Value");
-			Assert.IsFalse (collection.TryGetValue (HtmlAttributeId.Background, out attr), "HtmlAttributeId.Background");
-			Assert.IsNull (attr, "HtmlAttributeId.Background is not null");
+			Assert.That (collection.TryGetValue (HtmlAttributeId.Background, out attr), Is.False, "HtmlAttributeId.Background");
+			Assert.That (attr, Is.Null, "HtmlAttributeId.Background is not null");
 
-			Assert.IsTrue (collection.TryGetValue ("alt", out attr), "alt");
+			Assert.That (collection.TryGetValue ("alt", out attr), Is.True, "alt");
 			Assert.That (attr.Value, Is.EqualTo ("This is some alt text."), "alt Value");
-			Assert.IsTrue (collection.TryGetValue ("text", out attr), "text");
+			Assert.That (collection.TryGetValue ("text", out attr), Is.True, "text");
 			Assert.That (attr.Value, Is.EqualTo ("And this is the text."), "text Value");
-			Assert.IsFalse (collection.TryGetValue ("background", out attr), "background");
-			Assert.IsNull (attr, "background is not null");
+			Assert.That (collection.TryGetValue ("background", out attr), Is.False, "background");
+			Assert.That (attr, Is.Null, "background is not null");
 		}
 
 		[Test]

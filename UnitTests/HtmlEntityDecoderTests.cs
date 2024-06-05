@@ -84,7 +84,7 @@ namespace UnitTests {
 						break;
 
 					for (int i = 0; i < name.Length; i++)
-						Assert.IsTrue (decoder.Push (name[i]), "Failed to push char #{0} of \"{1}\".", i, name);
+						Assert.That (decoder.Push (name[i]), Is.True, $"Failed to push char #{i} of \"{name}\".");
 
 					Assert.That (decoder.GetValue (), Is.EqualTo (value), $"Decoded entity did not match for \"{name}\".");
 
@@ -98,7 +98,7 @@ namespace UnitTests {
 			var decoder = new HtmlEntityDecoder ();
 
 			for (int i = 0; i < text.Length; i++)
-				Assert.IsTrue (decoder.Push (text[i]), "Failed to push char #{0} of \"{1}\".", i, text);
+				Assert.That (decoder.Push (text[i]), Is.True, $"Failed to push char #{i} of \"{text}\".");
 
 			Assert.That (decoder.GetValue (), Is.EqualTo (expected), $"Decoded entity did not match for \"{text}\".");
 		}
@@ -152,9 +152,9 @@ namespace UnitTests {
 
 			for (int i = 0; i < text.Length; i++) {
 				if (i + 1 == text.Length)
-					Assert.IsFalse (decoder.Push (text[i]), "Should have failed to push char #{0} of \"{1}\".", i, text);
+					Assert.That (decoder.Push (text[i]), Is.False, $"Should have failed to push char #{i} of \"{text}\".");
 				else
-					Assert.IsTrue (decoder.Push (text[i]), "Failed to push char #{0} of \"{1}\".", i, text);
+					Assert.That (decoder.Push (text[i]), Is.True, $"Failed to push char #{i} of \"{text}\".");
 			}
 		}
 
@@ -176,11 +176,11 @@ namespace UnitTests {
 		{
 			var decoder = new HtmlEntityDecoder ();
 
-			Assert.IsTrue (decoder.Push ('&'));
-			Assert.IsTrue (decoder.Push ('#'));
-			Assert.IsTrue (decoder.Push ('x'));
-			Assert.IsTrue (decoder.Push ('9'));
-			Assert.IsTrue (decoder.Push ('5'));
+			Assert.That (decoder.Push ('&'), Is.True);
+			Assert.That (decoder.Push ('#'), Is.True);
+			Assert.That (decoder.Push ('x'), Is.True);
+			Assert.That (decoder.Push ('9'), Is.True);
+			Assert.That (decoder.Push ('5'), Is.True);
 
 			var value = decoder.GetValue ();
 			Assert.That (value, Is.EqualTo ("&#x95"));

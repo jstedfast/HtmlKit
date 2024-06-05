@@ -76,8 +76,8 @@ namespace UnitTests {
 			var token = new HtmlTagToken ("img", attrs, true);
 
 			Assert.That (token.Id, Is.EqualTo (HtmlTagId.Image));
-			Assert.IsTrue (token.IsEmptyElement);
-			Assert.IsFalse (token.IsEndTag);
+			Assert.That (token.IsEmptyElement, Is.True);
+			Assert.That (token.IsEndTag, Is.False);
 			Assert.That (token.Attributes.Count, Is.EqualTo (2));
 		}
 
@@ -89,17 +89,17 @@ namespace UnitTests {
 			doctype.PublicIdentifier = "public-identifier";
 			Assert.That (doctype.PublicIdentifier, Is.EqualTo ("public-identifier"), "PublicIdentifier");
 			Assert.That (doctype.PublicKeyword, Is.EqualTo ("PUBLIC"), "PublicKeyword");
-			Assert.IsNull (doctype.SystemKeyword, "SystemKeyword");
+			Assert.That (doctype.SystemKeyword, Is.Null, "SystemKeyword");
 
 			doctype.PublicIdentifier = null;
-			Assert.IsNull (doctype.PublicIdentifier, "PublicIdentifier");
+			Assert.That (doctype.PublicIdentifier, Is.Null, "PublicIdentifier");
 			Assert.That (doctype.PublicKeyword, Is.EqualTo ("PUBLIC"), "PublicKeyword");
-			Assert.IsNull (doctype.SystemKeyword, "SystemKeyword");
+			Assert.That (doctype.SystemKeyword, Is.Null, "SystemKeyword");
 
 			doctype.PublicIdentifier = "public-identifier";
 			doctype.SystemIdentifier = "system-identifier";
 			doctype.PublicIdentifier = null;
-			Assert.IsNull (doctype.PublicIdentifier, "PublicIdentifier");
+			Assert.That (doctype.PublicIdentifier, Is.Null, "PublicIdentifier");
 			Assert.That (doctype.PublicKeyword, Is.EqualTo ("PUBLIC"), "PublicKeyword");
 			Assert.That (doctype.SystemKeyword, Is.EqualTo ("SYSTEM"), "SystemKeyword");
 		}
@@ -114,8 +114,8 @@ namespace UnitTests {
 			Assert.That (doctype.SystemKeyword, Is.EqualTo ("SYSTEM"), "SystemKeyword");
 
 			doctype.SystemIdentifier = null;
-			Assert.IsNull (doctype.SystemIdentifier, "SystemIdentifier");
-			Assert.IsNull (doctype.SystemKeyword, "SystemKeyword");
+			Assert.That (doctype.SystemIdentifier, Is.Null, "SystemIdentifier");
+			Assert.That (doctype.SystemKeyword, Is.Null, "SystemKeyword");
 		}
 	}
 }
