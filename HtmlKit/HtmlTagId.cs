@@ -859,12 +859,19 @@ namespace HtmlKit {
 
 		static HtmlTagIdExtensions ()
 		{
-			var values = (HtmlTagId[]) Enum.GetValues (typeof (HtmlTagId));
+#if NET8_0_OR_GREATER
+			var values = Enum.GetValuesAsUnderlyingType<HtmlTagId> ();
+#else
+			var values = Enum.GetValues (typeof (HtmlTagId));
+#endif
 
 			IdMapping = new Dictionary<string, HtmlTagId> (values.Length - 1, OptimizedOrdinalIgnoreCaseComparer.Comparer);
 
-			for (int i = 1; i < values.Length; i++)
-				IdMapping.Add (values[i].ToHtmlTagName (), values[i]);
+			for (int i = 1; i < values.Length; i++) {
+				var value = (HtmlTagId) values.GetValue (i);
+
+				IdMapping.Add (value.ToHtmlTagName (), value);
+			}
 		}
 
 		/// <summary>
