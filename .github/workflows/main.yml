@@ -133,7 +133,7 @@ jobs:
         id: create_nuget_package
         shell: pwsh
         run: |
-          nuget pack nuget/MimeKit.nuspec -Version "$env:LATEST_VERSION.$env:BUILD_NUMBER"
+          nuget pack HtmlKit.nuspec -Version "$env:LATEST_VERSION.$env:BUILD_NUMBER"
         env:
           LATEST_VERSION: ${{ steps.semantic_version.outputs.version_num }}
           BUILD_NUMBER: ${{ github.run_number }}
