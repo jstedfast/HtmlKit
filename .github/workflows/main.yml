@@ -20,15 +20,15 @@ jobs:
     steps:
       - name: Setup/Install the .NET 6 SDK
         id: install-net6
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 
-      - name: Setup/Install the .NET 7 SDK
-        id: install-net7
-        uses: actions/setup-dotnet@v1
+      - name: Setup/Install the .NET 8 SDK
+        id: install-net8
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 8.0.x
 
       - name: Configure build options
         id: configure
@@ -84,11 +84,11 @@ jobs:
       - if: steps.configure.outputs.is_windows == 'true'
         name: Setup MSBuild
         id: setup_msbuild
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v2
 
       - name: Checkout repository
         id: checkout_repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           submodules: recursive
