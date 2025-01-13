@@ -870,7 +870,7 @@ namespace HtmlKit {
 			for (int i = 1; i < values.Length; i++) {
 				var value = (HtmlTagId) values.GetValue (i);
 
-				IdMapping.Add (value.ToHtmlTagName (), value);
+				IdMapping.Add (TagNames[i - 1], value);
 			}
 		}
 
@@ -915,12 +915,12 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Determines whether or not the HTML tag is an empty element.
+		/// Determines whether the HTML tag is an empty element.
 		/// </summary>
 		/// <remarks>
-		/// Determines whether or not the HTML tag is an empty element.
+		/// Determines whether the HTML tag is an empty element.
 		/// </remarks>
-		/// <returns><c>true</c> if the tag is an empty element; otherwise, <c>false</c>.</returns>
+		/// <returns><see langword="true" /> if the tag is an empty element; otherwise, <see langword="false" />.</returns>
 		/// <param name="id">Identifier.</param>
 		public static bool IsEmptyElement (this HtmlTagId id)
 		{
@@ -948,12 +948,12 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Determines whether or not the HTML tag is a formatting element.
+		/// Determines whether the HTML tag is a formatting element.
 		/// </summary>
 		/// <remarks>
-		/// Determines whether or not the HTML tag is a formatting element.
+		/// Determines whether the HTML tag is a formatting element.
 		/// </remarks>
-		/// <returns><c>true</c> if the HTML tag is a formatting element; otherwise, <c>false</c>.</returns>
+		/// <returns><see langword="true" /> if the HTML tag is a formatting element; otherwise, <see langword="false" />.</returns>
 		/// <param name="id">The HTML tag identifier.</param>
 		public static bool IsFormattingElement (this HtmlTagId id)
 		{

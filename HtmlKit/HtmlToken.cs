@@ -68,7 +68,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="output">The output.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="output"/> is <c>null</c>.
+		/// <paramref name="output"/> is <see langword="null"/>.
 		/// </exception>
 		public abstract void WriteTo (TextWriter output);
 
@@ -104,9 +104,9 @@ namespace HtmlKit {
 		/// Creates a new <see cref="HtmlCommentToken"/>.
 		/// </remarks>
 		/// <param name="comment">The comment text.</param>
-		/// <param name="bogus"><c>true</c> if the comment is bogus; otherwise, <c>false</c>.</param>
+		/// <param name="bogus"><see langword="true" /> if the comment is bogus; otherwise, <see langword="false" />.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="comment"/> is <c>null</c>.
+		/// <paramref name="comment"/> is <see langword="null"/>.
 		/// </exception>
 		public HtmlCommentToken (string comment, bool bogus = false) : base (HtmlTokenKind.Comment)
 		{
@@ -129,12 +129,12 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Get whether or not the comment is a bogus comment.
+		/// Get whether the comment is a bogus comment.
 		/// </summary>
 		/// <remarks>
-		/// Gets whether or not the comment is a bogus comment.
+		/// Gets whether the comment is a bogus comment.
 		/// </remarks>
-		/// <value><c>true</c> if the comment is bogus; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true" /> if the comment is bogus; otherwise, <see langword="false" />.</value>
 		public bool IsBogusComment {
 			get; private set;
 		}
@@ -151,7 +151,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="output">The output.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="output"/> is <c>null</c>.
+		/// <paramref name="output"/> is <see langword="null"/>.
 		/// </exception>
 		public override void WriteTo (TextWriter output)
 		{
@@ -192,7 +192,7 @@ namespace HtmlKit {
 		/// <paramref name="kind"/> is not a valid <see cref="HtmlTokenKind"/>.
 		/// </exception>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="data"/> is <c>null</c>.
+		/// <paramref name="data"/> is <see langword="null"/>.
 		/// </exception>
 		protected HtmlDataToken (HtmlTokenKind kind, string data) : base (kind)
 		{
@@ -218,7 +218,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="data">The character data.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="data"/> is <c>null</c>.
+		/// <paramref name="data"/> is <see langword="null"/>.
 		/// </exception>
 		public HtmlDataToken (string data) : base (HtmlTokenKind.Data)
 		{
@@ -252,7 +252,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="output">The output.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="output"/> is <c>null</c>.
+		/// <paramref name="output"/> is <see langword="null"/>.
 		/// </exception>
 		public override void WriteTo (TextWriter output)
 		{
@@ -269,7 +269,7 @@ namespace HtmlKit {
 	}
 
 	/// <summary>
-	/// An HTML token constisting of <c>[CDATA[</c>.
+	/// An HTML token consisting of <c>[CDATA[</c>.
 	/// </summary>
 	/// <remarks>
 	/// An HTML token consisting of <c>[CDATA[</c>.
@@ -284,7 +284,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="data">The character data.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="data"/> is <c>null</c>.
+		/// <paramref name="data"/> is <see langword="null"/>.
 		/// </exception>
 		public HtmlCDataToken (string data) : base (HtmlTokenKind.CData, data)
 		{
@@ -299,7 +299,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="output">The output.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="output"/> is <c>null</c>.
+		/// <paramref name="output"/> is <see langword="null"/>.
 		/// </exception>
 		public override void WriteTo (TextWriter output)
 		{
@@ -328,7 +328,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="data">The script data.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="data"/> is <c>null</c>.
+		/// <paramref name="data"/> is <see langword="null"/>.
 		/// </exception>
 		public HtmlScriptDataToken (string data) : base (HtmlTokenKind.ScriptData, data)
 		{
@@ -343,7 +343,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="output">The output.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="output"/> is <c>null</c>.
+		/// <paramref name="output"/> is <see langword="null"/>.
 		/// </exception>
 		public override void WriteTo (TextWriter output)
 		{
@@ -372,11 +372,11 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="name">The name of the tag.</param>
 		/// <param name="attributes">The attributes.</param>
-		/// <param name="isEmptyElement"><c>true</c> if the tag is an empty element; otherwise, <c>false</c>.</param>
+		/// <param name="isEmptyElement"><see langword="true" /> if the tag is an empty element; otherwise, <see langword="false" />.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <para><paramref name="name"/> is <c>null</c>.</para>
+		/// <para><paramref name="name"/> is <see langword="null"/>.</para>
 		/// <para>-or-</para>
-		/// <para><paramref name="attributes"/> is <c>null</c>.</para>
+		/// <para><paramref name="attributes"/> is <see langword="null"/>.</para>
 		/// </exception>
 		public HtmlTagToken (string name, IEnumerable<HtmlAttribute> attributes, bool isEmptyElement) : base (HtmlTokenKind.Tag)
 		{
@@ -398,9 +398,9 @@ namespace HtmlKit {
 		/// Creates a new <see cref="HtmlTagToken"/>.
 		/// </remarks>
 		/// <param name="name">The name of the tag.</param>
-		/// <param name="isEndTag"><c>true</c> if the tag is an end tag; otherwise, <c>false</c>.</param>
+		/// <param name="isEndTag"><see langword="true" /> if the tag is an end tag; otherwise, <see langword="false" />.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="name"/> is <c>null</c>.
+		/// <paramref name="name"/> is <see langword="null"/>.
 		/// </exception>
 		public HtmlTagToken (string name, bool isEndTag) : base (HtmlTokenKind.Tag)
 		{
@@ -440,23 +440,23 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Get whether or not the tag is an empty element.
+		/// Get whether the tag is an empty element.
 		/// </summary>
 		/// <remarks>
-		/// Gets whether or not the tag is an empty element.
+		/// Gets whether the tag is an empty element.
 		/// </remarks>
-		/// <value><c>true</c> if the tag is an empty element; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true" /> if the tag is an empty element; otherwise, <see langword="false" />.</value>
 		public bool IsEmptyElement {
 			get; internal set;
 		}
 
 		/// <summary>
-		/// Get whether or not the tag is an end tag.
+		/// Get whether the tag is an end tag.
 		/// </summary>
 		/// <remarks>
-		/// Gets whether or not the tag is an end tag.
+		/// Gets whether the tag is an end tag.
 		/// </remarks>
-		/// <value><c>true</c> if the tag is an end tag; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true" /> if the tag is an end tag; otherwise, <see langword="false" />.</value>
 		public bool IsEndTag {
 			get; private set;
 		}
@@ -480,7 +480,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="output">The output.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="output"/> is <c>null</c>.
+		/// <paramref name="output"/> is <see langword="null"/>.
 		/// </exception>
 		public override void WriteTo (TextWriter output)
 		{
@@ -532,12 +532,12 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
-		/// Get whether or not quirks-mode should be forced.
+		/// Get whether quirks-mode should be forced.
 		/// </summary>
 		/// <remarks>
-		/// Gets whether or not quirks-mode should be forced.
+		/// Gets whether quirks-mode should be forced.
 		/// </remarks>
-		/// <value><c>true</c> if quirks-mode should be forced; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true" /> if quirks-mode should be forced; otherwise, <see langword="false" />.</value>
 		public bool ForceQuirksMode {
 			get; set;
 		}
@@ -580,7 +580,7 @@ namespace HtmlKit {
 		/// <remarks>
 		/// Gets the public keyword that was used.
 		/// </remarks>
-		/// <value>The public keyword or <c>null</c> if it wasn't used.</value>
+		/// <value>The public keyword or <see langword="null"/> if it wasn't used.</value>
 		public string PublicKeyword {
 			get; internal set;
 		}
@@ -611,7 +611,7 @@ namespace HtmlKit {
 		/// <remarks>
 		/// Gets the system keyword that was used.
 		/// </remarks>
-		/// <value>The system keyword or <c>null</c> if it wasn't used.</value>
+		/// <value>The system keyword or <see langword="null"/> if it wasn't used.</value>
 		public string SystemKeyword {
 			get; internal set;
 		}
@@ -624,7 +624,7 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <param name="output">The output.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="output"/> is <c>null</c>.
+		/// <paramref name="output"/> is <see langword="null"/>.
 		/// </exception>
 		public override void WriteTo (TextWriter output)
 		{

@@ -67,7 +67,7 @@ namespace HtmlKit {
 		/// <param name="name">The attribute name.</param>
 		/// <param name="value">The attribute value.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="name"/> is <c>null</c>.
+		/// <paramref name="name"/> is <see langword="null"/>.
 		/// </exception>
 		public HtmlAttribute (string name, string value)
 		{
