@@ -21,14 +21,8 @@ jobs:
       PUBLISH: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.os == 'windows-latest' && matrix.build-configuration == 'Release' }}
 
     steps:
-      - name: Setup/Install the .NET 6 SDK
-        id: install-net6
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 6.0.x
-
       - name: Setup/Install the .NET 8 SDK
-        id: install-net8
+        id: install-netsdk
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
@@ -114,7 +108,7 @@ jobs:
           name: HtmlKit.${{ steps.semantic_version.outputs.version_num }}.${{ github.run_number }}-${{ matrix.os }}-${{ matrix.build-configuration }}-TestResults.xml
           path: TestResult.xml
           
-      - if: ${{ env.GENERATE_CODE_COVERAGE == 'yes' }}
+      - if: ${{ env.GENERATE_CODE_COVERAGE == 'true' }}
         name: Upload code coverage data to coveralls.io
         id: upload_to_coveralls
         run: |
