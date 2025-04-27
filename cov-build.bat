@@ -1,1 +1,3 @@
-..\cov-analysis\bin\cov-build.exe --dir cov-int "%WinDir%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" /t:Rebuild HtmlKit.sln
+rmdir /q /s cov-int
+del /q cov-int.zip
+..\cov-analysis\bin\cov-build.exe --dir cov-int "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" /t:Rebuild HtmlKit.sln
