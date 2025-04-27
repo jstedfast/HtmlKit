@@ -24,7 +24,7 @@
     </releaseNotes>
     <copyright>Jeffrey Stedfast</copyright>
     <language>en-US</language>
-    <tags>html parser net462 net47 net48 net6.0 net8.0, netstandard netstandard2.0 netstandard2.1</tags>
+    <tags>html parser</tags>
     <readme>docs\README.md</readme>
     <frameworkAssemblies>
     </frameworkAssemblies>
