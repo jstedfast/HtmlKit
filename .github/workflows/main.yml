@@ -9,6 +9,9 @@ jobs:
       matrix:
         os: [ windows-latest, ubuntu-latest ]
         build-configuration: [ Debug, Release ]
+    permissions:
+      actions: read
+      contents: write
     outputs:
       latest-version: ${{ steps.semantic_version.outputs.version_num }}
     environment: ci
