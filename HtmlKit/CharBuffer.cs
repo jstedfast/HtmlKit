@@ -28,7 +28,7 @@ using System;
 using System.Runtime.CompilerServices;
 
 namespace HtmlKit {
-	class CharBuffer
+	sealed class CharBuffer
 	{
 		char[] buffer;
 
