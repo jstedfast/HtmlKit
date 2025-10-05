@@ -700,7 +700,7 @@ namespace HtmlKit {
 			IdMapping = new Dictionary<string, HtmlAttributeId> (values.Length - 1, OptimizedOrdinalIgnoreCaseComparer.Comparer);
 
 			for (int i = 1; i < values.Length; i++) {
-				var value = (HtmlAttributeId) values.GetValue (i);
+				var value = (HtmlAttributeId) values.GetValue (i)!;
 
 				IdMapping.Add (AttributeNames[i - 1], value);
 			}

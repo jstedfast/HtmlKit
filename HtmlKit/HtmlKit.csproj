@@ -1,14 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>HtmlKit is a cross-platform .NET framework for parsing HTML.</Description>
     <AssemblyTitle>HtmlKit</AssemblyTitle>
     <VersionPrefix>1.2.0</VersionPrefix>
-    <LangVersion>10</LangVersion>
+    <LangVersion>12</LangVersion>
     <Authors>Jeffrey Stedfast</Authors>
     <_LegacyFrameworks>net462;net47</_LegacyFrameworks>
     <_LegacyFrameworks Condition=" Exists('C:\Windows') ">$(_LegacyFrameworks);net48</_LegacyFrameworks>
-    <TargetFrameworks>$(_LegacyFrameworks);netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
+    <TargetFrameworks>$(_LegacyFrameworks);netstandard2.0;netstandard2.1;net8.0;net9.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AssemblyName>HtmlKit</AssemblyName>
@@ -26,6 +26,7 @@
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <RootNamespace>HtmlKit</RootNamespace>
+    <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyOriginatorKeyFile>htmlkit.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -73,6 +74,7 @@
     <Compile Include="HtmlUtils.cs" />
     <Compile Include="HtmlWriter.cs" />
     <Compile Include="HtmlWriterState.cs" />
+    <Compile Include="NullableAttributes.cs" />
     <Compile Include="OptimizedOrdinalComparer.cs" />
   </ItemGroup>
 

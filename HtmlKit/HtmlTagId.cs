@@ -868,7 +868,7 @@ namespace HtmlKit {
 			IdMapping = new Dictionary<string, HtmlTagId> (values.Length - 1, OptimizedOrdinalIgnoreCaseComparer.Comparer);
 
 			for (int i = 1; i < values.Length; i++) {
-				var value = (HtmlTagId) values.GetValue (i);
+				var value = (HtmlTagId) values.GetValue (i)!;
 
 				IdMapping.Add (TagNames[i - 1], value);
 			}

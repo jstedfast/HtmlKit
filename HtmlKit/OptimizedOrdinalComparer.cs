@@ -71,8 +71,11 @@ namespace HtmlKit {
 		/// otherwise, <c>false</c>.</returns>
 		/// <param name="x">A string to compare to <paramref name="y"/>.</param>
 		/// <param name="y">A string to compare to <paramref name="x"/>.</param>
-		public bool Equals (string x, string y)
+		public bool Equals (string? x, string? y)
 		{
+			if (x == null || y == null)
+				return false;
+
 			if (x.Length != y.Length)
 				return false;
 
