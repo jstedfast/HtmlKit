@@ -24,6 +24,8 @@
 // THE SOFTWARE.
 //
 
+#if NETFRAMEWORK || NETSTANDARD2_0
+
 using HtmlKit;
 
 namespace UnitTests {
@@ -49,3 +51,5 @@ namespace UnitTests {
 		}
 	}
 }
+
+#endif
