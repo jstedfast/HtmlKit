@@ -697,7 +697,11 @@ namespace HtmlKit {
 			var values = Enum.GetValues (typeof (HtmlAttributeId));
 #endif
 
+#if NETFRAMEWORK || NETSTANDARD2_0
 			IdMapping = new Dictionary<string, HtmlAttributeId> (values.Length - 1, OptimizedOrdinalIgnoreCaseComparer.Comparer);
+#else
+			IdMapping = new Dictionary<string, HtmlAttributeId> (values.Length - 1, StringComparer.OrdinalIgnoreCase);
+#endif
 
 			for (int i = 1; i < values.Length; i++) {
 				var value = (HtmlAttributeId) values.GetValue (i)!;

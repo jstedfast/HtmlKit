@@ -75,7 +75,7 @@
     <Compile Include="HtmlWriter.cs" />
     <Compile Include="HtmlWriterState.cs" />
     <Compile Include="NullableAttributes.cs" />
-    <Compile Include="OptimizedOrdinalComparer.cs" />
+    <Compile Include="OptimizedOrdinalComparer.cs" Condition=" $(TargetFramework.StartsWith('net4')) Or '$(TargetFramework)' == 'netstandard2.0' " />
   </ItemGroup>
 
 </Project>
