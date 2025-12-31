@@ -72,6 +72,14 @@ namespace HtmlKit {
 		}
 
 		[MethodImpl (MethodImplOptions.AggressiveInlining)]
+		public void Append (char[] chars, int index, int count)
+		{
+			EnsureCapacity (Length + count);
+			chars.AsSpan (index, count).CopyTo (buffer.AsSpan (Length));
+			Length += count;
+		}
+
+		[MethodImpl (MethodImplOptions.AggressiveInlining)]
 		public void Append (string str)
 		{
 			EnsureCapacity (Length + str.Length);

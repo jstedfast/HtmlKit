@@ -534,6 +534,86 @@ namespace HtmlKit {
 			return false;
 		}
 
+		bool TryReadDataUntil (ReadOnlySpan<char> specials, out char c)
+		{
+			FillBuffer ();
+
+			while (bufferIndex < bufferEnd) {
+				int left = bufferEnd - bufferIndex;
+
+				// Note: 'specials' MUST contain '\n' for proper line number tracking...
+				var span = new ReadOnlySpan<char> (buffer, bufferIndex, left);
+				int count = span.IndexOfAny (specials);
+
+				if (count == -1) {
+					data.Append (buffer, bufferIndex, left);
+					bufferIndex += left;
+					FillBuffer ();
+					continue;
+				}
+
+				if (count > 0) {
+					data.Append (buffer, bufferIndex, count);
+					bufferIndex += count;
+				}
+
+				c = buffer[bufferIndex++];
+
+				if (c == '\n') {
+					IncrementLineNumber ();
+				} else {
+					linePosition++;
+				}
+
+				return true;
+			}
+
+			c = '\0';
+
+			return false;
+		}
+
+		bool TryReadNameUntil (ReadOnlySpan<char> specials, out char c)
+		{
+			FillBuffer ();
+
+			while (bufferIndex < bufferEnd) {
+				int left = bufferEnd - bufferIndex;
+
+				// Note: 'specials' MUST contain '\n' for proper line number tracking...
+				var span = new ReadOnlySpan<char> (buffer, bufferIndex, left);
+				int count = span.IndexOfAny (specials);
+
+				if (count == -1) {
+					data.Append (buffer, bufferIndex, left);
+					name.Append (buffer, bufferIndex, left);
+					bufferIndex += left;
+					FillBuffer ();
+					continue;
+				}
+
+				if (count > 0) {
+					data.Append (buffer, bufferIndex, count);
+					name.Append (buffer, bufferIndex, count);
+					bufferIndex += count;
+				}
+
+				c = buffer[bufferIndex++];
+
+				if (c == '\n') {
+					IncrementLineNumber ();
+				} else {
+					linePosition++;
+				}
+
+				return true;
+			}
+
+			c = '\0';
+
+			return false;
+		}
+
 		bool NameIs (string value)
 		{
 			if (name.Length != value.Length)
@@ -802,6 +882,10 @@ namespace HtmlKit {
 		// 8.2.4.1 Data state
 		HtmlToken? ReadData ()
 		{
+			//ReadOnlySpan<char> specials = DecodeCharacterReferences ?
+			//	stackalloc char[] { '\n', '&', '<' } :
+			//	stackalloc char[] { '\n', '<' };
+
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -838,6 +922,10 @@ namespace HtmlKit {
 		// 8.2.4.3 RCDATA state
 		HtmlToken? ReadRcData ()
 		{
+			//ReadOnlySpan<char> specials = DecodeCharacterReferences ?
+			//	stackalloc char[] { '\0', '\n', '&', '<' } :
+			//	stackalloc char[] { '\0', '\n', '<' };
+
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -873,6 +961,8 @@ namespace HtmlKit {
 		// 8.2.4.5 RAWTEXT state
 		HtmlToken? ReadRawText ()
 		{
+			//ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\n', '<' };
+
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -895,6 +985,8 @@ namespace HtmlKit {
 		// 8.2.4.6 Script data state
 		HtmlToken? ReadScriptData ()
 		{
+			//ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\n', '<' };
+
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -917,29 +1009,16 @@ namespace HtmlKit {
 		// 8.2.4.7 PLAINTEXT state
 		HtmlToken? ReadPlainText ()
 		{
+			ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\n' };
+
 			do {
-				while (bufferIndex < bufferEnd) {
-					char c = buffer[bufferIndex++];
-
-					linePosition++;
-
-					switch (c) {
-					case '\0':
-						data.Append ('\uFFFD');
-						break;
-					case '\n':
-						IncrementLineNumber ();
-						goto default;
-					default:
-						data.Append (c);
-						break;
-					}
+				if (!TryReadDataUntil (specials, out char c)) {
+					TokenizerState = HtmlTokenizerState.EndOfFile;
+					break;
 				}
 
-				FillBuffer ();
-			} while (!eof);
-
-			TokenizerState = HtmlTokenizerState.EndOfFile;
+				data.Append (c == '\0' ? '\uFFFD' : c);
+			} while (true);
 
 			return EmitDataToken (false, false);
 		}
@@ -1018,6 +1097,8 @@ namespace HtmlKit {
 		// 8.2.4.10 Tag name state
 		HtmlToken? ReadTagName ()
 		{
+			//ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\t', '\r', '\n', '\f', ' ', '/', '>' };
+
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -1719,8 +1800,10 @@ namespace HtmlKit {
 		// 8.2.4.38 Attribute value (double-quoted) state
 		HtmlToken? ReadAttributeValueQuoted ()
 		{
+			ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\n', '&', quote };
+
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryReadNameUntil (specials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
@@ -1737,7 +1820,7 @@ namespace HtmlKit {
 				case '\0':
 					name.Append ('\uFFFD');
 					break;
-				default:
+				default: // quote or '\n'
 					if (c == quote) {
 						TokenizerState = HtmlTokenizerState.AfterAttributeValueQuoted;
 						quote = '\0';
