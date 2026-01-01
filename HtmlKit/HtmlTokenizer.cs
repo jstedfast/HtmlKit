@@ -2784,9 +2784,7 @@ namespace HtmlKit {
 
 			TokenizerState = HtmlTokenizerState.EndOfFile;
 
-			for (int i = 0; i < cdataIndex; i++)
-				data.Append (cdata[i]);
-
+			data.Append (cdata, 0, cdataIndex);
 			cdataIndex = 0;
 
 			return EmitCDataToken ();
