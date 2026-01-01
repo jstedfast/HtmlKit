@@ -27,6 +27,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 
@@ -534,7 +535,11 @@ namespace HtmlKit {
 			return false;
 		}
 
+#if NET8_0_OR_GREATER
+		bool TryReadDataUntil (SearchValues<char> specials, out char c)
+#else
 		bool TryReadDataUntil (ReadOnlySpan<char> specials, out char c)
+#endif
 		{
 			FillBuffer ();
 
@@ -573,7 +578,11 @@ namespace HtmlKit {
 			return false;
 		}
 
+#if NET8_0_OR_GREATER
+		bool TryReadNameUntil (SearchValues<char> specials, out char c)
+#else
 		bool TryReadNameUntil (ReadOnlySpan<char> specials, out char c)
+#endif
 		{
 			FillBuffer ();
 
@@ -1006,10 +1015,19 @@ namespace HtmlKit {
 			return EmitScriptDataToken ();
 		}
 
+		static readonly char[] PlainTextSpecials = new char[] { '\0', '\n' };
+#if NET8_0_OR_GREATER
+		static readonly SearchValues<char> PlainTextSpecialsSV = SearchValues.Create (PlainTextSpecials);
+#endif
+
 		// 8.2.4.7 PLAINTEXT state
 		HtmlToken? ReadPlainText ()
 		{
-			ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\n' };
+#if NET8_0_OR_GREATER
+			SearchValues<char> specials = PlainTextSpecialsSV;
+#else
+			ReadOnlySpan<char> specials = PlainTextSpecials;
+#endif
 
 			do {
 				if (!TryReadDataUntil (specials, out char c)) {
@@ -1797,10 +1815,21 @@ namespace HtmlKit {
 			} while (true);
 		}
 
+		static readonly char[] AttributeValueQuotedDQuoteSpecials = { '\0', '\n', '&', '\"' };
+		static readonly char[] AttributeValueQuotedSQuoteSpecials = { '\0', '\n', '&', '\'' };
+#if NET8_0_OR_GREATER
+		static readonly SearchValues<char> AttributeValueQuotedDQuoteSpecialsSV = SearchValues.Create (AttributeValueQuotedDQuoteSpecials);
+		static readonly SearchValues<char> AttributeValueQuotedSQuoteSpecialsSV = SearchValues.Create (AttributeValueQuotedSQuoteSpecials);
+#endif
+
 		// 8.2.4.38 Attribute value (double-quoted) state
 		HtmlToken? ReadAttributeValueQuoted ()
 		{
-			ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\n', '&', quote };
+#if NET8_0_OR_GREATER
+			SearchValues<char> specials = quote == '\"' ? AttributeValueQuotedDQuoteSpecialsSV : AttributeValueQuotedSQuoteSpecialsSV;
+#else
+			ReadOnlySpan<char> specials = quote == '\"' ? AttributeValueQuotedDQuoteSpecials : AttributeValueQuotedSQuoteSpecials;
+#endif
 
 			do {
 				if (!TryReadNameUntil (specials, out char c)) {
