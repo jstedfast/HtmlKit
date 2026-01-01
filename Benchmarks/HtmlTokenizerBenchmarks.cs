@@ -40,13 +40,15 @@ namespace Benchmarks
 	public class HtmlTokenizerBenchmarks
 	{
 		static readonly string HtmlDataDir = Path.Combine (BenchmarkHelper.ProjectDir, "TestData", "html");
+		static readonly byte[] Xamarin3 = File.ReadAllBytes (Path.Combine (HtmlDataDir, "xamarin3.xhtml"));
+		static readonly byte[] Papercut44 = File.ReadAllBytes (Path.Combine (HtmlDataDir, "papercut-4.4.html"));
 
 		#region HtmlKit
 
-		static void HtmlKit_TokenizeTextReader (string fileName)
+		static void HtmlKit_TokenizeTextReader (byte[] rawData)
 		{
-			var path = Path.Combine (HtmlDataDir, fileName);
-			using var reader = new StreamReader (path);
+			using var stream = new MemoryStream (rawData, false);
+			using var reader = new StreamReader (stream);
 			var tokenizer = new HtmlTokenizer (reader);
 
 			while (tokenizer.ReadNextToken (out var token))
@@ -56,13 +58,18 @@ namespace Benchmarks
 		[Benchmark]
 		public void HtmlKit_TextReader_Xamarin3 ()
 		{
-			HtmlKit_TokenizeTextReader ("xamarin3.xhtml");
+			HtmlKit_TokenizeTextReader (Xamarin3);
 		}
 
-		static void HtmlKit_TokenizeStream (string fileName)
+		[Benchmark]
+		public void HtmlKit_TextReader_Papercut44 ()
 		{
-			var path = Path.Combine (HtmlDataDir, fileName);
-			using var stream = File.OpenRead (path);
+			HtmlKit_TokenizeTextReader (Papercut44);
+		}
+
+		static void HtmlKit_TokenizeStream (byte[] rawData)
+		{
+			using var stream = new MemoryStream (rawData, false);
 			var tokenizer = new HtmlTokenizer (stream);
 
 			while (tokenizer.ReadNextToken (out var token))
@@ -72,17 +79,23 @@ namespace Benchmarks
 		[Benchmark]
 		public void HtmlKit_Stream_Xamarin3 ()
 		{
-			HtmlKit_TokenizeStream ("xamarin3.xhtml");
+			HtmlKit_TokenizeStream (Xamarin3);
+		}
+
+		[Benchmark]
+		public void HtmlKit_Stream_Papercut44 ()
+		{
+			HtmlKit_TokenizeStream (Papercut44);
 		}
 
 		#endregion HtmlKit
 
 		#region HtmlPerformanceKit
 
-		static void HtmlPerformanceKit_TokenizeFile (string fileName)
+		static void HtmlPerformanceKit_TokenizeFile (byte[] rawData)
 		{
-			var path = Path.Combine (HtmlDataDir, fileName);
-			using var reader = new StreamReader (path);
+			using var stream = new MemoryStream (rawData, false);
+			using var reader = new StreamReader (stream);
 			var tokenizer = new HtmlPerformanceKit.HtmlReader (reader);
 
 			while (tokenizer.Read ()) {
@@ -116,17 +129,22 @@ namespace Benchmarks
 		[Benchmark]
 		public void HtmlPerformanceKit_Xamarin3 ()
 		{
-			HtmlPerformanceKit_TokenizeFile ("xamarin3.xhtml");
+			HtmlPerformanceKit_TokenizeFile (Xamarin3);
+		}
+
+		[Benchmark]
+		public void HtmlPerformanceKit_Papercut44 ()
+		{
+			HtmlPerformanceKit_TokenizeFile (Papercut44);
 		}
 
 		#endregion HtmlPerformanceKit
 
 		#region AngleSharp
 
-		static void AngleSharp_TokenizeFile (string fileName)
+		static void AngleSharp_TokenizeFile (byte[] rawData)
 		{
-			var path = Path.Combine (HtmlDataDir, fileName);
-			using var stream = File.OpenRead (path);
+			using var stream = new MemoryStream (rawData, false);
 			using var source = new AngleSharp.Text.TextSource (stream);
 
 			var tokenizer = new ASHtmlTokenizer (source, AngleSharp.Html.HtmlEntityProvider.Resolver);
@@ -140,17 +158,22 @@ namespace Benchmarks
 		[Benchmark]
 		public void AngleSharp_Xamarin3 ()
 		{
-			AngleSharp_TokenizeFile ("xamarin3.xhtml");
+			AngleSharp_TokenizeFile (Xamarin3);
+		}
+
+		[Benchmark]
+		public void AngleSharp_Papercut44 ()
+		{
+			AngleSharp_TokenizeFile (Papercut44);
 		}
 
 		#endregion AngleSharp
 
 		#region XmlReader
 
-		static void XmlReader_TokenizeFile (string fileName)
+		static void XmlReader_TokenizeFile (byte[] rawData)
 		{
-			var path = Path.Combine (HtmlDataDir, fileName);
-			using var stream = File.OpenRead (path);
+			using var stream = new MemoryStream (rawData, false);
 
 			var settings = new XmlReaderSettings () {
 				DtdProcessing = DtdProcessing.Parse
@@ -187,7 +210,7 @@ namespace Benchmarks
 		[Benchmark]
 		public void XmlReader_Xamarin3 ()
 		{
-			XmlReader_TokenizeFile ("xamarin3.xhtml");
+			XmlReader_TokenizeFile (Xamarin3);
 		}
 
 		#endregion XmlReader
