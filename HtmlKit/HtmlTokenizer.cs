@@ -877,7 +877,7 @@ namespace HtmlKit {
 						return null;
 					}
 
-					name.Append (c == '\0' ? '\uFFFD' : c);
+					name.Append (c);
 					break;
 				}
 			} while (TokenizerState == current);
@@ -1254,7 +1254,7 @@ namespace HtmlKit {
 						return null;
 					}
 
-					name.Append (c == '\0' ? '\uFFFD' : c);
+					name.Append (c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEndTagName);
