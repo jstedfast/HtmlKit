@@ -891,10 +891,6 @@ namespace HtmlKit {
 		// 8.2.4.1 Data state
 		HtmlToken? ReadData ()
 		{
-			//ReadOnlySpan<char> specials = DecodeCharacterReferences ?
-			//	stackalloc char[] { '\n', '&', '<' } :
-			//	stackalloc char[] { '\n', '<' };
-
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -931,10 +927,6 @@ namespace HtmlKit {
 		// 8.2.4.3 RCDATA state
 		HtmlToken? ReadRcData ()
 		{
-			//ReadOnlySpan<char> specials = DecodeCharacterReferences ?
-			//	stackalloc char[] { '\0', '\n', '&', '<' } :
-			//	stackalloc char[] { '\0', '\n', '<' };
-
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -970,8 +962,6 @@ namespace HtmlKit {
 		// 8.2.4.5 RAWTEXT state
 		HtmlToken? ReadRawText ()
 		{
-			//ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\n', '<' };
-
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -994,8 +984,6 @@ namespace HtmlKit {
 		// 8.2.4.6 Script data state
 		HtmlToken? ReadScriptData ()
 		{
-			//ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\n', '<' };
-
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -1015,22 +1003,17 @@ namespace HtmlKit {
 			return EmitScriptDataToken ();
 		}
 
-		static readonly char[] PlainTextSpecials = new char[] { '\0', '\n' };
 #if NET8_0_OR_GREATER
-		static readonly SearchValues<char> PlainTextSpecialsSV = SearchValues.Create (PlainTextSpecials);
+		static readonly SearchValues<char> PlainTextSpecials = SearchValues.Create (new char[] { '\0', '\n' });
+#else
+		static readonly char[] PlainTextSpecials = new char[] { '\0', '\n' };
 #endif
 
 		// 8.2.4.7 PLAINTEXT state
 		HtmlToken? ReadPlainText ()
 		{
-#if NET8_0_OR_GREATER
-			SearchValues<char> specials = PlainTextSpecialsSV;
-#else
-			ReadOnlySpan<char> specials = PlainTextSpecials;
-#endif
-
 			do {
-				if (!TryReadDataUntil (specials, out char c)) {
+				if (!TryReadDataUntil (PlainTextSpecials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					break;
 				}
@@ -1115,8 +1098,6 @@ namespace HtmlKit {
 		// 8.2.4.10 Tag name state
 		HtmlToken? ReadTagName ()
 		{
-			//ReadOnlySpan<char> specials = stackalloc char[] { '\0', '\t', '\r', '\n', '\f', ' ', '/', '>' };
-
 			do {
 				if (!TryRead (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
@@ -1815,18 +1796,19 @@ namespace HtmlKit {
 			} while (true);
 		}
 
-		static readonly char[] AttributeValueQuotedDQuoteSpecials = { '\0', '\n', '&', '\"' };
-		static readonly char[] AttributeValueQuotedSQuoteSpecials = { '\0', '\n', '&', '\'' };
 #if NET8_0_OR_GREATER
-		static readonly SearchValues<char> AttributeValueQuotedDQuoteSpecialsSV = SearchValues.Create (AttributeValueQuotedDQuoteSpecials);
-		static readonly SearchValues<char> AttributeValueQuotedSQuoteSpecialsSV = SearchValues.Create (AttributeValueQuotedSQuoteSpecials);
+		static readonly SearchValues<char> AttributeValueQuotedDQuoteSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\"' });
+		static readonly SearchValues<char> AttributeValueQuotedSQuoteSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\'' });
+#else
+		static readonly char[] AttributeValueQuotedDQuoteSpecials = new char[] { '\0', '\n', '&', '\"' };
+		static readonly char[] AttributeValueQuotedSQuoteSpecials = new char[] { '\0', '\n', '&', '\'' };
 #endif
 
 		// 8.2.4.38 Attribute value (double-quoted) state
 		HtmlToken? ReadAttributeValueQuoted ()
 		{
 #if NET8_0_OR_GREATER
-			SearchValues<char> specials = quote == '\"' ? AttributeValueQuotedDQuoteSpecialsSV : AttributeValueQuotedSQuoteSpecialsSV;
+			SearchValues<char> specials = quote == '\"' ? AttributeValueQuotedDQuoteSpecials : AttributeValueQuotedSQuoteSpecials;
 #else
 			ReadOnlySpan<char> specials = quote == '\"' ? AttributeValueQuotedDQuoteSpecials : AttributeValueQuotedSQuoteSpecials;
 #endif
