@@ -9,6 +9,7 @@
     <PackageReference Include="AngleSharp" Version="1.4.0" />
     <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageReference Include="HtmlPerformanceKit" Version="1.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.3.36812.1" />
   </ItemGroup>
 
   <ItemGroup>
