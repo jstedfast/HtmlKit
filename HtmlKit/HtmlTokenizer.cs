@@ -1006,7 +1006,7 @@ namespace HtmlKit {
 #if NET8_0_OR_GREATER
 		static readonly SearchValues<char> PlainTextSpecials = SearchValues.Create (new char[] { '\0', '\n' });
 #else
-		static readonly char[] PlainTextSpecials = new char[] { '\0', '\n' };
+		static ReadOnlySpan<char> PlainTextSpecials => new char[] { '\0', '\n' };
 #endif
 
 		// 8.2.4.7 PLAINTEXT state
@@ -1773,8 +1773,12 @@ namespace HtmlKit {
 				switch (c) {
 				case '\t': case '\r': case '\n': case '\f': case ' ':
 					break;
-				case '"': case '\'':
-					TokenizerState = HtmlTokenizerState.AttributeValueQuoted;
+				case '"':
+					TokenizerState = HtmlTokenizerState.AttributeValueDoubleQuoted;
+					quote = c;
+					return null;
+				case '\'':
+					TokenizerState = HtmlTokenizerState.AttributeValueSingleQuoted;
 					quote = c;
 					return null;
 				case '&':
@@ -1797,24 +1801,16 @@ namespace HtmlKit {
 		}
 
 #if NET8_0_OR_GREATER
-		static readonly SearchValues<char> AttributeValueQuotedDQuoteSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\"' });
-		static readonly SearchValues<char> AttributeValueQuotedSQuoteSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\'' });
+		static readonly SearchValues<char> AttributeValueDoubleQuotedSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\"' });
 #else
-		static readonly char[] AttributeValueQuotedDQuoteSpecials = new char[] { '\0', '\n', '&', '\"' };
-		static readonly char[] AttributeValueQuotedSQuoteSpecials = new char[] { '\0', '\n', '&', '\'' };
+		static ReadOnlySpan<char> AttributeValueDoubleQuotedSpecials => new char[] { '\0', '\n', '&', '\"' };
 #endif
 
 		// 8.2.4.38 Attribute value (double-quoted) state
-		HtmlToken? ReadAttributeValueQuoted ()
+		HtmlToken? ReadAttributeValueDoubleQuoted ()
 		{
-#if NET8_0_OR_GREATER
-			SearchValues<char> specials = quote == '\"' ? AttributeValueQuotedDQuoteSpecials : AttributeValueQuotedSQuoteSpecials;
-#else
-			ReadOnlySpan<char> specials = quote == '\"' ? AttributeValueQuotedDQuoteSpecials : AttributeValueQuotedSQuoteSpecials;
-#endif
-
 			do {
-				if (!TryReadNameUntil (specials, out char c)) {
+				if (!TryReadNameUntil (AttributeValueDoubleQuotedSpecials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
@@ -1828,20 +1824,61 @@ namespace HtmlKit {
 				case '&':
 					TokenizerState = HtmlTokenizerState.CharacterReferenceInAttributeValue;
 					return null;
+				case '"':
+					TokenizerState = HtmlTokenizerState.AfterAttributeValueQuoted;
+					quote = '\0';
+					break;
 				case '\0':
 					name.Append ('\uFFFD');
 					break;
-				default: // quote or '\n'
-					if (c == quote) {
-						TokenizerState = HtmlTokenizerState.AfterAttributeValueQuoted;
-						quote = '\0';
-						break;
-					}
-
+				default: // '\n'
 					name.Append (c);
 					break;
 				}
-			} while (TokenizerState == HtmlTokenizerState.AttributeValueQuoted);
+			} while (TokenizerState == HtmlTokenizerState.AttributeValueDoubleQuoted);
+
+			attribute!.Value = name.ToString ();
+			name.Length = 0;
+
+			return null;
+		}
+
+#if NET8_0_OR_GREATER
+		static readonly SearchValues<char> AttributeValueSingleQuotedSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\'' });
+#else
+		static ReadOnlySpan<char> AttributeValueSingleQuotedSpecials => new char[] { '\0', '\n', '&', '\'' };
+#endif
+
+		// 8.2.4.39 Attribute value (single-quoted) state
+		HtmlToken? ReadAttributeValueSingleQuoted ()
+		{
+			do {
+				if (!TryReadNameUntil (AttributeValueSingleQuotedSpecials, out char c)) {
+					TokenizerState = HtmlTokenizerState.EndOfFile;
+					name.Length = 0;
+
+					return EmitDataToken (false, true);
+				}
+
+				// Note: we save the data in case we hit a parse error and have to emit a data token
+				data.Append (c);
+
+				switch (c) {
+				case '&':
+					TokenizerState = HtmlTokenizerState.CharacterReferenceInAttributeValue;
+					return null;
+				case '\'':
+					TokenizerState = HtmlTokenizerState.AfterAttributeValueQuoted;
+					quote = '\0';
+					break;
+				case '\0':
+					name.Append ('\uFFFD');
+					break;
+				default: // '\n'
+					name.Append (c);
+					break;
+				}
+			} while (TokenizerState == HtmlTokenizerState.AttributeValueSingleQuoted);
 
 			attribute!.Value = name.ToString ();
 			name.Length = 0;
@@ -1947,10 +1984,17 @@ namespace HtmlKit {
 				break;
 			}
 
-			if (quote == '\0')
+			switch (quote) {
+			case '"':
+				TokenizerState = HtmlTokenizerState.AttributeValueDoubleQuoted;
+				break;
+			case '\'':
+				TokenizerState = HtmlTokenizerState.AttributeValueSingleQuoted;
+				break;
+			default:
 				TokenizerState = HtmlTokenizerState.AttributeValueUnquoted;
-			else
-				TokenizerState = HtmlTokenizerState.AttributeValueQuoted;
+				break;
+			}
 
 			return null;
 		}
@@ -2924,8 +2968,11 @@ namespace HtmlKit {
 				case HtmlTokenizerState.BeforeAttributeValue:
 					token = ReadBeforeAttributeValue ();
 					break;
-				case HtmlTokenizerState.AttributeValueQuoted:
-					token = ReadAttributeValueQuoted ();
+				case HtmlTokenizerState.AttributeValueDoubleQuoted:
+					token = ReadAttributeValueDoubleQuoted ();
+					break;
+				case HtmlTokenizerState.AttributeValueSingleQuoted:
+					token = ReadAttributeValueSingleQuoted ();
 					break;
 				case HtmlTokenizerState.AttributeValueUnquoted:
 					token = ReadAttributeValueUnquoted ();
