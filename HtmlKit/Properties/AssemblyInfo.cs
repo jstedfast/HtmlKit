@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("Xamarin Inc.")]
 [assembly: AssemblyProduct ("HtmlKit")]
-[assembly: AssemblyCopyright ("Copyright © 2015-2024 Jeffrey Stedfast <jestedfa@microsoft.com>")]
+[assembly: AssemblyCopyright ("Copyright © 2015-2026 Jeffrey Stedfast <jestedfa@microsoft.com>")]
 [assembly: AssemblyTrademark ("Jeffrey Stedfast <jestedfa@microsoft.com>")]
 [assembly: AssemblyCulture ("")]
 
