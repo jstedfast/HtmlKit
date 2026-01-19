@@ -42,17 +42,20 @@ namespace Benchmarks
 		static readonly string HtmlDataDir = Path.Combine (BenchmarkHelper.ProjectDir, "TestData", "html");
 		static readonly byte[] Xamarin3 = File.ReadAllBytes (Path.Combine (HtmlDataDir, "xamarin3.xhtml"));
 		static readonly byte[] Papercut44 = File.ReadAllBytes (Path.Combine (HtmlDataDir, "papercut-4.4.html"));
+		const int BenchmarkIterations = 10000;
 
 		#region HtmlKit
 
 		static void HtmlKit_TokenizeTextReader (byte[] rawData)
 		{
-			using var stream = new MemoryStream (rawData, false);
-			using var reader = new StreamReader (stream);
-			var tokenizer = new HtmlTokenizer (reader);
+			for (int i = 0; i < BenchmarkIterations; i++) {
+				using var stream = new MemoryStream (rawData, false);
+				using var reader = new StreamReader (stream);
+				var tokenizer = new HtmlTokenizer (reader);
 
-			while (tokenizer.ReadNextToken (out var token))
-				;
+				while (tokenizer.ReadNextToken (out var token))
+					;
+			}
 		}
 
 		[Benchmark]
@@ -69,11 +72,13 @@ namespace Benchmarks
 
 		static void HtmlKit_TokenizeStream (byte[] rawData)
 		{
-			using var stream = new MemoryStream (rawData, false);
-			var tokenizer = new HtmlTokenizer (stream);
+			for (int i = 0; i < BenchmarkIterations; i++) {
+				using var stream = new MemoryStream (rawData, false);
+				var tokenizer = new HtmlTokenizer (stream);
 
-			while (tokenizer.ReadNextToken (out var token))
-				;
+				while (tokenizer.ReadNextToken (out var token))
+					;
+			}
 		}
 
 		[Benchmark]
@@ -92,36 +97,38 @@ namespace Benchmarks
 
 		#region HtmlPerformanceKit
 
-		static void HtmlPerformanceKit_TokenizeFile (byte[] rawData)
+		static void HtmlPerformanceKit_TokenizeData (byte[] rawData)
 		{
-			using var stream = new MemoryStream (rawData, false);
-			using var reader = new StreamReader (stream);
-			var tokenizer = new HtmlPerformanceKit.HtmlReader (reader);
+			for (int i = 0; i < BenchmarkIterations; i++) {
+				using var stream = new MemoryStream (rawData, false);
+				using var reader = new StreamReader (stream);
+				var tokenizer = new HtmlPerformanceKit.HtmlReader (reader);
 
-			while (tokenizer.Read ()) {
-				switch (tokenizer.TokenKind) {
-				case HtmlPerformanceKit.HtmlTokenKind.Doctype:
-					for (int i = 0; i < tokenizer.AttributeCount; i++) {
-						var attrName = tokenizer.GetAttributeName (i);
-						var attrValue = tokenizer.GetAttribute (i);
+				while (tokenizer.Read ()) {
+					switch (tokenizer.TokenKind) {
+					case HtmlPerformanceKit.HtmlTokenKind.Doctype:
+						for (int attr = 0; attr < tokenizer.AttributeCount; attr++) {
+							var attrName = tokenizer.GetAttributeName (attr);
+							var attrValue = tokenizer.GetAttribute (attr);
+						}
+						break;
+					case HtmlPerformanceKit.HtmlTokenKind.Tag:
+						var tagName = tokenizer.Name;
+						for (int attr = 0; attr < tokenizer.AttributeCount; attr++) {
+							var attrName = tokenizer.GetAttributeName (attr);
+							var attrValue = tokenizer.GetAttribute (attr);
+						}
+						break;
+					case HtmlPerformanceKit.HtmlTokenKind.EndTag:
+						var endTagName = tokenizer.Name;
+						break;
+					case HtmlPerformanceKit.HtmlTokenKind.Comment:
+						var comment = tokenizer.Text;
+						break;
+					case HtmlPerformanceKit.HtmlTokenKind.Text:
+						var text = tokenizer.Text;
+						break;
 					}
-					break;
-				case HtmlPerformanceKit.HtmlTokenKind.Tag:
-					var tagName = tokenizer.Name;
-					for (int i = 0; i < tokenizer.AttributeCount; i++) {
-						var attrName = tokenizer.GetAttributeName (i);
-						var attrValue = tokenizer.GetAttribute (i);
-					}
-					break;
-				case HtmlPerformanceKit.HtmlTokenKind.EndTag:
-					var endTagName = tokenizer.Name;
-					break;
-				case HtmlPerformanceKit.HtmlTokenKind.Comment:
-					var comment = tokenizer.Text;
-					break;
-				case HtmlPerformanceKit.HtmlTokenKind.Text:
-					var text = tokenizer.Text;
-					break;
 				}
 			}
 		}
@@ -129,13 +136,13 @@ namespace Benchmarks
 		[Benchmark]
 		public void HtmlPerformanceKit_Xamarin3 ()
 		{
-			HtmlPerformanceKit_TokenizeFile (Xamarin3);
+			HtmlPerformanceKit_TokenizeData (Xamarin3);
 		}
 
 		[Benchmark]
 		public void HtmlPerformanceKit_Papercut44 ()
 		{
-			HtmlPerformanceKit_TokenizeFile (Papercut44);
+			HtmlPerformanceKit_TokenizeData (Papercut44);
 		}
 
 		#endregion HtmlPerformanceKit
@@ -144,15 +151,17 @@ namespace Benchmarks
 
 		static void AngleSharp_TokenizeFile (byte[] rawData)
 		{
-			using var stream = new MemoryStream (rawData, false);
-			using var source = new AngleSharp.Text.TextSource (stream);
+			for (int i = 0; i < BenchmarkIterations; i++) {
+				using var stream = new MemoryStream (rawData, false);
+				using var source = new AngleSharp.Text.TextSource (stream);
 
-			var tokenizer = new ASHtmlTokenizer (source, AngleSharp.Html.HtmlEntityProvider.Resolver);
-			ASHtmlToken token;
+				var tokenizer = new ASHtmlTokenizer (source, AngleSharp.Html.HtmlEntityProvider.Resolver);
+				ASHtmlToken token;
 
-			do {
-				token = tokenizer.Get ();
-			} while (token.Type != ASHtmlTokenType.EndOfFile);
+				do {
+					token = tokenizer.Get ();
+				} while (token.Type != ASHtmlTokenType.EndOfFile);
+			}
 		}
 
 		[Benchmark]
@@ -171,38 +180,40 @@ namespace Benchmarks
 
 		#region XmlReader
 
-		static void XmlReader_TokenizeFile (byte[] rawData)
+		static void XmlReader_TokenizeData (byte[] rawData)
 		{
-			using var stream = new MemoryStream (rawData, false);
+			for (int i = 0; i < BenchmarkIterations; i++) {
+				using var stream = new MemoryStream (rawData, false);
 
-			var settings = new XmlReaderSettings () {
-				DtdProcessing = DtdProcessing.Parse
-			};
+				var settings = new XmlReaderSettings () {
+					DtdProcessing = DtdProcessing.Parse
+				};
 
-			var reader = XmlReader.Create (stream, settings);
+				var reader = XmlReader.Create (stream, settings);
 
-			while (reader.Read ()) {
-				switch (reader.NodeType) {
-				case XmlNodeType.Attribute:
-					var attrName = reader.Name;
-					var attrValue = reader.Value;
-					break;
-				case XmlNodeType.Element:
-				case XmlNodeType.EndElement:
-					var tagName = reader.Name;
-					break;
-				case XmlNodeType.EntityReference:
-					var entityReference = reader.Value;
-					break;
-				case XmlNodeType.CDATA:
-				case XmlNodeType.Text:
-				case XmlNodeType.Whitespace:
-				case XmlNodeType.SignificantWhitespace:
-					var text = reader.ReadContentAsString ();
-					break;
-				case XmlNodeType.DocumentType:
-					var lang = reader.XmlLang;
-					break;
+				while (reader.Read ()) {
+					switch (reader.NodeType) {
+					case XmlNodeType.Attribute:
+						var attrName = reader.Name;
+						var attrValue = reader.Value;
+						break;
+					case XmlNodeType.Element:
+					case XmlNodeType.EndElement:
+						var tagName = reader.Name;
+						break;
+					case XmlNodeType.EntityReference:
+						var entityReference = reader.Value;
+						break;
+					case XmlNodeType.CDATA:
+					case XmlNodeType.Text:
+					case XmlNodeType.Whitespace:
+					case XmlNodeType.SignificantWhitespace:
+						var text = reader.ReadContentAsString ();
+						break;
+					case XmlNodeType.DocumentType:
+						var lang = reader.XmlLang;
+						break;
+					}
 				}
 			}
 		}
@@ -210,7 +221,7 @@ namespace Benchmarks
 		[Benchmark]
 		public void XmlReader_Xamarin3 ()
 		{
-			XmlReader_TokenizeFile (Xamarin3);
+			XmlReader_TokenizeData (Xamarin3);
 		}
 
 		#endregion XmlReader
