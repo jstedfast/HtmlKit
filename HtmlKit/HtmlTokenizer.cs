@@ -590,8 +590,31 @@ namespace HtmlKit {
 			return false;
 		}
 
+		// Updates the line number and line position after consuming the specified run of characters from the buffer.
+		void UpdateLinePosition (int startIndex, int count)
+		{
+			var span = new ReadOnlySpan<char> (buffer, startIndex, count);
+			int lastNewLine = span.LastIndexOf ('\n');
+
+			if (lastNewLine == -1) {
+				linePosition += count;
+				return;
+			}
+
+#if NET8_0_OR_GREATER
+			lineNumber += span.Slice (0, lastNewLine + 1).Count ('\n');
+#else
+			for (int i = 0; i <= lastNewLine; i++) {
+				if (span[i] == '\n')
+					lineNumber++;
+			}
+#endif
+
+			linePosition = count - lastNewLine;
+		}
+
 		// Reads characters into 'data' until one of the 'specials' is found, then consumes and returns that character
-		// like TryRead() does. Note: 'specials' MUST contain '\n' for proper line number tracking.
+		// like TryRead() does.
 #if NET8_0_OR_GREATER
 		bool TryReadDataUntil (SearchValues<char> specials, out char c)
 #else
@@ -607,7 +630,7 @@ namespace HtmlKit {
 
 				if (count == -1) {
 					data.Append (buffer, bufferIndex, left);
-					linePosition += left;
+					UpdateLinePosition (bufferIndex, left);
 					bufferIndex += left;
 					FillBuffer ();
 					continue;
@@ -615,7 +638,7 @@ namespace HtmlKit {
 
 				if (count > 0) {
 					data.Append (buffer, bufferIndex, count);
-					linePosition += count;
+					UpdateLinePosition (bufferIndex, count);
 					bufferIndex += count;
 				}
 
@@ -636,7 +659,7 @@ namespace HtmlKit {
 		}
 
 		// Reads characters into both 'data' and 'name' until one of the 'specials' is found, then consumes and returns that
-		// character like TryRead() does. Note: 'specials' MUST contain '\n' for proper line number tracking.
+		// character like TryRead() does.
 #if NET8_0_OR_GREATER
 		bool TryReadNameUntil (SearchValues<char> specials, out char c)
 #else
@@ -653,7 +676,7 @@ namespace HtmlKit {
 				if (count == -1) {
 					data.Append (buffer, bufferIndex, left);
 					name.Append (buffer, bufferIndex, left);
-					linePosition += left;
+					UpdateLinePosition (bufferIndex, left);
 					bufferIndex += left;
 					FillBuffer ();
 					continue;
@@ -662,7 +685,7 @@ namespace HtmlKit {
 				if (count > 0) {
 					data.Append (buffer, bufferIndex, count);
 					name.Append (buffer, bufferIndex, count);
-					linePosition += count;
+					UpdateLinePosition (bufferIndex, count);
 					bufferIndex += count;
 				}
 
@@ -1011,11 +1034,17 @@ namespace HtmlKit {
 			return null;
 		}
 
+#if NET8_0_OR_GREATER
+		static readonly SearchValues<char> DataSpecials = SearchValues.Create (new char[] { '&', '<' });
+#else
+		static readonly char[] DataSpecials = new char[] { '&', '<' };
+#endif
+
 		// 8.2.4.1 Data state
 		HtmlToken? ReadData ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryReadDataUntil (DataSpecials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					break;
 				}
@@ -1058,11 +1087,17 @@ namespace HtmlKit {
 			return ReadCharacterReference (HtmlTokenizerState.Data);
 		}
 
+#if NET8_0_OR_GREATER
+		static readonly SearchValues<char> RcDataSpecials = SearchValues.Create (new char[] { '\0', '&', '<' });
+#else
+		static readonly char[] RcDataSpecials = new char[] { '\0', '&', '<' };
+#endif
+
 		// 8.2.4.3 RCDATA state
 		HtmlToken? ReadRcData ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryReadDataUntil (RcDataSpecials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					break;
 				}
@@ -1093,11 +1128,17 @@ namespace HtmlKit {
 			return ReadCharacterReference (HtmlTokenizerState.RcData);
 		}
 
+#if NET8_0_OR_GREATER
+		static readonly SearchValues<char> RawTextSpecials = SearchValues.Create (new char[] { '\0', '<' });
+#else
+		static readonly char[] RawTextSpecials = new char[] { '\0', '<' };
+#endif
+
 		// 8.2.4.5 RAWTEXT state
 		HtmlToken? ReadRawText ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryReadDataUntil (RawTextSpecials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					break;
 				}
@@ -1119,7 +1160,7 @@ namespace HtmlKit {
 		HtmlToken? ReadScriptData ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryReadDataUntil (RawTextSpecials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					break;
 				}
@@ -1138,9 +1179,9 @@ namespace HtmlKit {
 		}
 
 #if NET8_0_OR_GREATER
-		static readonly SearchValues<char> PlainTextSpecials = SearchValues.Create (new char[] { '\0', '\n' });
+		static readonly SearchValues<char> PlainTextSpecials = SearchValues.Create (new char[] { '\0' });
 #else
-		static readonly char[] PlainTextSpecials = new char[] { '\0', '\n' };
+		static readonly char[] PlainTextSpecials = new char[] { '\0' };
 #endif
 
 		// 8.2.4.7 PLAINTEXT state
@@ -1960,9 +2001,9 @@ namespace HtmlKit {
 		}
 
 #if NET8_0_OR_GREATER
-		static readonly SearchValues<char> AttributeValueDoubleQuotedSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '"' });
+		static readonly SearchValues<char> AttributeValueDoubleQuotedSpecials = SearchValues.Create (new char[] { '\0', '&', '"' });
 #else
-		static readonly char[] AttributeValueDoubleQuotedSpecials = new char[] { '\0', '\n', '&', '"' };
+		static readonly char[] AttributeValueDoubleQuotedSpecials = new char[] { '\0', '&', '"' };
 #endif
 
 		// 8.2.4.38 Attribute value (double-quoted) state
@@ -1987,11 +2028,8 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.AfterAttributeValueQuoted;
 					quote = '\0';
 					break;
-				case '\0':
+				default: // '\0'
 					name.Append ('\uFFFD');
-					break;
-				default: // '\n'
-					name.Append (c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.AttributeValueDoubleQuoted);
@@ -2003,9 +2041,9 @@ namespace HtmlKit {
 		}
 
 #if NET8_0_OR_GREATER
-		static readonly SearchValues<char> AttributeValueSingleQuotedSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\'' });
+		static readonly SearchValues<char> AttributeValueSingleQuotedSpecials = SearchValues.Create (new char[] { '\0', '&', '\'' });
 #else
-		static readonly char[] AttributeValueSingleQuotedSpecials = new char[] { '\0', '\n', '&', '\'' };
+		static readonly char[] AttributeValueSingleQuotedSpecials = new char[] { '\0', '&', '\'' };
 #endif
 
 		// 8.2.4.39 Attribute value (single-quoted) state
@@ -2030,11 +2068,8 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.AfterAttributeValueQuoted;
 					quote = '\0';
 					break;
-				case '\0':
+				default: // '\0'
 					name.Append ('\uFFFD');
-					break;
-				default: // '\n'
-					name.Append (c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.AttributeValueSingleQuoted);
@@ -2197,11 +2232,17 @@ namespace HtmlKit {
 			return null;
 		}
 
+#if NET8_0_OR_GREATER
+		static readonly SearchValues<char> BogusCommentSpecials = SearchValues.Create (new char[] { '\0', '>' });
+#else
+		static readonly char[] BogusCommentSpecials = new char[] { '\0', '>' };
+#endif
+
 		// 8.2.4.44 Bogus comment state
 		HtmlToken ReadBogusComment ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryReadDataUntil (BogusCommentSpecials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					break;
 				}
@@ -2372,11 +2413,17 @@ namespace HtmlKit {
 			return null;
 		}
 
+#if NET8_0_OR_GREATER
+		static readonly SearchValues<char> CommentSpecials = SearchValues.Create (new char[] { '\0', '-' });
+#else
+		static readonly char[] CommentSpecials = new char[] { '\0', '-' };
+#endif
+
 		// 8.2.4.48 Comment state
 		HtmlToken? ReadComment ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryReadNameUntil (CommentSpecials, out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					return EmitCommentToken (name);
 				}
