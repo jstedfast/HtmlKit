@@ -163,9 +163,16 @@ namespace HtmlKit {
 				output.Write (Comment);
 				output.Write ("-->");
 			} else {
-				output.Write ('<');
+				// Note: Bogus comments come from "<!" (e.g. "<!DOC>"), "<?" (e.g. "<?xml ...?>") or "</" followed by a character
+				// that cannot start a tag name (e.g. "</ x>"). The leading '?' is part of the comment text in the "<?" case, but
+				// the '/' is not part of the comment text in the "</" case, so it needs to be restored in order for the output
+				// to tokenize as a bogus comment again (e.g. "</<o" must not be written as "<<o>").
 				if (IsBangComment)
-					output.Write ('!');
+					output.Write ("<!");
+				else if (Comment.Length > 0 && Comment[0] == '?')
+					output.Write ('<');
+				else
+					output.Write ("</");
 				output.Write (Comment);
 				output.Write ('>');
 			}
@@ -207,7 +214,7 @@ namespace HtmlKit {
 			if (data is null)
 				throw new ArgumentNullException (nameof (data));
 
-			Data = data;
+			content = data;
 		}
 
 		/// <summary>
@@ -225,10 +232,32 @@ namespace HtmlKit {
 			if (data is null)
 				throw new ArgumentNullException (nameof (data));
 
-			Data = data;
+			content = data;
 		}
 
+		/// <summary>
+		/// Initialize a new reusable instance of the <see cref="HtmlDataToken"/> class.
+		/// </summary>
+		/// <remarks>
+		/// Creates a new reusable <see cref="HtmlDataToken"/> whose content is set via SetData.
+		/// </remarks>
+		/// <param name="kind">The kind of character data.</param>
+		/// <param name="reusable">Not used; distinguishes this constructor from the public constructors.</param>
+		internal HtmlDataToken (HtmlTokenKind kind, bool reusable) : base (kind)
+		{
+			content = string.Empty;
+		}
+
+		// Note: This is either a string or, for a reusable token (used internally by HtmlToHtml), a CharBuffer that is reused
+		// for each run of character data in order to avoid allocating a string per token. The string is only created if the
+		// Data property is accessed.
+		object content;
+
 		internal bool EncodeEntities {
+			get; set;
+		}
+
+		internal bool IsDataState {
 			get; set;
 		}
 
@@ -240,7 +269,46 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <value>The character data.</value>
 		public string Data {
-			get; private set;
+			get {
+				if (content is CharBuffer buffer)
+					content = buffer.ToString ();
+
+				return (string) content;
+			}
+		}
+
+		internal void SetData (CharBuffer source)
+		{
+			if (content is not CharBuffer buffer)
+				content = buffer = new CharBuffer (Math.Max (source.Length, 64));
+
+			buffer.CopyFrom (source);
+			EncodeEntities = false;
+			IsDataState = false;
+		}
+
+		internal ReadOnlySpan<char> DataSpan {
+			get { return content is CharBuffer buffer ? buffer.AsSpan () : ((string) content).AsSpan (); }
+		}
+
+		internal void WriteData (TextWriter output, int count)
+		{
+			if (content is CharBuffer buffer) {
+				buffer.WriteTo (output, count);
+				return;
+			}
+
+			var data = (string) content;
+
+			if (count == data.Length) {
+				output.Write (data);
+			} else {
+#if NET6_0_OR_GREATER
+				output.Write (data.AsSpan (0, count));
+#else
+				output.Write (data.Substring (0, count));
+#endif
+			}
 		}
 
 		/// <summary>
@@ -259,12 +327,24 @@ namespace HtmlKit {
 			if (output is null)
 				throw new ArgumentNullException (nameof (output));
 
+			var span = DataSpan;
+
 			if (!EncodeEntities) {
-				output.Write (Data);
+				// Note: The tokenizer only ends a data-state token with a literal '<' when the following input
+				// begins markup that a browser treats as text (e.g. the first '<' in "<</>c>"). If the markup that
+				// follows gets dropped (e.g. "</>", a filtered comment, or a tag removed by a callback), writing
+				// the '<' verbatim would allow it to combine with the next token to form a new tag, so encode it.
+				if (IsDataState && span.Length > 0 && span[span.Length - 1] == '<') {
+					WriteData (output, span.Length - 1);
+					output.Write ("&lt;");
+					return;
+				}
+
+				WriteData (output, span.Length);
 				return;
 			}
 
-			HtmlUtils.HtmlEncode (output, Data);
+			HtmlUtils.HtmlEncode (output, span);
 		}
 	}
 
@@ -290,6 +370,10 @@ namespace HtmlKit {
 		{
 		}
 
+		internal HtmlCDataToken () : base (HtmlTokenKind.CData, true)
+		{
+		}
+
 		/// <summary>
 		/// Write the HTML character data to a <see cref="System.IO.TextWriter"/>.
 		/// </summary>
@@ -307,7 +391,7 @@ namespace HtmlKit {
 				throw new ArgumentNullException (nameof (output));
 
 			output.Write ("<![CDATA[");
-			output.Write (Data);
+			WriteData (output, DataSpan.Length);
 			output.Write ("]]>");
 		}
 	}
@@ -334,6 +418,10 @@ namespace HtmlKit {
 		{
 		}
 
+		internal HtmlScriptDataToken () : base (HtmlTokenKind.ScriptData, true)
+		{
+		}
+
 		/// <summary>
 		/// Write the HTML script data to a <see cref="System.IO.TextWriter"/>.
 		/// </summary>
@@ -350,7 +438,7 @@ namespace HtmlKit {
 			if (output is null)
 				throw new ArgumentNullException (nameof (output));
 
-			output.Write (Data);
+			WriteData (output, DataSpan.Length);
 		}
 	}
 
@@ -407,10 +495,11 @@ namespace HtmlKit {
 			if (name is null)
 				throw new ArgumentNullException (nameof (name));
 
-			Attributes = new HtmlAttributeCollection ();
 			IsEndTag = isEndTag;
 			Name = name;
 		}
+
+		HtmlAttributeCollection? attributes;
 
 		/// <summary>
 		/// Get the attributes.
@@ -420,7 +509,14 @@ namespace HtmlKit {
 		/// </remarks>
 		/// <value>The attributes.</value>
 		public HtmlAttributeCollection Attributes {
-			get; private set;
+			get { return attributes ?? HtmlAttributeCollection.Empty; }
+			private set { attributes = value; }
+		}
+
+		internal void AddAttribute (HtmlAttribute attribute)
+		{
+			attributes ??= new HtmlAttributeCollection ();
+			attributes.Add (attribute);
 		}
 
 		/// <summary>
@@ -492,8 +588,15 @@ namespace HtmlKit {
 				output.Write ('/');
 			output.Write (Name);
 			for (int i = 0; i < Attributes.Count; i++) {
+				var name = Attributes[i].Name;
+
+				// Note: If the previous attribute had no value, give it an explicit empty value so that an attribute name
+				// that begins with '=' cannot get reparsed as the previous attribute's value.
+				if (i > 0 && Attributes[i - 1].Value == null && name.Length > 0 && name[0] == '=')
+					output.Write ("=\"\"");
+
 				output.Write (' ');
-				output.Write (Attributes[i].Name);
+				output.Write (name);
 
 				var value = Attributes[i].Value;
 				if (value != null) {

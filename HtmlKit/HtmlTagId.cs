@@ -865,11 +865,7 @@ namespace HtmlKit {
 			var values = Enum.GetValues (typeof (HtmlTagId));
 #endif
 
-#if NETFRAMEWORK || NETSTANDARD2_0
-			IdMapping = new Dictionary<string, HtmlTagId> (values.Length - 1, OptimizedOrdinalIgnoreCaseComparer.Comparer);
-#else
-			IdMapping = new Dictionary<string, HtmlTagId> (values.Length - 1, StringComparer.OrdinalIgnoreCase);
-#endif
+			IdMapping = new Dictionary<string, HtmlTagId> (values.Length - 1, StringComparers.OrdinalIgnoreCase);
 
 			for (int i = 1; i < values.Length; i++) {
 				var value = (HtmlTagId) values.GetValue (i)!;

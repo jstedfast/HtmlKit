@@ -37,10 +37,8 @@ namespace HtmlKit {
 	/// </remarks>
 	sealed class OptimizedOrdinalIgnoreCaseComparer : IEqualityComparer<string>
 	{
-		public static readonly IEqualityComparer<string> Comparer = new OptimizedOrdinalIgnoreCaseComparer ();
-
 		/// <summary>
-		/// Initializes a new instance of the <see cref="HtmlKit.OptimizedOrdinalIgnoreCaseComparer"/> class.
+		/// Initialize a new instance of the <see cref="OptimizedOrdinalIgnoreCaseComparer"/> class.
 		/// </summary>
 		/// <remarks>
 		/// Creates a new <see cref="OptimizedOrdinalIgnoreCaseComparer"/>.
@@ -59,22 +57,33 @@ namespace HtmlKit {
 			return c;
 		}
 
+		//static int ToLower (int c)
+		//{
+		//	if (c >= 0x41 && c <= 0x5A)
+		//		return c + 0x20;
+		//
+		//	return c;
+		//}
+
 		/// <summary>
 		/// Compare the input strings for equality.
 		/// </summary>
 		/// <remarks>
 		/// Compares the input strings for equality.
 		/// </remarks>
-		/// <returns><c>true</c>if <paramref name="x"/> and <paramref name="y"/> refer to the same object,
+		/// <returns><see langword="true" />if <paramref name="x"/> and <paramref name="y"/> refer to the same object,
 		/// or <paramref name="x"/> and <paramref name="y"/> are equal,
-		/// or <paramref name="x"/> and <paramref name="y"/> are <c>null</c>;
-		/// otherwise, <c>false</c>.</returns>
+		/// or <paramref name="x"/> and <paramref name="y"/> are <see langword="null"/>;
+		/// otherwise, <see langword="false" />.</returns>
 		/// <param name="x">A string to compare to <paramref name="y"/>.</param>
 		/// <param name="y">A string to compare to <paramref name="x"/>.</param>
-		public bool Equals (string? x, string? y)
+		public bool Equals (string x, string y)
 		{
-			if (x == null || y == null)
-				return false;
+			//if (x is null && y is null)
+			//	return true;
+
+			//if (x is null || y is null)
+			//	return false;
 
 			if (x.Length != y.Length)
 				return false;
@@ -97,19 +106,19 @@ namespace HtmlKit {
 		/// <returns>A 32-bit signed hash code calculated from the value of the <paramref name="obj"/> parameter.</returns>
 		/// <param name="obj">The string.</param>
 		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="obj"/> is <c>null</c>.
+		/// <paramref name="obj"/> is <see langword="null"/>.
 		/// </exception>
 		public int GetHashCode (string obj)
 		{
-			if (obj == null)
+			if (obj is null)
 				throw new ArgumentNullException (nameof (obj));
 
 			unsafe {
 				unchecked {
-					fixed (char* src = obj) {
+					fixed (char *src = obj) {
 						int hash1 = 5381;
 						int hash2 = hash1;
-						char* s = src;
+						char *s = src;
 						int c;
 
 						while ((c = s[0]) != 0) {

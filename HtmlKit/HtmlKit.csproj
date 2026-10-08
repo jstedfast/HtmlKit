@@ -66,6 +66,7 @@
       <DependentUpon>HtmlEntityDecoder.cs</DependentUpon>
     </Compile>
     <Compile Include="HtmlNamespace.cs" />
+    <Compile Include="HtmlOpenElementStack.cs" />
     <Compile Include="HtmlTagId.cs" />
     <Compile Include="HtmlToken.cs" />
     <Compile Include="HtmlTokenizer.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="HtmlWriter.cs" />
     <Compile Include="HtmlWriterState.cs" />
     <Compile Include="NullableAttributes.cs" />
+    <Compile Include="StringComparers.cs" />
     <Compile Include="OptimizedOrdinalComparer.cs" Condition=" $(TargetFramework.StartsWith('net4')) Or '$(TargetFramework)' == 'netstandard2.0' " />
   </ItemGroup>
 

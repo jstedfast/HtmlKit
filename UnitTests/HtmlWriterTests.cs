@@ -35,8 +35,10 @@ namespace UnitTests {
 		[Test]
 		public void TestArgumentExceptions ()
 		{
+			using var memory = new MemoryStream ();
+
 			Assert.Throws<ArgumentNullException> (() => new HtmlWriter (null, Encoding.UTF8));
-			Assert.Throws<ArgumentNullException> (() => new HtmlWriter (new MemoryStream (), null));
+			Assert.Throws<ArgumentNullException> (() => new HtmlWriter (memory, null));
 			Assert.Throws<ArgumentNullException> (() => new HtmlWriter (null));
 
 			using (var html = new HtmlWriter (new StringWriter ())) {
@@ -240,7 +242,7 @@ namespace UnitTests {
 		[Test]
 		public void TestHtmlWriterToStream ()
 		{
-			var memory = new MemoryStream ();
+			using var memory = new MemoryStream ();
 
 			using (var html = new HtmlWriter (memory, new UTF8Encoding (false)))
 				TestHtmlWriter (html, memory);

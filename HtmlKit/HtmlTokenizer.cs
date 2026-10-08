@@ -46,9 +46,12 @@ namespace HtmlKit {
 
 		const int MinimumBufferSize = 1024;
 
+		internal const int DefaultMaxElementDepth = 4096;
+
 		readonly HtmlEntityDecoder entity = new HtmlEntityDecoder ();
 		readonly CharBuffer data = new CharBuffer (2048);
 		readonly CharBuffer name = new CharBuffer (32);
+		readonly HtmlOpenElementStack openElements = new HtmlOpenElementStack (DefaultMaxElementDepth);
 
 		readonly TextReader? textReader;
 		readonly Stream? stream;
@@ -71,6 +74,7 @@ namespace HtmlKit {
 		char quote;
 
 		bool decodeCharacterReferences = true;
+		bool scriptingEnabled = true;
 		int linePosition = 1;
 		int lineNumber = 1;
 
@@ -197,6 +201,57 @@ namespace HtmlKit {
 		}
 
 		/// <summary>
+		/// Get or set the maximum element depth.
+		/// </summary>
+		/// <remarks>
+		/// <para>Gets or sets the maximum number of distinct nested elements that will be tracked.</para>
+		/// <para>In order to tokenize the content of elements such as <c>&lt;style&gt;</c>, <c>&lt;title&gt;</c> and
+		/// <c>&lt;![CDATA[</c> the same way that a web browser would, the tokenizer keeps track of which elements
+		/// are open (and, in particular, whether they are SVG or MathML elements). Consecutive nested elements
+		/// that are identical share a single entry, so arbitrarily deep nesting of the same element does not count
+		/// towards this limit.</para>
+		/// <para>Once a start tag exceeds this limit, the tokenizer can no longer reliably determine how the
+		/// remainder of the document would be tokenized by a web browser. To avoid misinterpreting markup that
+		/// follows, that start tag is the last tag token returned; the remainder of the input is returned as
+		/// <see cref="HtmlDataToken"/>s containing literal text.</para>
+		/// </remarks>
+		/// <value>The maximum element depth.</value>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <paramref name="value"/> is less than <c>1</c>.
+		/// </exception>
+		public int MaxElementDepth {
+			get { return openElements.MaxDepth; }
+			set {
+				if (value < 1)
+					throw new ArgumentOutOfRangeException (nameof (value));
+
+				openElements.MaxDepth = value;
+			}
+		}
+
+		/// <summary>
+		/// Get or set whether the tokenizer should behave as if scripting is enabled.
+		/// </summary>
+		/// <remarks>
+		/// <para>Gets or sets whether the tokenizer should behave as if scripting is enabled.</para>
+		/// <para>This corresponds to the scripting flag described in the HTML5 specification and controls
+		/// how the content of <c>&lt;noscript&gt;</c> elements is tokenized. When scripting is enabled, the
+		/// content of a <c>&lt;noscript&gt;</c> element is treated as raw text and emitted as an
+		/// <see cref="HtmlDataToken"/>. When scripting is disabled, the content is tokenized as normal markup
+		/// (i.e. as tags, comments and character data).</para>
+		/// <note type="security">If the tokens are being used to filter HTML that will later be rendered by
+		/// another application (such as a web browser), then this value should match whether scripting will
+		/// be enabled in that application. Otherwise, the renderer may interpret the content of
+		/// <c>&lt;noscript&gt;</c> elements differently than the tokenizer did, allowing markup to bypass the
+		/// filter.</note>
+		/// </remarks>
+		/// <value><see langword="true" /> if the tokenizer should behave as if scripting is enabled; otherwise, <see langword="false" />.</value>
+		public bool ScriptingEnabled {
+			get { return scriptingEnabled; }
+			set { scriptingEnabled = value; }
+		}
+
+		/// <summary>
 		/// Get the current line number.
 		/// </summary>
 		/// <remarks>
@@ -288,10 +343,10 @@ namespace HtmlKit {
 		/// Creates an HTML character data token.
 		/// </remarks>
 		/// <returns>The HTML character data token.</returns>
-		/// <param name="data">The character data.</param>
-		protected virtual HtmlCDataToken CreateCDataToken (string data)
+		/// <param name="cdata">The character data.</param>
+		protected virtual HtmlCDataToken CreateCDataToken (string cdata)
 		{
-			return new HtmlCDataToken (data);
+			return new HtmlCDataToken (cdata);
 		}
 
 		/// <summary>
@@ -301,10 +356,10 @@ namespace HtmlKit {
 		/// Creates an HTML script data token.
 		/// </remarks>
 		/// <returns>The HTML script data token.</returns>
-		/// <param name="data">The script data.</param>
-		protected virtual HtmlScriptDataToken CreateScriptDataToken (string data)
+		/// <param name="scriptData">The script data.</param>
+		protected virtual HtmlScriptDataToken CreateScriptDataToken (string scriptData)
 		{
-			return new HtmlScriptDataToken (data);
+			return new HtmlScriptDataToken (scriptData);
 		}
 
 		/// <summary>
@@ -314,11 +369,11 @@ namespace HtmlKit {
 		/// Creates an HTML tag token.
 		/// </remarks>
 		/// <returns>The HTML tag token.</returns>
-		/// <param name="name">The tag name.</param>
+		/// <param name="tagName">The tag name.</param>
 		/// <param name="isEndTag"><see langword="true" /> if the tag is an end tag; otherwise, <see langword="false" />.</param>
-		protected virtual HtmlTagToken CreateTagToken (string name, bool isEndTag = false)
+		protected virtual HtmlTagToken CreateTagToken (string tagName, bool isEndTag = false)
 		{
-			return new HtmlTagToken (name, isEndTag);
+			return new HtmlTagToken (tagName, isEndTag);
 		}
 
 		/// <summary>
@@ -328,10 +383,10 @@ namespace HtmlKit {
 		/// Creates an attribute.
 		/// </remarks>
 		/// <returns>The attribute.</returns>
-		/// <param name="name">The attribute name.</param>
-		protected virtual HtmlAttribute CreateAttribute (string name)
+		/// <param name="attributeName">The attribute name.</param>
+		protected virtual HtmlAttribute CreateAttribute (string attributeName)
 		{
-			return new HtmlAttribute (name);
+			return new HtmlAttribute (attributeName);
 		}
 
 		[MethodImpl (MethodImplOptions.AggressiveInlining)]
@@ -535,6 +590,8 @@ namespace HtmlKit {
 			return false;
 		}
 
+		// Reads characters into 'data' until one of the 'specials' is found, then consumes and returns that character
+		// like TryRead() does. Note: 'specials' MUST contain '\n' for proper line number tracking.
 #if NET8_0_OR_GREATER
 		bool TryReadDataUntil (SearchValues<char> specials, out char c)
 #else
@@ -545,13 +602,12 @@ namespace HtmlKit {
 
 			while (bufferIndex < bufferEnd) {
 				int left = bufferEnd - bufferIndex;
-
-				// Note: 'specials' MUST contain '\n' for proper line number tracking...
 				var span = new ReadOnlySpan<char> (buffer, bufferIndex, left);
 				int count = span.IndexOfAny (specials);
 
 				if (count == -1) {
 					data.Append (buffer, bufferIndex, left);
+					linePosition += left;
 					bufferIndex += left;
 					FillBuffer ();
 					continue;
@@ -559,6 +615,7 @@ namespace HtmlKit {
 
 				if (count > 0) {
 					data.Append (buffer, bufferIndex, count);
+					linePosition += count;
 					bufferIndex += count;
 				}
 
@@ -578,6 +635,8 @@ namespace HtmlKit {
 			return false;
 		}
 
+		// Reads characters into both 'data' and 'name' until one of the 'specials' is found, then consumes and returns that
+		// character like TryRead() does. Note: 'specials' MUST contain '\n' for proper line number tracking.
 #if NET8_0_OR_GREATER
 		bool TryReadNameUntil (SearchValues<char> specials, out char c)
 #else
@@ -588,14 +647,13 @@ namespace HtmlKit {
 
 			while (bufferIndex < bufferEnd) {
 				int left = bufferEnd - bufferIndex;
-
-				// Note: 'specials' MUST contain '\n' for proper line number tracking...
 				var span = new ReadOnlySpan<char> (buffer, bufferIndex, left);
 				int count = span.IndexOfAny (specials);
 
 				if (count == -1) {
 					data.Append (buffer, bufferIndex, left);
 					name.Append (buffer, bufferIndex, left);
+					linePosition += left;
 					bufferIndex += left;
 					FillBuffer ();
 					continue;
@@ -604,6 +662,7 @@ namespace HtmlKit {
 				if (count > 0) {
 					data.Append (buffer, bufferIndex, count);
 					name.Append (buffer, bufferIndex, count);
+					linePosition += count;
 					bufferIndex += count;
 				}
 
@@ -638,8 +697,8 @@ namespace HtmlKit {
 
 		void EmitTagAttribute ()
 		{
-			attribute = CreateAttribute (name.ToString ());
-			tag!.Attributes.Add (attribute);
+			attribute = CreateAttribute (name.ToCachedString ());
+			tag!.AddAttribute (attribute);
 			name.Length = 0;
 		}
 
@@ -663,8 +722,27 @@ namespace HtmlKit {
 			var token = doctype;
 			data.Length = 0;
 			doctype = null;
+
+			// Note: The After DOCTYPE name state accumulates up to 6 characters in the name buffer while looking for
+			// the PUBLIC or SYSTEM keywords. If the DOCTYPE ends before then, those characters must not leak into the
+			// name of the next tag or attribute.
+			name.Length = 0;
+
+			// Note: An abruptly terminated DOCTYPE identifier (e.g. <!DOCTYPE x PUBLIC "...>) leaves the quote set.
+			quote = '\0';
+
 			return token;
 		}
+
+		// Note: When enabled, character data tokens are reused rather than allocated for each run of character data. This
+		// is only safe for consumers that are done with each data token before reading the next token (e.g. HtmlToHtml).
+		internal bool ReuseDataTokens {
+			get; set;
+		}
+
+		HtmlScriptDataToken? reusableScriptDataToken;
+		HtmlCDataToken? reusableCDataToken;
+		HtmlDataToken? reusableDataToken;
 
 		HtmlToken? EmitDataToken (bool encodeEntities, bool truncated)
 		{
@@ -676,7 +754,15 @@ namespace HtmlKit {
 				return null;
 			}
 
-			var token = CreateDataToken (data.ToString ());
+			HtmlDataToken token;
+
+			if (ReuseDataTokens) {
+				token = reusableDataToken ??= new HtmlDataToken (HtmlTokenKind.Data, true);
+				token.SetData (data);
+			} else {
+				token = CreateDataToken (data.ToString ());
+			}
+
 			token.EncodeEntities = encodeEntities;
 			data.Length = 0;
 
@@ -688,7 +774,15 @@ namespace HtmlKit {
 			if (data.Length == 0)
 				return null;
 
-			var token = CreateCDataToken (data.ToString ());
+			HtmlDataToken token;
+
+			if (ReuseDataTokens) {
+				token = reusableCDataToken ??= new HtmlCDataToken ();
+				token.SetData (data);
+			} else {
+				token = CreateCDataToken (data.ToString ());
+			}
+
 			data.Length = 0;
 
 			return token;
@@ -699,7 +793,15 @@ namespace HtmlKit {
 			if (data.Length == 0)
 				return null;
 
-			var token = CreateScriptDataToken (data.ToString ());
+			HtmlDataToken token;
+
+			if (ReuseDataTokens) {
+				token = reusableScriptDataToken ??= new HtmlScriptDataToken ();
+				token.SetData (data);
+			} else {
+				token = CreateScriptDataToken (data.ToString ());
+			}
+
 			data.Length = 0;
 
 			return token;
@@ -707,7 +809,12 @@ namespace HtmlKit {
 
 		HtmlToken EmitTagToken ()
 		{
-			if (!tag!.IsEndTag && !tag.IsEmptyElement) {
+			if (tag!.IsEndTag) {
+				openElements.ProcessEndTag (tag);
+				TokenizerState = HtmlTokenizerState.Data;
+			} else if (openElements.ProcessStartTag (tag)) {
+				// Note: The tokenizer state is switched even if the tag is self-closing because browsers ignore
+				// the self-closing flag on non-void HTML elements.
 				switch (tag.Id) {
 				case HtmlTagId.Style: case HtmlTagId.Xmp: case HtmlTagId.IFrame: case HtmlTagId.NoEmbed: case HtmlTagId.NoFrames:
 					TokenizerState = HtmlTokenizerState.RawText;
@@ -724,12 +831,18 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.ScriptData;
 					break;
 				case HtmlTagId.NoScript:
-					// TODO: only switch into the RawText state if scripting is enabled
-					TokenizerState = HtmlTokenizerState.RawText;
-					activeTagName = "noscript";
+					if (scriptingEnabled) {
+						TokenizerState = HtmlTokenizerState.RawText;
+						activeTagName = tag.Id.ToHtmlTagName ();
+					} else {
+						TokenizerState = HtmlTokenizerState.Data;
+					}
 					break;
 				case HtmlTagId.Html:
 					TokenizerState = HtmlTokenizerState.Data;
+
+					if (tag.IsEmptyElement)
+						break;
 
 					for (int i = tag.Attributes.Count; i > 0; i--) {
 						var attr = tag.Attributes[i - 1];
@@ -745,8 +858,15 @@ namespace HtmlKit {
 					break;
 				}
 			} else {
+				// Note: Start tags in SVG and MathML content never switch the tokenizer out of the data state.
 				TokenizerState = HtmlTokenizerState.Data;
 			}
+
+			// Note: If the stack of open elements overflowed, the tokenizer can no longer tell how a browser would tokenize the rest
+			// of the input (e.g. an untracked <svg> would change how <style> or <![CDATA[ are handled), so fail closed by treating
+			// the remainder of the input as literal text.
+			if (openElements.DepthExceeded)
+				TokenizerState = HtmlTokenizerState.PlainText;
 
 			var token = tag;
 			data.Length = 0;
@@ -783,7 +903,7 @@ namespace HtmlKit {
 
 				if (!TryPeek (out c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					data.Append (entity.GetPushedInput ());
+					data.Append (entity.GetValue ());
 					entity.Reset ();
 
 					return EmitDataToken (true, false);
@@ -818,7 +938,7 @@ namespace HtmlKit {
 		{
 			if (!TryPeek (out char c)) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitDataToken (decoded, true);
+				return EmitDataToken (decoded, false);
 			}
 
 			if (IsAsciiLetter (c)) {
@@ -838,15 +958,12 @@ namespace HtmlKit {
 			var current = TokenizerState;
 
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryPeek (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
-					return EmitDataToken (decoded, true);
+					return EmitDataToken (decoded, false);
 				}
-
-				// Note: we save the data in case we hit a parse error and have to emit a data token
-				data.Append (c);
 
 				switch (c) {
 				case '\t': case '\r': case '\n': case '\f': case ' ':
@@ -864,25 +981,31 @@ namespace HtmlKit {
 					goto default;
 				case '>':
 					if (NameIs (activeTagName)) {
-						var token = CreateTagToken (name.ToString (), true);
-						TokenizerState = HtmlTokenizerState.Data;
-						data.Length = 0;
+						ConsumeCharacter (c);
+						tag = CreateTagToken (name.ToCachedString (), true);
 						name.Length = 0;
-						return token;
+						return EmitTagToken ();
 					}
 					goto default;
 				default:
 					if (!IsAsciiLetter (c)) {
+						// Note: The current input character is not consumed; it gets reconsumed in the RCDATA/RAWTEXT state
+						// so that, for example, the second '<' in "</styl</style>" can still start the real end tag.
 						TokenizerState = rawText;
+						name.Length = 0;
 						return null;
 					}
 
 					name.Append (c);
 					break;
 				}
+
+				// Note: we save the data in case we hit a parse error and have to emit a data token
+				ConsumeCharacter (c);
+				data.Append (c);
 			} while (TokenizerState == current);
 
-			tag = CreateTagToken (name.ToString (), true);
+			tag = CreateTagToken (name.ToCachedString (), true);
 			name.Length = 0;
 
 			return null;
@@ -906,6 +1029,12 @@ namespace HtmlKit {
 
 					goto default;
 				case '<':
+					// Note: If the next character cannot begin a tag, a comment or a markup declaration, then the tag open
+					// state would just emit the '<' as character data and reconsume the next character in the data state,
+					// so avoid emitting a separate data token for each '<' (e.g. "<<<<<<<<").
+					if (TryPeek (out char next) && next != '!' && next != '/' && next != '?' && !IsAsciiLetter (next))
+						goto default;
+
 					TokenizerState = HtmlTokenizerState.TagOpen;
 					break;
 				//case 0: // parse error, but emit it anyway
@@ -915,7 +1044,12 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.Data);
 
-			return EmitDataToken (DecodeCharacterReferences, false);
+			var token = EmitDataToken (DecodeCharacterReferences, false);
+
+			if (token is HtmlDataToken dataToken)
+				dataToken.IsDataState = true;
+
+			return token;
 		}
 
 		// 8.2.4.2 Character reference in data state
@@ -1006,55 +1140,63 @@ namespace HtmlKit {
 #if NET8_0_OR_GREATER
 		static readonly SearchValues<char> PlainTextSpecials = SearchValues.Create (new char[] { '\0', '\n' });
 #else
-		static ReadOnlySpan<char> PlainTextSpecials => new char[] { '\0', '\n' };
+		static readonly char[] PlainTextSpecials = new char[] { '\0', '\n' };
 #endif
 
 		// 8.2.4.7 PLAINTEXT state
 		HtmlToken? ReadPlainText ()
 		{
-			do {
-				if (!TryReadDataUntil (PlainTextSpecials, out char c)) {
-					TokenizerState = HtmlTokenizerState.EndOfFile;
-					break;
-				}
-
+			while (TryReadDataUntil (PlainTextSpecials, out char c))
 				data.Append (c == '\0' ? '\uFFFD' : c);
-			} while (true);
 
-			return EmitDataToken (false, false);
+			TokenizerState = HtmlTokenizerState.EndOfFile;
+
+			// Note: If the depth limit was exceeded, then the remaining input is not the content of a <plaintext> element and
+			// so needs to be encoded when written as HTML.
+			return EmitDataToken (openElements.DepthExceeded, false);
 		}
 
 		// 8.2.4.8 Tag open state
 		HtmlToken? ReadTagOpen ()
 		{
-			if (!TryRead (out char c)) {
-				var token = IgnoreTruncatedTags ? null : CreateDataToken ("<");
+			if (!TryPeek (out char c)) {
+				// eof-before-tag-name parse error: emit '<' as character data
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return token;
+				data.Append ('<');
+				return EmitDataToken (true, false);
 			}
 
 			// Note: we save the data in case we hit a parse error and have to emit a data token
 			data.Append ('<');
-			data.Append (c);
 
 			switch (c) {
 			case '!':
 				TokenizerState = HtmlTokenizerState.MarkupDeclarationOpen;
+				ConsumeCharacter (c);
+				data.Append (c);
 				break;
 			case '?':
 				TokenizerState = HtmlTokenizerState.BogusComment;
+				ConsumeCharacter (c);
 				data.Length = 1;
 				data[0] = c;
 				break;
 			case '/':
 				TokenizerState = HtmlTokenizerState.EndTagOpen;
+				ConsumeCharacter (c);
+				data.Append (c);
 				break;
 			default:
 				if (IsAsciiLetter (c)) {
 					TokenizerState = HtmlTokenizerState.TagName;
+					ConsumeCharacter (c);
+					data.Append (c);
 					isEndTag = false;
 					name.Append (c);
 				} else {
+					// invalid-first-character-of-tag-name parse error: emit the '<' as character data and
+					// reconsume the current input character in the data state (e.g. the second '<' in "<<img>"
+					// must still be able to start a tag).
 					TokenizerState = HtmlTokenizerState.Data;
 				}
 				break;
@@ -1067,17 +1209,19 @@ namespace HtmlKit {
 		HtmlToken? ReadEndTagOpen ()
 		{
 			if (!TryRead (out char c)) {
+				// eof-before-tag-name parse error: emit "</" as character data
 				TokenizerState = HtmlTokenizerState.EndOfFile;
-				return EmitDataToken (false, true);
+				return EmitDataToken (true, false);
 			}
 
 			// Note: we save the data in case we hit a parse error and have to emit a data token
 			data.Append (c);
 
 			switch (c) {
-			case '>': // parse error
+			case '>': // missing-end-tag-name parse error
+				// Note: per the HTML5 spec, "</>" is simply dropped (nothing is emitted).
 				TokenizerState = HtmlTokenizerState.Data;
-				data.Length = 0; // FIXME: this is probably wrong
+				data.Length = 0;
 				break;
 			default:
 				if (IsAsciiLetter (c)) {
@@ -1087,7 +1231,7 @@ namespace HtmlKit {
 				} else {
 					TokenizerState = HtmlTokenizerState.BogusComment;
 					data.Length = 1;
-					data[0] = c;
+					data[0] = c == '\0' ? '\uFFFD' : c;
 				}
 				break;
 			}
@@ -1117,7 +1261,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
 					break;
 				case '>':
-					tag = CreateTagToken (name.ToString (), isEndTag);
+					tag = CreateTagToken (name.ToCachedString (), isEndTag);
 					data.Length = 0;
 					name.Length = 0;
 
@@ -1128,7 +1272,7 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.TagName);
 
-			tag = CreateTagToken (name.ToString (), isEndTag);
+			tag = CreateTagToken (name.ToCachedString (), isEndTag);
 			name.Length = 0;
 
 			return null;
@@ -1215,15 +1359,12 @@ namespace HtmlKit {
 		HtmlToken? ReadScriptDataEndTagName ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryPeek (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
 					return EmitScriptDataToken ();
 				}
-
-				// Note: we save the data in case we hit a parse error and have to emit a data token
-				data.Append (c);
 
 				switch (c) {
 				case '\t': case '\r': case '\n': case '\f': case ' ':
@@ -1240,15 +1381,15 @@ namespace HtmlKit {
 					goto default;
 				case '>':
 					if (NameIs ("script")) {
-						var token = CreateTagToken (name.ToString (), true);
-						TokenizerState = HtmlTokenizerState.Data;
-						data.Length = 0;
+						ConsumeCharacter (c);
+						tag = CreateTagToken (name.ToCachedString (), true);
 						name.Length = 0;
-						return token;
+						return EmitTagToken ();
 					}
 					goto default;
 				default:
 					if (!IsAsciiLetter (c)) {
+						// Note: The current input character is reconsumed in the script data state.
 						TokenizerState = HtmlTokenizerState.ScriptData;
 						name.Length = 0;
 						return null;
@@ -1257,9 +1398,13 @@ namespace HtmlKit {
 					name.Append (c);
 					break;
 				}
+
+				// Note: we save the data in case we hit a parse error and have to emit a data token
+				ConsumeCharacter (c);
+				data.Append (c);
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEndTagName);
 
-			tag = CreateTagToken (name.ToString (), true);
+			tag = CreateTagToken (name.ToCachedString (), true);
 			name.Length = 0;
 
 			return null;
@@ -1378,7 +1523,7 @@ namespace HtmlKit {
 					break;
 				default:
 					TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
-					data.Append (c);
+					data.Append (c == '\0' ? '\uFFFD' : c);
 					break;
 				}
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscapedDashDash);
@@ -1403,6 +1548,7 @@ namespace HtmlKit {
 				TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscapeStart;
 				ConsumeCharacter (c);
 				data.Append (c);
+				name.Length = 0;
 				name.Append (c);
 			} else {
 				TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
@@ -1423,6 +1569,7 @@ namespace HtmlKit {
 				TokenizerState = HtmlTokenizerState.ScriptDataEscapedEndTagName;
 				ConsumeCharacter (c);
 				data.Append (c);
+				name.Length = 0;
 				name.Append (c);
 			} else {
 				TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
@@ -1435,15 +1582,12 @@ namespace HtmlKit {
 		HtmlToken? ReadScriptDataEscapedEndTagName ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryPeek (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
 					return EmitScriptDataToken ();
 				}
-
-				// Note: we save the data in case we hit a parse error and have to emit a data token
-				data.Append (c);
 
 				switch (c) {
 				case '\t': case '\r': case '\n': case '\f': case ' ':
@@ -1461,25 +1605,30 @@ namespace HtmlKit {
 					goto default;
 				case '>':
 					if (NameIs ("script")) {
-						var token = CreateTagToken (name.ToString (), true);
-						TokenizerState = HtmlTokenizerState.Data;
-						data.Length = 0;
+						ConsumeCharacter (c);
+						tag = CreateTagToken (name.ToCachedString (), true);
 						name.Length = 0;
-						return token;
+						return EmitTagToken ();
 					}
 					goto default;
 				default:
 					if (!IsAsciiLetter (c)) {
-						TokenizerState = HtmlTokenizerState.ScriptData;
+						// Note: The current input character is reconsumed in the script data escaped state.
+						TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
+						name.Length = 0;
 						return null;
 					}
 
 					name.Append (c);
 					break;
 				}
+
+				// Note: we save the data in case we hit a parse error and have to emit a data token
+				ConsumeCharacter (c);
+				data.Append (c);
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscapedEndTagName);
 
-			tag = CreateTagToken (name.ToString (), true);
+			tag = CreateTagToken (name.ToCachedString (), true);
 			name.Length = 0;
 
 			return null;
@@ -1489,14 +1638,12 @@ namespace HtmlKit {
 		HtmlToken? ReadScriptDataDoubleEscapeStart ()
 		{
 			do {
-				if (!TryRead (out char c)) {
+				if (!TryPeek (out char c)) {
 					TokenizerState = HtmlTokenizerState.EndOfFile;
 					name.Length = 0;
 
 					return EmitScriptDataToken ();
 				}
-
-				data.Append (c);
 
 				switch (c) {
 				case '\t': case '\r': case '\n': case '\f': case ' ': case '/': case '>':
@@ -1507,12 +1654,19 @@ namespace HtmlKit {
 					name.Length = 0;
 					break;
 				default:
-					if (!IsAsciiLetter (c))
+					if (!IsAsciiLetter (c)) {
+						// Note: The current input character is reconsumed in the script data escaped state.
 						TokenizerState = HtmlTokenizerState.ScriptDataEscaped;
-					else
-						name.Append (c);
+						name.Length = 0;
+						return null;
+					}
+
+					name.Append (c);
 					break;
 				}
+
+				ConsumeCharacter (c);
+				data.Append (c);
 			} while (TokenizerState == HtmlTokenizerState.ScriptDataDoubleEscapeStart);
 
 			return null;
@@ -1540,7 +1694,7 @@ namespace HtmlKit {
 					data.Append (c == '\0' ? '\uFFFD' : c);
 					break;
 				}
-			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscaped);
+			} while (TokenizerState == HtmlTokenizerState.ScriptDataDoubleEscaped);
 
 			return null;
 		}
@@ -1594,10 +1748,10 @@ namespace HtmlKit {
 					break;
 				default:
 					TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
-					data.Append (c);
+					data.Append (c == '\0' ? '\uFFFD' : c);
 					break;
 				}
-			} while (TokenizerState == HtmlTokenizerState.ScriptDataEscapedDashDash);
+			} while (TokenizerState == HtmlTokenizerState.ScriptDataDoubleEscapedDashDash);
 
 			return null;
 		}
@@ -1609,6 +1763,7 @@ namespace HtmlKit {
 				TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscapeEnd;
 				ConsumeCharacter (c);
 				data.Append ('/');
+				name.Length = 0;
 			} else {
 				TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
 			}
@@ -1630,11 +1785,13 @@ namespace HtmlKit {
 						TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
 					ConsumeCharacter (c);
 					data.Append (c);
+					name.Length = 0;
 					break;
 				default:
 					if (!IsAsciiLetter (c)) {
 						// Note: EOF also hits this case.
 						TokenizerState = HtmlTokenizerState.ScriptDataDoubleEscaped;
+						name.Length = 0;
 					} else {
 						ConsumeCharacter (c);
 						name.Append (c);
@@ -1782,10 +1939,11 @@ namespace HtmlKit {
 					quote = c;
 					return null;
 				case '&':
+					// Note: This is the start of an unquoted attribute value. Make sure that a stale quote character
+					// (e.g. from an abruptly terminated DOCTYPE identifier) does not cause the character reference
+					// state to resume in the quoted attribute value state.
 					TokenizerState = HtmlTokenizerState.CharacterReferenceInAttributeValue;
-					return null;
-				case '/':
-					TokenizerState = HtmlTokenizerState.SelfClosingStartTag;
+					quote = '\0';
 					return null;
 				case '>':
 					return EmitTagToken ();
@@ -1794,6 +1952,7 @@ namespace HtmlKit {
 					goto default;
 				default:
 					TokenizerState = HtmlTokenizerState.AttributeValueUnquoted;
+					quote = '\0';
 					name.Append (c == '\0' ? '\uFFFD' : c);
 					return null;
 				}
@@ -1801,9 +1960,9 @@ namespace HtmlKit {
 		}
 
 #if NET8_0_OR_GREATER
-		static readonly SearchValues<char> AttributeValueDoubleQuotedSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\"' });
+		static readonly SearchValues<char> AttributeValueDoubleQuotedSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '"' });
 #else
-		static ReadOnlySpan<char> AttributeValueDoubleQuotedSpecials => new char[] { '\0', '\n', '&', '\"' };
+		static readonly char[] AttributeValueDoubleQuotedSpecials = new char[] { '\0', '\n', '&', '"' };
 #endif
 
 		// 8.2.4.38 Attribute value (double-quoted) state
@@ -1837,7 +1996,7 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.AttributeValueDoubleQuoted);
 
-			attribute!.Value = name.ToString ();
+			attribute!.Value = name.ToCachedString ();
 			name.Length = 0;
 
 			return null;
@@ -1846,7 +2005,7 @@ namespace HtmlKit {
 #if NET8_0_OR_GREATER
 		static readonly SearchValues<char> AttributeValueSingleQuotedSpecials = SearchValues.Create (new char[] { '\0', '\n', '&', '\'' });
 #else
-		static ReadOnlySpan<char> AttributeValueSingleQuotedSpecials => new char[] { '\0', '\n', '&', '\'' };
+		static readonly char[] AttributeValueSingleQuotedSpecials = new char[] { '\0', '\n', '&', '\'' };
 #endif
 
 		// 8.2.4.39 Attribute value (single-quoted) state
@@ -1880,7 +2039,7 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.AttributeValueSingleQuoted);
 
-			attribute!.Value = name.ToString ();
+			attribute!.Value = name.ToCachedString ();
 			name.Length = 0;
 
 			return null;
@@ -1908,7 +2067,7 @@ namespace HtmlKit {
 					TokenizerState = HtmlTokenizerState.CharacterReferenceInAttributeValue;
 					return null;
 				case '>':
-					attribute!.Value = name.ToString ();
+					attribute!.Value = name.ToCachedString ();
 					name.Length = 0;
 
 					return EmitTagToken ();
@@ -1921,7 +2080,7 @@ namespace HtmlKit {
 				}
 			} while (TokenizerState == HtmlTokenizerState.AttributeValueUnquoted);
 
-			attribute!.Value = name.ToString ();
+			attribute!.Value = name.ToCachedString ();
 			name.Length = 0;
 
 			return null;
@@ -1953,47 +2112,31 @@ namespace HtmlKit {
 
 				entity.Push ('&');
 
+				// Note: 'data' already contains the '&' and accumulates the raw text in case the tag is truncated.
 				while (entity.Push (c)) {
 					ConsumeCharacter (c);
+					data.Append (c);
 
 					if (c == ';')
 						break;
 
 					if (!TryPeek (out c)) {
 						TokenizerState = HtmlTokenizerState.EndOfFile;
-						data.Length--;
-						data.Append (entity.GetPushedInput ());
 						entity.Reset ();
 
 						return EmitDataToken (false, true);
 					}
 				}
 
-				var pushed = entity.GetPushedInput ();
-				string value;
-
-				if (c == '=' || IsAlphaNumeric (c))
-					value = pushed;
-				else
-					value = entity.GetValue ();
-
-				data.Length--;
-				data.Append (pushed);
-				name.Append (value);
+				name.Append (entity.GetAttributeValue (c));
 				entity.Reset ();
 				break;
 			}
 
 			switch (quote) {
-			case '"':
-				TokenizerState = HtmlTokenizerState.AttributeValueDoubleQuoted;
-				break;
-			case '\'':
-				TokenizerState = HtmlTokenizerState.AttributeValueSingleQuoted;
-				break;
-			default:
-				TokenizerState = HtmlTokenizerState.AttributeValueUnquoted;
-				break;
+			case '"': TokenizerState = HtmlTokenizerState.AttributeValueDoubleQuoted; break;
+			case '\'': TokenizerState = HtmlTokenizerState.AttributeValueSingleQuoted; break;
+			default: TokenizerState = HtmlTokenizerState.AttributeValueUnquoted; break;
 			}
 
 			return null;
@@ -2035,22 +2178,21 @@ namespace HtmlKit {
 		// 8.2.4.43 Self-closing start tag state
 		HtmlToken? ReadSelfClosingStartTag ()
 		{
-			if (!TryRead (out char c)) {
+			if (!TryPeek (out char c)) {
 				TokenizerState = HtmlTokenizerState.EndOfFile;
 				return EmitDataToken (false, true);
 			}
 
 			if (c == '>') {
+				ConsumeCharacter (c);
 				tag!.IsEmptyElement = true;
 
 				return EmitTagToken ();
 			}
 
-			// parse error
+			// unexpected-solidus-in-tag parse error: reconsume the current input character in the before attribute
+			// name state (e.g. "<img/onerror=...>" has an "onerror" attribute, not a "nerror" attribute).
 			TokenizerState = HtmlTokenizerState.BeforeAttributeName;
-
-			// Note: we save the data in case we hit a parse error and have to emit a data token
-			data.Append (c);
 
 			return null;
 		}
@@ -2082,10 +2224,8 @@ namespace HtmlKit {
 			char c = '\0';
 
 			while (count < 2) {
-				if (!TryPeek (out c)) {
-					TokenizerState = HtmlTokenizerState.EndOfFile;
-					return EmitDataToken (false, true);
-				}
+				if (!TryPeek (out c))
+					break;
 
 				if (c != '-')
 					break;
@@ -2105,6 +2245,10 @@ namespace HtmlKit {
 
 			if (count == 0) {
 				// Check for "<!DOCTYPE " or "<![CDATA["
+				//
+				// Note: Only the characters that match the keyword are consumed. If a character does not match, it is not
+				// consumed so that it gets reconsumed in the bogus comment state. This is important because the mismatched
+				// character might be the '>' that terminates the bogus comment (e.g. "<!DOC>").
 				if (c == 'D' || c == 'd') {
 					// Note: we save the data in case we hit a parse error and have to emit a data token
 					ConsumeCharacter (c);
@@ -2113,18 +2257,16 @@ namespace HtmlKit {
 					count = 1;
 
 					while (count < 7) {
-						if (!TryRead (out c)) {
-							TokenizerState = HtmlTokenizerState.EndOfFile;
-							return EmitDataToken (false, true);
-						}
-
-						// Note: we save the data in case we hit a parse error and have to emit a data token
-						data.Append (c);
-						name.Append (c);
+						if (!TryPeek (out c))
+							break;
 
 						if (ToLower (c) != DocType[count])
 							break;
 
+						// Note: we save the data in case we hit a parse error and have to emit a data token
+						ConsumeCharacter (c);
+						data.Append (c);
+						name.Append (c);
 						count++;
 					}
 
@@ -2143,21 +2285,20 @@ namespace HtmlKit {
 					count = 1;
 
 					while (count < 7) {
-						if (!TryRead (out c)) {
-							TokenizerState = HtmlTokenizerState.EndOfFile;
-							return EmitDataToken (false, true);
-						}
-
-						// Note: we save the data in case we hit a parse error and have to emit a data token
-						data.Append (c);
+						if (!TryPeek (out c))
+							break;
 
 						if (c != CData[count])
 							break;
 
+						// Note: we save the data in case we hit a parse error and have to emit a data token
+						ConsumeCharacter (c);
+						data.Append (c);
 						count++;
 					}
 
-					if (count == 7) {
+					// Note: CDATA sections are only allowed in SVG and MathML content. Elsewhere, "<![CDATA[" starts a bogus comment.
+					if (count == 7 && openElements.IsInForeignContent) {
 						TokenizerState = HtmlTokenizerState.CDataSection;
 						data.Length = 0;
 						return null;
@@ -2444,8 +2585,21 @@ namespace HtmlKit {
 
 				switch (c) {
 				case '\t': case '\r': case '\n': case '\f': case ' ':
+					if (name.Length > 0) {
+						// parse error: not "PUBLIC" or "SYSTEM"
+						TokenizerState = HtmlTokenizerState.BogusDocType;
+						doctype!.ForceQuirksMode = true;
+						name.Length = 0;
+						return null;
+					}
 					break;
 				case '>':
+					if (name.Length > 0) {
+						// parse error: not "PUBLIC" or "SYSTEM"
+						doctype!.ForceQuirksMode = true;
+						name.Length = 0;
+					}
+
 					TokenizerState = HtmlTokenizerState.Data;
 					return EmitDocType ();
 				default:
@@ -2461,6 +2615,7 @@ namespace HtmlKit {
 						doctype!.SystemKeyword = name.ToString ();
 					} else {
 						TokenizerState = HtmlTokenizerState.BogusDocType;
+						doctype!.ForceQuirksMode = true;
 					}
 
 					name.Length = 0;
@@ -2789,8 +2944,8 @@ namespace HtmlKit {
 		{
 			do {
 				if (!TryRead (out char c)) {
+					// Note: unlike most DOCTYPE states, EOF in the bogus DOCTYPE state does not set force-quirks.
 					TokenizerState = HtmlTokenizerState.EndOfFile;
-					doctype!.ForceQuirksMode = true;
 					return EmitDocType ();
 				}
 

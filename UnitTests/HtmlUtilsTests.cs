@@ -35,7 +35,7 @@ namespace UnitTests {
 		[Test]
 		public void TestArgumentExceptions ()
 		{
-			var writer = new StringWriter ();
+			using var writer = new StringWriter ();
 			const string text = "text";
 
 			// HtmlAttributeEncode
@@ -227,6 +227,17 @@ namespace UnitTests {
 		}
 
 		[Test]
+		public void TestEncodeNumericCharacterReferenceBoundaries ()
+		{
+			const string attributeValue = "\"&#160;&#255;&#256;&#65535;&#65536;&#1114111;\"";
+			const string encoded = "&#160;&#255;&#256;&#65535;&#65536;&#1114111;";
+			var text = "\u00A0\u00FF\u0100\uFFFF" + char.ConvertFromUtf32 (0x10000) + char.ConvertFromUtf32 (0x10FFFF);
+
+			AssertHtmlAttributeEncode (text, attributeValue);
+			AssertHtmlEncode (text, encoded, false);
+		}
+
+		[Test]
 		public void TestEncodeIllegalControlCharacters ()
 		{
 			const string attributeValue = "\"This contains some embedded control sequences ()\"";
@@ -242,6 +253,17 @@ namespace UnitTests {
 		{
 			const string encoded = "&lt;&pound;&euro;&cent;&yen;&nbsp;&copy;&reg;&gt;";
 			const string expected = "<£€¢¥\u00a0©®>";
+
+			var decoded = HtmlUtils.HtmlDecode (encoded);
+
+			Assert.That (decoded, Is.EqualTo (expected));
+		}
+
+		[Test]
+		public void TestHtmlDecodeNumericCharacterReferences ()
+		{
+			const string encoded = "&#65 &#x42;&#x110000;&#xD800;&#x96;&#1;&#;";
+			const string expected = "A B\uFFFD\uFFFD\u2013\u0001&#;";
 
 			var decoded = HtmlUtils.HtmlDecode (encoded);
 
